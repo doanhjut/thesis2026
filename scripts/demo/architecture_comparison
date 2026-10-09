@@ -1,0 +1,44 @@
+digraph ArchitectureComparison {
+	dpi=300 fontname=Arial rankdir=TB size="12,8"
+	node [fontname=Arial margin=0.2 shape=box style="filled, rounded"]
+	subgraph cluster_blackbox {
+		color="#d32f2f" fontname="Arial-Bold" fontsize=16 label="Hệ thống EDR Truyền thống (Black-Box)" style=dashed
+		A1 [label="Tệp thực thi (PE)" fillcolor="#f5f5f5"]
+		A2 [label="Mô hình ML Tĩnh" fillcolor="#e0e0e0"]
+		A3 [label="Giám sát Hành vi Động" fillcolor="#e0e0e0"]
+		A4 [label="Bộ tổng hợp (Hard-coded Rules)" fillcolor="#ffcccb" shape=diamond]
+		A5 [label="Quyết định: MALWARE" fillcolor="#ef5350" fontcolor=white]
+		A6 [label="⁉️ Không giải thích được:
+- Không rõ đặc trưng tĩnh
+- Không rõ lý do tổng hợp" fillcolor="#ffebee" fontcolor="#c62828" shape=note]
+		A1 -> A2
+		A1 -> A3
+		A2 -> A4
+		A3 -> A4
+		A4 -> A5
+		A5 -> A6 [style=dotted]
+	}
+	subgraph cluster_xai {
+		color="#2e7d32" fontname="Arial-Bold" fontsize=16 label="Hệ thống Đề xuất: Khung XAI Đa tầng" penwidth=2 style=solid
+		B1 [label="Tệp thực thi ngụy trang (PE)" fillcolor="#e3f2fd"]
+		B2 [label="Phân tích Tĩnh (LightGBM)" fillcolor="#bbdefb"]
+		B2_XAI [label="Giải thích cục bộ: TreeSHAP" fillcolor="#c8e6c9" shape=ellipse]
+		B3 [label="Giám sát Honeypot Watchdog" fillcolor="#bbdefb"]
+		B3_XAI [label="Triggers: Entropy, Đổi đuôi" fillcolor="#c8e6c9" shape=ellipse]
+		B4 [label="Tổng hợp Thích nghi (Adaptive Fusion)
+Tính toán trọng số dựa trên Độ tin cậy" fillcolor="#81c784" shape=diamond]
+		B5 [label="Quyết định: MALWARE" fillcolor="#ef5350" fontcolor=white]
+		B6 [label="✅ Giải thích Minh bạch Đa tầng:
+1. Báo cáo SHAP (Đặc trưng Tĩnh)
+2. Báo cáo Hành vi (Forensic Động)
+3. Lý do Fusion: Ghi đè do C_file thấp" fillcolor="#e8f5e9" fontcolor="#2e7d32" penwidth=2 shape=note]
+		B1 -> B2
+		B1 -> B3
+		B2 -> B2_XAI [dir=none style=dashed]
+		B3 -> B3_XAI [dir=none style=dashed]
+		B2 -> B4 [label=" C_file (Thấp)"]
+		B3 -> B4 [label=" P_dynamic (Cao)"]
+		B4 -> B5
+		B5 -> B6 [color="#2e7d32" penwidth=2]
+	}
+}

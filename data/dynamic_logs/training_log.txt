@@ -1,0 +1,4 @@
+Thời gian huấn luyện: 99.50 phút
+Số iteration tốt nhất: 4974
+Accuracy: 0.987845 | F1: 0.989810 | AUC: 0.998867
+Model path: D:\Code\WoDT\Digital-Twin-in-python\ransomware_lgbm_1M_final.txt

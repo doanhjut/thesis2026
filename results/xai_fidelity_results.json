@@ -1,0 +1,148 @@
+{
+  "experiment_time": "2026-03-19T10:36:48.404757",
+  "model": "..\\ransomware_lgbm_1M_final.txt",
+  "overall_fidelity": {
+    "feature_faithfulness": 0.49980790779191475,
+    "explanation_consistency": 0.9570039834152154,
+    "contrastive_fidelity": 0.49666666666666665,
+    "weights": {
+      "ff": 0.5,
+      "ec": 0.3,
+      "cf": 0.2
+    },
+    "overall_fidelity_score": 0.6363384822538554,
+    "grade": "HIGH \u2705 (Trustworthy)",
+    "faithfulness_ratio": 209.0323529411633
+  },
+  "feature_faithfulness": {
+    "10": {
+      "auc_original": 0.952232942908346,
+      "auc_masked": 0.9424723182283666,
+      "auc_drop": 0.009760624679979402,
+      "ff_score": 0.02158317927307119
+    },
+    "25": {
+      "auc_original": 0.952232942908346,
+      "auc_masked": 0.8756120391705069,
+      "auc_drop": 0.07662090373783914,
+      "ff_score": 0.1694279572936107
+    },
+    "50": {
+      "auc_original": 0.952232942908346,
+      "auc_masked": 0.7247903865847416,
+      "auc_drop": 0.22744255632360444,
+      "ff_score": 0.5029323048889435
+    },
+    "100": {
+      "auc_original": 0.952232942908346,
+      "auc_masked": 0.6679307475678444,
+      "auc_drop": 0.2843021953405016,
+      "ff_score": 0.6286631697198607
+    },
+    "random_control": {
+      "auc_drop": -0.0013600870455710012,
+      "ff_score": 0.0
+    },
+    "overall": 0.49980790779191475,
+    "redundancy_score": 0.9656681346822196,
+    "faithfulness_ratio": 209.0323529411633
+  },
+  "explanation_consistency": {
+    "0.01": {
+      "ec_score": 0.9702658734514276,
+      "ec_std": 0.08050743266772148,
+      "n_pairs": 2500
+    },
+    "0.05": {
+      "ec_score": 0.9253687763374966,
+      "ec_std": 0.11847973129920956,
+      "n_pairs": 2500
+    },
+    "0.1": {
+      "ec_score": 0.8876554972085312,
+      "ec_std": 0.13617746045805754,
+      "n_pairs": 2500
+    },
+    "overall": 0.9570039834152154
+  },
+  "contrastive_fidelity": {
+    "cf_score": 0.49666666666666665,
+    "cf_std": 0.19529180445909372,
+    "mean_diff_features": 72.04,
+    "mean_shap_in_diff": 9.933333333333334,
+    "n_pairs": 300,
+    "top_k": 20,
+    "overall": 0.49666666666666665
+  },
+  "multistage_analysis": {
+    "groups": {
+      "ByteHistogram": {
+        "feature_range": "[0:256]",
+        "n_features": 256,
+        "auc_drop": 0.021552897471617705,
+        "shap_concentration": 0.18965153417225503,
+        "alignment_score": 0.8328986844609939
+      },
+      "ByteEntropy": {
+        "feature_range": "[256:512]",
+        "n_features": 256,
+        "auc_drop": 0.01698931962658723,
+        "shap_concentration": 0.118035960129029,
+        "alignment_score": 0.8997395093879674
+      },
+      "StringFeatures": {
+        "feature_range": "[512:616]",
+        "n_features": 104,
+        "auc_drop": 0.013914909288882393,
+        "shap_concentration": 0.1540169996811674,
+        "alignment_score": 0.860541796746985
+      },
+      "GeneralFileInfo": {
+        "feature_range": "[616:622]",
+        "n_features": 6,
+        "auc_drop": -0.007221661782837785,
+        "shap_concentration": 0.018506786923870956,
+        "alignment_score": 0.9739373820184802
+      },
+      "PEHeader": {
+        "feature_range": "[622:738]",
+        "n_features": 116,
+        "auc_drop": -0.011641126643288313,
+        "shap_concentration": 0.1687623225536231,
+        "alignment_score": 0.8190578788235151
+      },
+      "PESections": {
+        "feature_range": "[738:1018]",
+        "n_features": 280,
+        "auc_drop": -0.013594658212038202,
+        "shap_concentration": 0.09553200445203852,
+        "alignment_score": 0.8902442692332302
+      },
+      "Imports": {
+        "feature_range": "[1018:1306]",
+        "n_features": 288,
+        "auc_drop": -0.005332180429456712,
+        "shap_concentration": 0.026846940226181025,
+        "alignment_score": 0.9675741423853554
+      },
+      "Exports": {
+        "feature_range": "[1306:1338]",
+        "n_features": 32,
+        "auc_drop": -0.0011849289843237631,
+        "shap_concentration": 0.003016537240933513,
+        "alignment_score": 0.9957437033394079
+      },
+      "DataDirectories": {
+        "feature_range": "[1338:2381]",
+        "n_features": 1043,
+        "auc_drop": 0.0708715633056316,
+        "shap_concentration": 0.2256309146209013,
+        "alignment_score": 0.8485201014792176
+      }
+    },
+    "best_group": "Exports",
+    "worst_group": "PEHeader",
+    "mean_alignment": 0.8986952742083503,
+    "baseline_auc": 0.9557733262878096
+  }
+}

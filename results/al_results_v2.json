@@ -1,0 +1,96 @@
+{
+  "experiment_time": "2026-03-18T14:57:06.627939",
+  "data_info": {
+    "n": 2000,
+    "n_seed": 200,
+    "malware_pct": 50.0
+  },
+  "config": {
+    "budget": 20,
+    "rounds": 8,
+    "n_trees": 30
+  },
+  "xai_history": [
+    {
+      "round": 1,
+      "n_labeled": 20,
+      "auc": 1.0,
+      "f1": 1.0
+    },
+    {
+      "round": 2,
+      "n_labeled": 40,
+      "auc": 1.0,
+      "f1": 1.0
+    },
+    {
+      "round": 3,
+      "n_labeled": 60,
+      "auc": 1.0,
+      "f1": 1.0
+    },
+    {
+      "round": 4,
+      "n_labeled": 80,
+      "auc": 1.0,
+      "f1": 1.0
+    }
+  ],
+  "random_history": [
+    {
+      "round": 1,
+      "n_labeled": 220,
+      "auc": 1.0,
+      "f1": 1.0
+    },
+    {
+      "round": 2,
+      "n_labeled": 240,
+      "auc": 1.0,
+      "f1": 1.0
+    },
+    {
+      "round": 3,
+      "n_labeled": 260,
+      "auc": 1.0,
+      "f1": 1.0
+    },
+    {
+      "round": 4,
+      "n_labeled": 280,
+      "auc": 1.0,
+      "f1": 1.0
+    },
+    {
+      "round": 5,
+      "n_labeled": 300,
+      "auc": 1.0,
+      "f1": 1.0
+    },
+    {
+      "round": 6,
+      "n_labeled": 320,
+      "auc": 1.0,
+      "f1": 1.0
+    },
+    {
+      "round": 7,
+      "n_labeled": 340,
+      "auc": 1.0,
+      "f1": 1.0
+    },
+    {
+      "round": 8,
+      "n_labeled": 360,
+      "auc": 1.0,
+      "f1": 1.0
+    }
+  ],
+  "comparison": {
+    "xai_final_auc": 1.0,
+    "random_final_auc": 1.0,
+    "xai_efficiency": 20,
+    "random_efficiency": 220,
+    "label_saving_pct": 90.9090909090909
+  }
+}

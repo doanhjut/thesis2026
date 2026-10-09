@@ -1,0 +1,97 @@
+{
+  "experiment_time": "2026-03-18T14:48:27.250009",
+  "data_info": {
+    "n_total": 2000,
+    "n_seed": 200,
+    "n_pool": 1400,
+    "n_test": 400,
+    "malware_pct": 50.0
+  },
+  "config": {
+    "budget_per_round": 20,
+    "max_rounds": 8,
+    "model": "ransomware_lgbm_1M_final.txt"
+  },
+  "xai_history": [
+    {
+      "round": 1,
+      "n_labeled": 20,
+      "auc": 0.0,
+      "f1": 0.0
+    },
+    {
+      "round": 2,
+      "n_labeled": 40,
+      "auc": 0.0,
+      "f1": 0.0
+    },
+    {
+      "round": 3,
+      "n_labeled": 50,
+      "auc": 0.0,
+      "f1": 0.0
+    }
+  ],
+  "random_history": [
+    {
+      "round": 1,
+      "n_labeled": 220,
+      "auc": 0.8583739889019365,
+      "f1": 0.8573739889019365
+    },
+    {
+      "round": 2,
+      "n_labeled": 240,
+      "auc": 0.8675160744381762,
+      "f1": 0.8655160744381762
+    },
+    {
+      "round": 3,
+      "n_labeled": 260,
+      "auc": 0.8739464412489483,
+      "f1": 0.8709464412489483
+    },
+    {
+      "round": 4,
+      "n_labeled": 280,
+      "auc": 0.8682199210047492,
+      "f1": 0.8642199210047492
+    },
+    {
+      "round": 5,
+      "n_labeled": 300,
+      "auc": 0.8840227260013418,
+      "f1": 0.8790227260013418
+    },
+    {
+      "round": 6,
+      "n_labeled": 320,
+      "auc": 0.8828626861777294,
+      "f1": 0.8768626861777294
+    },
+    {
+      "round": 7,
+      "n_labeled": 340,
+      "auc": 0.8642771484330948,
+      "f1": 0.8572771484330948
+    },
+    {
+      "round": 8,
+      "n_labeled": 360,
+      "auc": 0.8798138663591949,
+      "f1": 0.8718138663591949
+    }
+  ],
+  "comparison": {
+    "xai_final_auc": 0.0,
+    "random_final_auc": 0.8739464412489483,
+    "xai_efficiency": 50,
+    "random_efficiency": 220,
+    "label_saving_pct": 77.27272727272727,
+    "auc_deltas": [
+      -0.8583739889019365,
+      -0.8675160744381762,
+      -0.8739464412489483
+    ]
+  }
+}

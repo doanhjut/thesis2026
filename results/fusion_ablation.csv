@@ -1,0 +1,5 @@
+﻿Kich ban,AUC,FPR (%),Do tre trung binh (ms)
+1. Static Only (LightGBM),0.942,4.5,2.1
+2. Dynamic Only (Honeypot),0.9915,0.2,1205.4
+3. Simple Average (50/50),0.965,3.8,602.5
+4. Adaptive Fusion (PID),0.9818,0.8,15.2

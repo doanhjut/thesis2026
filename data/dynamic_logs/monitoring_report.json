@@ -1,0 +1,13 @@
+{
+  "generated": "2026-06-10T15:18:08.713727",
+  "statistics": {
+    "file_opened": 0,
+    "file_modified": 0,
+    "file_renamed": 0,
+    "file_deleted": 0,
+    "total_events": 0,
+    "monitoring_since": null
+  },
+  "recent_events": [],
+  "honeypots": 23
+}

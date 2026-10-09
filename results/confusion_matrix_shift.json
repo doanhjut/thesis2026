@@ -1,0 +1,26 @@
+{
+  "iteration_0": {
+    "TP": 915,
+    "FP": 135,
+    "TN": 2865,
+    "FN": 85,
+    "Accuracy": 0.945,
+    "Precision": 0.8714,
+    "Recall": 0.915
+  },
+  "iteration_5": {
+    "TP": 962,
+    "FP": 48,
+    "TN": 2952,
+    "FN": 38,
+    "Accuracy": 0.9785,
+    "Precision": 0.9525,
+    "Recall": 0.962
+  },
+  "improvement": {
+    "TP_gain": 47,
+    "FP_reduction": 87,
+    "FN_reduction": 47,
+    "TN_gain": 87
+  }
+}

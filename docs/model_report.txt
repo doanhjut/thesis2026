@@ -1,0 +1,37 @@
+LIGHTGBM MALWARE DETECTION - TRAINING REPORT
+================================================================================
+
+Dataset         : validation_dataset_small.csv
+Total samples   : 1,000,000
+Train samples   : 800,000 (80%)
+Valid samples   : 200,000 (20%)
+Best iteration  : 7
+Train AUC       : 0.554167
+Valid AUC       : 0.507445
+Train LogLoss   : 0.591356
+Valid LogLoss   : 0.592917
+
+Top 20 Important Features:
+--------------------------------------------------------------------------------
+771. 770                           : 1,399
+514. 513                           : 440
+617. 616                           : 308
+616. 615                           : 284
+776. 775                           : 283
+513. 512                           : 276
+627. 626                           : 236
+515. 514                           : 230
+826. 825                           : 198
+2357. 2356                          : 143
+2376. 2375                          : 140
+2353. 2352                          : 138
+2365. 2364                          : 127
+2355. 2354                          : 121
+613. 612                           : 121
+2352. 2351                          : 117
+808. 807                           : 113
+735. 734                           : 112
+2356. 2355                          : 109
+837. 836                           : 107
+
+Model saved at  : D:\Code\WoDT\Digital-Twin-in-python\model_lightgbm.pkl

@@ -1,0 +1,236 @@
+{
+  "base_path": "D:\\Code\\Luanvan\\data\\dynamic_logs\\honeypot",
+  "created": "2026-06-01T17:12:08.090730",
+  "honeypots": [
+    {
+      "path": "D:\\Code\\Luanvan\\data\\dynamic_logs\\honeypot\\Documents\\Personal\\passwords.txt",
+      "filename": "passwords.txt",
+      "folder": "Documents/Personal",
+      "size": 4302,
+      "original_entropy": 4.126427986338223,
+      "created": "2026-06-01T17:12:07.605500",
+      "last_modified": 1780308727.5716884,
+      "is_honeypot": true
+    },
+    {
+      "path": "D:\\Code\\Luanvan\\data\\dynamic_logs\\honeypot\\Documents\\Personal\\bank_accounts.xlsx",
+      "filename": "bank_accounts.xlsx",
+      "folder": "Documents/Personal",
+      "size": 20480,
+      "original_entropy": 2.0,
+      "created": "2026-06-01T17:12:07.622500",
+      "last_modified": 1780308727.6064985,
+      "is_honeypot": true
+    },
+    {
+      "path": "D:\\Code\\Luanvan\\data\\dynamic_logs\\honeypot\\Documents\\Personal\\credit_cards.docx",
+      "filename": "credit_cards.docx",
+      "folder": "Documents/Personal",
+      "size": 15360,
+      "original_entropy": 2.0,
+      "created": "2026-06-01T17:12:07.639498",
+      "last_modified": 1780308727.6234984,
+      "is_honeypot": true
+    },
+    {
+      "path": "D:\\Code\\Luanvan\\data\\dynamic_logs\\honeypot\\Documents\\Personal\\personal_info.pdf",
+      "filename": "personal_info.pdf",
+      "folder": "Documents/Personal",
+      "size": 30720,
+      "original_entropy": 2.0,
+      "created": "2026-06-01T17:12:07.656918",
+      "last_modified": 1780308727.6404984,
+      "is_honeypot": true
+    },
+    {
+      "path": "D:\\Code\\Luanvan\\data\\dynamic_logs\\honeypot\\Documents\\Personal\\tax_return_2024.pdf",
+      "filename": "tax_return_2024.pdf",
+      "folder": "Documents/Personal",
+      "size": 51200,
+      "original_entropy": 2.0,
+      "created": "2026-06-01T17:12:07.677290",
+      "last_modified": 1780308727.657918,
+      "is_honeypot": true
+    },
+    {
+      "path": "D:\\Code\\Luanvan\\data\\dynamic_logs\\honeypot\\Documents\\Work\\salary_info.xlsx",
+      "filename": "salary_info.xlsx",
+      "folder": "Documents/Work",
+      "size": 25600,
+      "original_entropy": 2.0,
+      "created": "2026-06-01T17:12:07.695291",
+      "last_modified": 1780308727.677291,
+      "is_honeypot": true
+    },
+    {
+      "path": "D:\\Code\\Luanvan\\data\\dynamic_logs\\honeypot\\Documents\\Work\\employee_data.csv",
+      "filename": "employee_data.csv",
+      "folder": "Documents/Work",
+      "size": 24850,
+      "original_entropy": 4.119459123186831,
+      "created": "2026-06-01T17:12:07.716109",
+      "last_modified": 1780308727.6962914,
+      "is_honeypot": true
+    },
+    {
+      "path": "D:\\Code\\Luanvan\\data\\dynamic_logs\\honeypot\\Documents\\Work\\contracts.docx",
+      "filename": "contracts.docx",
+      "folder": "Documents/Work",
+      "size": 40960,
+      "original_entropy": 2.0,
+      "created": "2026-06-01T17:12:07.737112",
+      "last_modified": 1780308727.7171085,
+      "is_honeypot": true
+    },
+    {
+      "path": "D:\\Code\\Luanvan\\data\\dynamic_logs\\honeypot\\Documents\\Work\\confidential_report.pdf",
+      "filename": "confidential_report.pdf",
+      "folder": "Documents/Work",
+      "size": 35840,
+      "original_entropy": 2.0,
+      "created": "2026-06-01T17:12:07.755993",
+      "last_modified": 1780308727.7381108,
+      "is_honeypot": true
+    },
+    {
+      "path": "D:\\Code\\Luanvan\\data\\dynamic_logs\\honeypot\\Documents\\Financial\\investment_portfolio.xlsx",
+      "filename": "investment_portfolio.xlsx",
+      "folder": "Documents/Financial",
+      "size": 46080,
+      "original_entropy": 2.0,
+      "created": "2026-06-01T17:12:07.776540",
+      "last_modified": 1780308727.7569933,
+      "is_honeypot": true
+    },
+    {
+      "path": "D:\\Code\\Luanvan\\data\\dynamic_logs\\honeypot\\Documents\\Financial\\crypto_wallets.txt",
+      "filename": "crypto_wallets.txt",
+      "folder": "Documents/Financial",
+      "size": 4088,
+      "original_entropy": 4.127458651653993,
+      "created": "2026-06-01T17:12:07.793539",
+      "last_modified": 1780308727.7775395,
+      "is_honeypot": true
+    },
+    {
+      "path": "D:\\Code\\Luanvan\\data\\dynamic_logs\\honeypot\\Documents\\Financial\\financial_statements.pdf",
+      "filename": "financial_statements.pdf",
+      "folder": "Documents/Financial",
+      "size": 61440,
+      "original_entropy": 2.0,
+      "created": "2026-06-01T17:12:07.815095",
+      "last_modified": 1780308727.794539,
+      "is_honeypot": true
+    },
+    {
+      "path": "D:\\Code\\Luanvan\\data\\dynamic_logs\\honeypot\\Pictures\\Family\\wedding_2023.jpg",
+      "filename": "wedding_2023.jpg",
+      "folder": "Pictures/Family",
+      "size": 102400,
+      "original_entropy": 2.0,
+      "created": "2026-06-01T17:12:07.841099",
+      "last_modified": 1780308727.8160954,
+      "is_honeypot": true
+    },
+    {
+      "path": "D:\\Code\\Luanvan\\data\\dynamic_logs\\honeypot\\Pictures\\Family\\baby_photos.jpg",
+      "filename": "baby_photos.jpg",
+      "folder": "Pictures/Family",
+      "size": 102400,
+      "original_entropy": 2.0,
+      "created": "2026-06-01T17:12:07.862818",
+      "last_modified": 1780308727.842097,
+      "is_honeypot": true
+    },
+    {
+      "path": "D:\\Code\\Luanvan\\data\\dynamic_logs\\honeypot\\Pictures\\Family\\vacation_memories.jpg",
+      "filename": "vacation_memories.jpg",
+      "folder": "Pictures/Family",
+      "size": 102400,
+      "original_entropy": 2.0,
+      "created": "2026-06-01T17:12:07.884819",
+      "last_modified": 1780308727.8638184,
+      "is_honeypot": true
+    },
+    {
+      "path": "D:\\Code\\Luanvan\\data\\dynamic_logs\\honeypot\\Backups\\Database\\database_backup.bak",
+      "filename": "database_backup.bak",
+      "folder": "Backups/Database",
+      "size": 204800,
+      "original_entropy": 2.0,
+      "created": "2026-06-01T17:12:07.911423",
+      "last_modified": 1780308727.8861742,
+      "is_honeypot": true
+    },
+    {
+      "path": "D:\\Code\\Luanvan\\data\\dynamic_logs\\honeypot\\Backups\\Database\\mysql_dump.sql",
+      "filename": "mysql_dump.sql",
+      "folder": "Backups/Database",
+      "size": 84674,
+      "original_entropy": 4.120872470749105,
+      "created": "2026-06-01T17:12:07.933453",
+      "last_modified": 1780308727.9134214,
+      "is_honeypot": true
+    },
+    {
+      "path": "D:\\Code\\Luanvan\\data\\dynamic_logs\\honeypot\\Backups\\Database\\backup_20240107.zip",
+      "filename": "backup_20240107.zip",
+      "folder": "Backups/Database",
+      "size": 204800,
+      "original_entropy": 2.0,
+      "created": "2026-06-01T17:12:07.974455",
+      "last_modified": 1780308727.9478145,
+      "is_honeypot": true
+    },
+    {
+      "path": "D:\\Code\\Luanvan\\data\\dynamic_logs\\honeypot\\Projects\\Source_Code\\important_project.zip",
+      "filename": "important_project.zip",
+      "folder": "Projects/Source_Code",
+      "size": 102400,
+      "original_entropy": 2.0,
+      "created": "2026-06-01T17:12:07.994896",
+      "last_modified": 1780308727.9744556,
+      "is_honeypot": true
+    },
+    {
+      "path": "D:\\Code\\Luanvan\\data\\dynamic_logs\\honeypot\\Projects\\Source_Code\\source_code.rar",
+      "filename": "source_code.rar",
+      "folder": "Projects/Source_Code",
+      "size": 102400,
+      "original_entropy": 2.0,
+      "created": "2026-06-01T17:12:08.018009",
+      "last_modified": 1780308727.9948967,
+      "is_honeypot": true
+    },
+    {
+      "path": "D:\\Code\\Luanvan\\data\\dynamic_logs\\honeypot\\Passwords\\master_passwords.kdbx",
+      "filename": "master_passwords.kdbx",
+      "folder": "Passwords",
+      "size": 10240,
+      "original_entropy": 2.0,
+      "created": "2026-06-01T17:12:08.054455",
+      "last_modified": 1780308728.036941,
+      "is_honeypot": true
+    },
+    {
+      "path": "D:\\Code\\Luanvan\\data\\dynamic_logs\\honeypot\\Passwords\\ssh_keys.txt",
+      "filename": "ssh_keys.txt",
+      "folder": "Passwords",
+      "size": 4578,
+      "original_entropy": 4.106154137573995,
+      "created": "2026-06-01T17:12:08.073396",
+      "last_modified": 1780308728.0549774,
+      "is_honeypot": true
+    },
+    {
+      "path": "D:\\Code\\Luanvan\\data\\dynamic_logs\\honeypot\\Passwords\\vpn_credentials.txt",
+      "filename": "vpn_credentials.txt",
+      "folder": "Passwords",
+      "size": 2536,
+      "original_entropy": 4.123020356465419,
+      "created": "2026-06-01T17:12:08.090730",
+      "last_modified": 1780308728.0744705,
+      "is_honeypot": true
+    }
+  ]
+}

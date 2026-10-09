@@ -1,0 +1,91 @@
+# Bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+
+# Secrets
+.env
+.env.*
+*.pem
+credentials.json
+secrets.json
+
+# Editors and local tooling
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+.codegraph/
+.cursor/
+
+# Unrelated local project
+doanh-trang/
+
+# Executables and real PE samples. Keep binaries on disk, never in git.
+*.exe
+*.dll
+*.scr
+*.sys
+*.msi
+data/sample_pe/*
+!data/sample_pe/.gitkeep
+
+# Local honeypot rename simulator (not part of the published source)
+scripts/demo/createRansomware.py
+
+# Raw and oversized datasets (GitHub file limit is 100 MB)
+data/archives/
+data/ember2018/
+data/processed/train_small.csv
+data/processed/validation_dataset_small.csv
+data/processed/train_10percent.csv
+data/processed/train_dataset_2M.csv
+*.npz
+*.npy
+*.zip
+*.7z
+*.tar
+*.tar.gz
+*.bz2
+*.rar
+*.dat
+*.jsonl
+*.parquet
+*.feather
+*.h5
+*.hdf5
+*.ckpt
+*.pt
+*.pth
+*.onnx
+
+# Experiment trackers
+wandb/
+mlruns/
+lightning_logs/
+outputs/
+
+# Browser saves, not thesis documents
+docs/*.htm
+
+# OS / logs that are regenerated
+*.log
+~$*

@@ -1,0 +1,43 @@
+
+CROSS-DATASET EVALUATION REPORT
+================================
+Date: 2026-01-06 11:20:17.721943
+
+MODEL INFORMATION:
+- Training dataset: SOREL-20M (subset 1M samples)
+- Model type: LightGBM
+- Features: 2381 (EMBER-v2 format)
+
+TEST DATASET:
+- Dataset: EMBER 2018 Test Set
+- Samples: 200,000
+- Malware: 100,000
+- Benign: 100,000
+
+PERFORMANCE METRICS:
+- Accuracy: 0.901715
+- F1-Score: 0.900865
+- AUC: 0.961850
+- Precision: 0.908725
+- Recall (TPR): 0.893140
+- False Positive Rate: 0.089710
+
+CONFUSION MATRIX:
+                Predicted
+              Benign  Malware
+Actual Benign   91,029    8,971
+       Malware  10,686    89,314
+
+GENERALIZATION ANALYSIS:
+- SOREL validation AUC: 0.998867
+- EMBER test AUC: 0.961850
+- Performance drop: 3.70%
+- Generalization score: 96.29%
+
+CONCLUSION:
+GOOD - Reasonable cross-dataset performance
+
+RECOMMENDATIONS:
+1. Continue with this model
+2. Investigate false positives
+3. Critical: Too many missed malware samples

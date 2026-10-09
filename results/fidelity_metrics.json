@@ -1,0 +1,14 @@
+{
+  "Faithfulness (FF)": 0.3328,
+  "Consistency (EC)": 0.3008,
+  "Contrastive (CF)": 0.523,
+  "OFS (Harmonic Mean)": 0.3612,
+  "metadata": {
+    "n_test_samples": 4000,
+    "n_features": 2381,
+    "max_features_masked": 20,
+    "dataset": "SOREL-20M",
+    "model": "LightGBM + TreeSHAP",
+    "timestamp": "2026-07-22T09:32:42.218879"
+  }
+}
