@@ -1,34 +1,25 @@
-# Slide báo cáo với GVHD — đóng góp và bằng chứng thực nghiệm
+# Báo cáo dự án — 9 trang
 
-Bản cập nhật 12/10/2026: **12 slide chính + 5 slide phụ lục**, có lời dẫn cho từng slide. Nội dung tập trung vào điểm khác biệt của ba đóng góp, số liệu đo và việc tiếp thu góp ý Seminar.
+Cập nhật 13/10/2026. Slide tập trung vào **nội dung dự án, ba đóng góp, bảng/biểu đồ kết quả và tiếp thu góp ý Seminar**. Ghi chú dữ liệu và các việc cần bổ sung được tách thành tài liệu riêng.
 
-- [Xem PDF trên GitHub](Dong_gop_va_bang_chung_thuc_nghiem_GVHD.pdf)
-- [Tải PowerPoint chỉnh sửa được](Dong_gop_va_bang_chung_thuc_nghiem_GVHD.pptx?raw=true)
-- [Tải ZIP đầy đủ — khoảng 16 MB](Bo_slide_GVHD.zip?raw=true)
+- **[Xem slide PDF](Dong_gop_va_bang_chung_thuc_nghiem_GVHD.pdf)**
+- **[Tải PowerPoint](Dong_gop_va_bang_chung_thuc_nghiem_GVHD.pptx?raw=true)**
+- **[Xem phiếu bổ sung thực nghiệm — PDF](Ke_hoach_bo_sung_thuc_nghiem.pdf)**
+- **[Sửa phiếu công việc — Word](Ke_hoach_bo_sung_thuc_nghiem.docx?raw=true)** · [Đọc trên GitHub](Ke_hoach_bo_sung_thuc_nghiem.md)
+- **[Tải ZIP gồm slide và tài liệu đi kèm](Bo_slide_GVHD.zip?raw=true)**
 
-ZIP có PowerPoint, PDF, lời dẫn, đánh giá các bảng cũ, kết quả bổ sung, mã chạy, cấu hình, split, seed, 150 checkpoint AL, dự đoán và log kiểm tra. Mã ứng dụng của repository không bị thay đổi.
+| Trang | Nội dung |
+|---|---|
+| 1 | Giới thiệu dự án |
+| 2 | Bài toán và điểm khác biệt |
+| 3 | Kiến trúc hệ thống |
+| 4 | PID Fusion và bảng so sánh trong luận văn |
+| 5 | Công thức XAI-Guided AL |
+| 6 | Đường học và bảng kết quả AL |
+| 7 | Biểu đồ kiểm tra SHAP và Fidelity |
+| 8 | Tiếp thu góp ý Seminar |
+| 9 | Tổng hợp đóng góp và kết quả |
 
-## Kết quả mới đã đo
+Phiếu đi kèm chỉ rõ: dữ liệu còn cần, thí nghiệm cần chạy, tệp hình/bảng cần tạo, vị trí thay trên slide và tiêu chí chấp nhận. Slide 4 dẫn số trong bản thảo; slide 6–7 dẫn kết quả pilot đã đo. Chi tiết đối soát nằm trong phiếu.
 
-AL dùng 1.200 mẫu train/pool, 400 validation, 400 test; 5 seed ghép cặp. Từ 200 nhãn ban đầu, thêm 5 vòng × 100 nhãn. Bảng tại **700 nhãn huấn luyện**, trung bình ± SD qua seed:
-
-| Phương pháp | ROC-AUC | AP | FPR | TPR |
-|---|---:|---:|---:|---:|
-| Random | 0,9634 ± 0,0063 | 0,9194 | 21,73% | 93,80% |
-| Uncertainty | 0,9691 ± 0,0046 | 0,9363 | 19,87% | 95,60% |
-| U + H | 0,9676 ± 0,0031 | 0,9371 | 17,20% | 93,00% |
-| U + V | 0,9692 ± 0,0062 | 0,9392 | 28,33% | 96,40% |
-| XAI đầy đủ | 0,9749 ± 0,0040 | 0,9442 | 17,53% | 95,40% |
-
-AUC của XAI cao hơn Uncertainty ở **5/5 seed**; chênh lệch ghép cặp **+0,005787 ± 0,003904**. FPR thấp hơn chỉ ở **2/5 seed**, chưa thể kết luận giảm FPR ổn định. Ngưỡng chọn trên validation với TPR ≥ 95%; TPR test thực đạt được báo trong bảng. 400 nhãn validation là tài nguyên bổ sung, chưa tính trong ngân sách huấn luyện.
-
-Fidelity dùng **mô hình riêng**, huấn luyện trên toàn bộ 1.200 mẫu, cùng test 400 mẫu. AUC trước che là **0,9802**. Tại k = 25, che top-SHAP cho **0,8185**, còn che ngẫu nhiên cùng k cho trung bình **0,9799** qua 20 lần lặp. Đây là kiểm tra tác động dưới phép masking đã chọn; không lấy AUC của hai pilot trừ nhau để suy ra hiệu quả AL.
-
-## Phạm vi kết luận
-
-- CSV trong repo có 2.000 mẫu và 2.381 đặc trưng; nguồn upstream, họ/thời gian và ý nghĩa nhãn riêng ransomware chưa xác minh. Pilot mới không xác nhận hồi tố các Bảng 4.5–4.9 của luận văn.
-- AL chưa chứng minh số nhãn hoặc thời gian chuyên gia tiết kiệm để đạt cùng mục tiêu. Năm seed dùng chung một tập test, không phải năm bộ dữ liệu độc lập.
-- Fidelity chỉ che vector đặc trưng bằng baseline train; chưa xác nhận tệp PE hợp lệ hay tính nhân quả. Chưa tổng hợp OFS vì định nghĩa và miền giá trị cần thống nhất.
-- PID chưa có điểm động thật ghép theo mẫu đủ để kiểm chứng mức cải thiện. Số cũ chỉ nằm trong phụ lục đối soát. Kế hoạch đo Fixed/P/PI/PID và bảng 2×2 PID × AL nằm trong ZIP; chưa điền số giả lập.
-
-PowerPoint/PDF đã được kiểm tra 17 trang, lời dẫn đầy đủ và số liệu khớp artifacts; ZIP đã kiểm tra giải nén và SHA-256 từng tệp. Bộ báo cáo dùng cho trao đổi khoa học với GVHD, không tự kết luận toàn bộ luận văn đủ điều kiện bảo vệ.
+Bản đầy đủ mã chạy, mô hình và dự đoán được giữ tại [gói thực nghiệm của commit 526a748](https://github.com/doanhjut/thesis2026/blob/526a748093447a02f680d808ed05a211fb23def3/docs/presentations/Bo_slide_GVHD.zip?raw=true). Không chạy lại hoặc thay đổi số đo khi rút gọn slide.
