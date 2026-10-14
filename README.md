@@ -1,144 +1,93 @@
-# Phát hiện Ransomware bằng XAI và Active Learning
+# Phát hiện ransomware bằng XAI và Active Learning
 
-Luận văn thạc sĩ. Hệ thống phân loại PE ransomware bằng LightGBM trên đặc trưng EMBER (2381 chiều), rồi giải thích quyết định bằng SHAP và chọn mẫu gắn nhãn theo độ bất định của lời giải thích.
+Kho mã nguồn luận văn dùng LightGBM trên vector đặc trưng EMBER, Active Learning có hướng dẫn bởi TreeSHAP và cơ chế dung hợp điểm tĩnh–động. Pipeline thực nghiệm dùng cho báo cáo nằm trong `src/experiments/`; mọi bảng và biểu đồ của một lần chạy được sinh từ dự đoán từng mẫu đã lưu, không chứa kết quả gán sẵn hay nhánh mô phỏng dự phòng.
 
-Ba đóng góp lõi nằm ở `src/`.
+## Phạm vi đã kiểm chứng
 
-## Đóng góp
+Ba câu hỏi được tách thành ba thí nghiệm độc lập:
 
-### 1. PID Fusion
+1. **XAI-Guided Active Learning:** so sánh `Random`, `Uncertainty`, `U+H`, `U+V` và `XAI_full` với cùng tập khởi tạo, ngân sách nhãn, validation và test. Mỗi vòng huấn luyện model mới; test không tham gia chọn mẫu, ngưỡng hay tham số.
+2. **Fidelity:** tính TreeSHAP gốc của LightGBM, kiểm tra tính cộng, rồi so sánh việc che top-k đặc trưng với nhiều mask ngẫu nhiên cùng kích thước. FF, EC và CF được báo cáo riêng; pipeline không tự tổng hợp OFS vì chưa có quy tắc chuẩn hóa và trọng số được kiểm định cho dữ liệu PE.
+3. **PID Fusion:** chỉ chạy khi có điểm động quan sát thật, báo cáo theo từng mẫu và metadata nguồn. Runner từ chối trace demo, dữ liệu khai là mô phỏng, thiếu báo cáo hoặc hash không khớp. So sánh static, dynamic, trung bình, trọng số cố định, P, PI và PID; kèm bảng nhân tố 2×2 giữa `Random/XAI_full` và `Fixed/PID`.
 
-`src/pid_fusion.py` dung hợp xác suất tĩnh `P_static` (LightGBM) và xác suất động `P_dynamic` (honeypot / sandbox).
-
-Sai số `e(t) = P_static - P_dynamic` đi qua bộ điều khiển PID với hệ số thực nghiệm `Kp = 0.85`, `Ki = 0.12`, `Kd = 0.35`. Trọng số tĩnh là sigmoid của tín hiệu điều khiển, được kẹp trong `(0.1, 0.9)`:
-
-```text
-P_fused = w_static * P_static + (1 - w_static) * P_dynamic
-```
-
-Mục tiêu là giữ độ trễ quyết định quanh 15 ms thay vì chờ toàn bộ quan sát động.
-
-### 2. XAI-Guided Active Learning
-
-`src/xai_active_learning.py` chọn mẫu cần gắn nhãn theo phương sai SHAP giữa các cây, không chỉ theo entropy hay margin của xác suất đầu ra. Mẫu mà lời giải thích không ổn định được ưu tiên, vì đó là vùng mô hình chưa giải thích được hành vi.
-
-### 3. Fidelity OFS
-
-`src/fidelity_framework.py` chấm độ trung thực của giải thích SHAP trên đặc trưng PE bằng Overall Fidelity Score (OFS). OFS là trung bình có trọng số của ba thước đo:
-
-- **Feature Faithfulness (FF):** xóa top-K đặc trưng mà SHAP cho là quan trọng thì AUC phải giảm.
-- **Explanation Consistency (EC):** nhiễu nhỏ trên đầu vào không được lật lời giải thích.
-- **Contrastive Fidelity (CF):** cặp malware và benign gần nhau phải được tách bằng đúng các đặc trưng phân biệt.
-
-Khung này xử lý đặc trưng PE tương quan với nhau, không xóa ngây thơ từng cột độc lập.
-
-## Cấu trúc
-
-```text
-data/sample_pe/       PE mẫu để trích đặc trưng (file .exe không được commit)
-data/processed/       CSV đặc trưng đã trích xuất
-data/dynamic_logs/    JSON, CSV và log honeypot
-data/archives/        NPZ / ZIP gốc, chỉ giữ trên máy local
-data/ember2018/       EMBER 2018 raw, chỉ giữ trên máy local
-models/               Trọng số LightGBM (.pkl và booster .txt)
-src/                  feature_extraction.py, pid_fusion.py,
-                      xai_active_learning.py, fidelity_framework.py
-scripts/              pipeline huấn luyện, thực nghiệm, mã EMBER kèm theo
-notebooks/            notebook EMBER
-dashboard/            giao diện Streamlit và honeypot monitor
-figures/              hình luận văn
-results/              số liệu và biểu đồ thực nghiệm
-```
-
-`scripts/ember/` là bản EMBER kèm các thí nghiệm của luận văn. Các file `pe_feature_extractor.py`, `active_learner.py` và `xai_fidelity.py` trong đó là lớp tương thích, trỏ về module canonical trong `src/`.
-
-Thư mục `doanh-trang/` không thuộc luận văn và được `.gitignore` loại khỏi remote.
+CSV hiện có trong Git cho phép chạy pilot nội bộ theo dòng dữ liệu. Nguồn tệp PE gốc, quan hệ họ malware, thời điểm thu thập và ý nghĩa ransomware cụ thể của nhãn chưa được xác minh trong kho. Vì vậy kết quả này chưa phải bằng chứng family-held-out, temporal/zero-day hoặc benchmark ransomware độc lập.
 
 ## Cài đặt
 
-Chạy mọi lệnh từ thư mục gốc của repo.
+Chạy từ thư mục gốc:
 
 ```bash
 python -m venv .venv
-```
-
-Windows (PowerShell):
-
-```powershell
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-pip install -e scripts/ember
-```
-
-Bash:
-
-```bash
 source .venv/bin/activate
 pip install -r requirements.txt
-pip install -e scripts/ember
 ```
 
-`pip install -e scripts/ember` cần cho `src/feature_extraction.py`, vì trình trích đặc trưng gọi gói `ember` và LIEF.
+Trên PowerShell, kích hoạt bằng `\.venv\Scripts\Activate.ps1`.
 
-## Chạy
+## Chạy và kiểm tra lại
 
-Ablation ba bài toán (PID fusion, active learning, fidelity) và ghi kết quả vào `results/`:
+Audit dữ liệu mà không huấn luyện:
 
 ```bash
-python scripts/run_experiments.py
+python scripts/run_experiments.py audit-data \
+  --data data/processed/real_mini_dataset.csv
 ```
 
-Demo trực tiếp: nạp `models/ransomware_lgbm_1M_final.txt`, chấm `data/processed/real_mini_dataset.csv`, chạy PID fusion và TreeSHAP, ghi log vào `data/dynamic_logs/`:
+Chạy cấu hình mặc định gồm AL và Fidelity. Thư mục output phải chưa tồn tại:
 
 ```bash
-python scripts/live_defense_demo.py
+python scripts/run_experiments.py run \
+  --data data/processed/real_mini_dataset.csv \
+  --output outputs/thesis_run
 ```
 
-Vẽ lại biểu đồ từ log thô:
+Đầu ra gồm config, split cố định, model/checkpoint, dự đoán từng mẫu, truy vấn AL, mask Fidelity, bảng CSV/LaTeX, biểu đồ PDF/PNG, báo cáo Markdown và SHA-256 của artifact. Kiểm tra độc lập bằng cách nạp lại model và tái tính dự đoán/chỉ số:
 
 ```bash
-python scripts/generate_thesis_charts.py
+python scripts/run_experiments.py verify --run outputs/thesis_run
 ```
 
-Active learning (demo ngắn) và fidelity:
+Có thể cấp split hoàn chỉnh bằng CSV gồm `row_id,split`, trong đó `split` nhận đúng ba giá trị `train_pool`, `validation`, `test`. Đây là cách nên dùng khi đã có split theo họ, thời gian hoặc nguồn dữ liệu.
+
+## Thu thập và chạy PID
+
+Tạo mẫu quan sát động khớp chính xác với các dòng validation/test của lần chạy AL:
 
 ```bash
-python src/xai_active_learning.py --mode demo
-python src/fidelity_framework.py --quick
+python scripts/run_experiments.py prepare-dynamic \
+  --al-run outputs/thesis_run/al \
+  --output outputs/thesis_run/dynamic_template
 ```
 
-Trích đặc trưng một file PE (file mẫu đặt trong `data/sample_pe/`, không commit):
+Điền `dynamic_measurements.csv`, lưu báo cáo quan sát riêng cho từng mẫu trong thư mục này và hoàn thiện `provenance.json`. Sau khi cập nhật `measurements_sha256`, chạy:
 
 ```bash
-python src/feature_extraction.py data/sample_pe/sample.exe
+python scripts/run_experiments.py fusion \
+  --al-run outputs/thesis_run/al \
+  --dynamic-data outputs/thesis_run/dynamic_template/dynamic_measurements.csv \
+  --provenance outputs/thesis_run/dynamic_template/provenance.json \
+  --output outputs/thesis_fusion
 ```
 
-Giao diện giải thích:
+Điểm động phải được tạo bằng quy tắc cố định không đọc nhãn đích. `sequence_id` và `sequence_order` phải phản ánh phiên quan sát thật; trạng thái PID được reset giữa các phiên và giữa validation/test. Thời gian runner báo cáo chỉ là thời gian replay phép dung hợp, không phải độ trễ sandbox, model hay I/O đầu cuối.
 
-```bash
-streamlit run dashboard/xai_dashboard.py
+## Công thức được cài đặt
+
+Ở bước quan sát rời rạc `k`:
+
+```text
+e[k]        = P_static[k] - P_dynamic[k]
+u[k]        = Kp e[k] + Ki Σ(i=0..k)e[i] + Kd(e[k] - e[k-1])
+w_static[k] = clip(sigmoid(u[k]), 0.1, 0.9)
+P_fused[k]  = w_static[k] P_static[k] + (1-w_static[k]) P_dynamic[k]
 ```
 
-Huấn luyện lại LightGBM trên CSV đã xử lý (file lớn, chỉ có local):
+Các hệ số mặc định `Kp=0.85`, `Ki=0.12`, `Kd=0.35` chỉ là cấu hình cần đối chứng. Pipeline chọn cấu hình trên validation và đánh giá một lần trên test. Công thức hiện là PID theo bước quan sát, chưa có `Δt` hay anti-windup; không tự tạo cam kết độ trễ.
 
-```bash
-python scripts/train_lightgbm_optimized.py
-```
+Active Learning dùng `U = 1 - 2|p-0.5|`. Từ SHAP có dấu `φ`, đặt tổng phần dương `A+`, độ lớn phần âm `A-`, `q=A+/(A++A-)`, rồi tính entropy nhị phân `H(q)` và `V=Var_j(φ_j)`. Từng tín hiệu được min-max trên pool tại vòng hiện tại trước khi ghép theo trọng số khai báo trong `src/experiments/signals.py`.
 
-## Dữ liệu không nằm trên Git
+## Mã legacy và demo
 
-Các file sau vượt giới hạn GitHub hoặc là bộ dữ liệu thô. Chúng vẫn ở trên máy, và `.gitignore` đã loại chúng:
+`scripts/live_defense_demo.py`, `scripts/defense_demo.py`, `src/xai_active_learning.py` và `src/fidelity_framework.py` là mã nguyên mẫu cũ. Một số đường chạy trong đó sinh tín hiệu bằng RNG hoặc dùng công thức đánh giá cũ; không dùng các tệp này để tạo số liệu luận văn. Lệnh thực nghiệm chuẩn là `scripts/run_experiments.py`.
 
-| Đường dẫn | Vai trò |
-| --- | --- |
-| `data/archives/train-features.npz` | Đặc trưng train gốc |
-| `data/archives/test-features.npz` | Tập test held-out |
-| `data/archives/validation-features.npz` | Tập validation |
-| `data/processed/train_small.csv` | Mẫu rút từ NPZ train |
-| `data/processed/validation_dataset_small.csv` | CSV validation |
-| `data/processed/train_10percent.csv` | 10% dùng cho thí nghiệm nhanh |
-| `data/ember2018/` | EMBER 2018 (JSONL và ma trận `.dat`) |
-
-Được commit: `data/processed/mini_sorel_features.csv`, `data/processed/real_mini_dataset.csv`, và trọng số trong `models/`.
-
-Đặt PE cần phân tích vào `data/sample_pe/`. Mọi `*.exe` và `*.dll` bị bỏ qua khi `git add`.
+Các file PE thô, archive lớn và EMBER raw được `.gitignore` loại khỏi Git. Trình trích đặc trưng riêng lẻ vẫn có thể chạy qua `src/feature_extraction.py` khi đã cài `lief` và đặt mẫu được phép phân tích trong `data/sample_pe/`.
