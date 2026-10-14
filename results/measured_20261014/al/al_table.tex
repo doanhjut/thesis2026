@@ -1,0 +1,17 @@
+% Generated from measured artifacts; requires booktabs.
+\begin{table}[htbp]
+\centering
+\small
+\caption{Equal training budget: 700 labels; mean and seed sample SD.}
+\begin{tabular}{lrrrr}
+\toprule
+Strategy & ROC-AUC & AP & FPR (\%) & TPR (\%) \\
+\midrule
+Random & 0.9634 $\pm$ 0.0063 & 0.9194 $\pm$ 0.0115 & 21.73 $\pm$ 4.59 & 93.80 $\pm$ 2.28 \\
+Uncertainty & 0.9691 $\pm$ 0.0046 & 0.9363 $\pm$ 0.0076 & 19.87 $\pm$ 4.65 & 95.60 $\pm$ 1.14 \\
+U+H & 0.9676 $\pm$ 0.0031 & 0.9371 $\pm$ 0.0015 & 17.20 $\pm$ 5.15 & 93.00 $\pm$ 2.35 \\
+U+V & 0.9692 $\pm$ 0.0062 & 0.9392 $\pm$ 0.0073 & 28.33 $\pm$ 7.23 & 96.40 $\pm$ 3.05 \\
+XAI\_full & 0.9749 $\pm$ 0.0040 & 0.9442 $\pm$ 0.0057 & 17.53 $\pm$ 4.85 & 95.40 $\pm$ 1.52 \\
+\bottomrule
+\end{tabular}
+\end{table}

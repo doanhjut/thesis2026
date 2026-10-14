@@ -1,0 +1,78 @@
+{
+  "status": "measured",
+  "evaluation_rows": 400,
+  "baseline_test_roc_auc": 0.9801666666666666,
+  "baseline_test_average_precision": 0.9553380178484554,
+  "max_shap_additivity_error": 7.105427357601002e-15,
+  "deletion_comparisons": [
+    {
+      "k": 10,
+      "auc_before": 0.9801666666666666,
+      "top_shap_auc_after": 0.9139333333333333,
+      "top_shap_auc_drop": 0.06623333333333337,
+      "top_shap_auc_drop_bootstrap_test_ci95": [
+        0.03904416666666659,
+        0.09702583333333321
+      ],
+      "random_auc_after_mean": 0.9798666666666666,
+      "random_auc_drop_mean": 0.00029999999999997807,
+      "random_auc_drop_sd_across_masks": 0.000941753993777184,
+      "top_shap_ff_raw": 1.0394040633947021,
+      "top_shap_mean_absolute_probability_change": 0.1744114468777009,
+      "random_mean_absolute_probability_change": 0.002570609997552407
+    },
+    {
+      "k": 25,
+      "auc_before": 0.9801666666666666,
+      "top_shap_auc_after": 0.8185333333333333,
+      "top_shap_auc_drop": 0.1616333333333333,
+      "top_shap_auc_drop_bootstrap_test_ci95": [
+        0.12223249999999991,
+        0.20775249999999984
+      ],
+      "random_auc_after_mean": 0.9799100000000001,
+      "random_auc_drop_mean": 0.00025666666666664394,
+      "random_auc_drop_sd_across_masks": 0.0012789387047573342,
+      "top_shap_ff_raw": 2.0045177992450762,
+      "top_shap_mean_absolute_probability_change": 0.2018620927591442,
+      "random_mean_absolute_probability_change": 0.0050918275367737515
+    },
+    {
+      "k": 50,
+      "auc_before": 0.9801666666666666,
+      "top_shap_auc_after": 0.6712,
+      "top_shap_auc_drop": 0.3089666666666666,
+      "top_shap_auc_drop_bootstrap_test_ci95": [
+        0.25342833333333326,
+        0.3739683333333333
+      ],
+      "random_auc_after_mean": 0.9792633333333335,
+      "random_auc_drop_mean": 0.0009033333333333116,
+      "random_auc_drop_sd_across_masks": 0.0013240421893951243,
+      "top_shap_ff_raw": 2.1483055636822423,
+      "top_shap_mean_absolute_probability_change": 0.21225366568018614,
+      "random_mean_absolute_probability_change": 0.010177448281832998
+    }
+  ],
+  "ec": 0.304372514036267,
+  "ec_reason": null,
+  "ec_pair_count": 79800,
+  "cf": 0.5873515795897664,
+  "cf_numerator": 1.3373522292299567,
+  "cf_denominator_max_sample_shap_norm": 2.2769194392282697,
+  "ofs": null,
+  "ofs_reason": "No validated common-scale aggregation rule; report components separately.",
+  "limitations": [
+    "The CSV source, original file identities and ransomware-specific label semantics are not verified. Row-disjoint measurements are an internal pilot, not a verified ransomware, family-held-out or zero-day benchmark.",
+    "One fitted model; test bootstrap is conditional on that model.",
+    "Masking is not a validated transformation of executable PE files.",
+    "EC pairs share samples; no naive independent-pair p-value.",
+    "CF describes class separation, not causality or explanation correctness."
+  ],
+  "timings": {
+    "train_seconds": 0.6889010390150361,
+    "native_shap_seconds": 0.013702013995498419,
+    "mask_prediction_seconds": 0.4165978980017826,
+    "total_seconds": 2.845892407989595
+  }
+}

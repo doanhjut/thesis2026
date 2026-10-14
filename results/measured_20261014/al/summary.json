@@ -1,0 +1,132 @@
+{
+  "status": "measured",
+  "scope": [
+    "The CSV source, original file identities and ransomware-specific label semantics are not verified. Row-disjoint measurements are an internal pilot, not a verified ransomware, family-held-out or zero-day benchmark."
+  ],
+  "n_seeds": 5,
+  "final_training_labels": 700,
+  "additional_validation_labels": 400,
+  "final": {
+    "Random": {
+      "auc": {
+        "mean": 0.9633999999999998,
+        "sd": 0.00626786336091583,
+        "n": 5
+      },
+      "ap": {
+        "mean": 0.9193914080459142,
+        "sd": 0.011476775146232712,
+        "n": 5
+      },
+      "fpr": {
+        "mean": 0.21733333333333332,
+        "sd": 0.045910541031203046,
+        "n": 5
+      },
+      "tpr": {
+        "mean": 0.9380000000000001,
+        "sd": 0.022803508501982733,
+        "n": 5
+      }
+    },
+    "U+H": {
+      "auc": {
+        "mean": 0.9676066666666667,
+        "sd": 0.003056359490199624,
+        "n": 5
+      },
+      "ap": {
+        "mean": 0.9370713132759707,
+        "sd": 0.0014972000331606602,
+        "n": 5
+      },
+      "fpr": {
+        "mean": 0.172,
+        "sd": 0.05151051672555162,
+        "n": 5
+      },
+      "tpr": {
+        "mean": 0.93,
+        "sd": 0.02345207879911711,
+        "n": 5
+      }
+    },
+    "U+V": {
+      "auc": {
+        "mean": 0.9692133333333335,
+        "sd": 0.0061540230743798805,
+        "n": 5
+      },
+      "ap": {
+        "mean": 0.9391904760367751,
+        "sd": 0.007347285748915234,
+        "n": 5
+      },
+      "fpr": {
+        "mean": 0.2833333333333333,
+        "sd": 0.07234178138070235,
+        "n": 5
+      },
+      "tpr": {
+        "mean": 0.9640000000000001,
+        "sd": 0.03049590136395379,
+        "n": 5
+      }
+    },
+    "Uncertainty": {
+      "auc": {
+        "mean": 0.9690866666666667,
+        "sd": 0.004634628116448791,
+        "n": 5
+      },
+      "ap": {
+        "mean": 0.9363013998014639,
+        "sd": 0.007607088457915169,
+        "n": 5
+      },
+      "fpr": {
+        "mean": 0.19866666666666666,
+        "sd": 0.046463844964540854,
+        "n": 5
+      },
+      "tpr": {
+        "mean": 0.9559999999999998,
+        "sd": 0.01140175425099139,
+        "n": 5
+      }
+    },
+    "XAI_full": {
+      "auc": {
+        "mean": 0.9748733333333334,
+        "sd": 0.003980675542891929,
+        "n": 5
+      },
+      "ap": {
+        "mean": 0.9442159205848902,
+        "sd": 0.00565240820853207,
+        "n": 5
+      },
+      "fpr": {
+        "mean": 0.1753333333333333,
+        "sd": 0.04845387268090939,
+        "n": 5
+      },
+      "tpr": {
+        "mean": 0.954,
+        "sd": 0.01516575088810307,
+        "n": 5
+      }
+    }
+  },
+  "counts": {
+    "models": 150,
+    "queries": 12500,
+    "prediction_records": 120000
+  },
+  "max_shap_additivity_error": 4.440892098500626e-15,
+  "elapsed_seconds": 49.907001860032324,
+  "limitations": [
+    "Seeds share one test set; SD is not a population confidence interval.",
+    "No conclusion about labels/time saved unless that quantity is separately measured."
+  ]
+}
