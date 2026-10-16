@@ -1,0 +1,68 @@
+\documentclass{IEEEtran}
+
+\usepackage{amsmath}
+\usepackage{cite}
+\usepackage{url}
+
+\title{A Multi-Stage Analysis Ransomware Detection System\protect\\
+Integrating Active Learning and XAI Fidelity Verification}
+
+\author{Luu Van Doanh}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Ransomware detection must balance early intervention against the limited evidence available before a suspicious program executes. Static machine-learning detectors provide rapid decisions but remain vulnerable to packing, obfuscation, and distribution shift, whereas dynamic analysis exposes behavior at the cost of observation delay and evasion by dormant execution. Moreover, high-performing detectors are commonly deployed as opaque classifiers, while obtaining labels for emerging or ambiguous samples is expensive. This paper presents a multi-stage framework that connects three complementary mechanisms: adaptive proportional--integral--derivative (PID) fusion of static LightGBM scores and dynamic behavioral evidence; an explanation-guided active-learning policy that combines predictive uncertainty, TreeSHAP directional entropy, and SHAP variance; and a feature-space fidelity framework that evaluates faithfulness, consistency, and contrastive separation using a training-derived replacement baseline. In a verified row-disjoint pilot with unverified upstream sample provenance, the full active-learning policy achieved a mean ROC--AUC of 0.9749 under a 700-label training budget, compared with 0.9691 for uncertainty sampling and 0.9634 for random sampling. For a separately fitted fidelity model, replacing the 25 features with the largest absolute SHAP values reduced ROC--AUC from 0.9802 to 0.8185, whereas equal-budget random replacement retained an average ROC--AUC of 0.9799. These results support explanation-guided sample prioritization and the behavioral faithfulness of the reported SHAP ranking within the evaluated feature space. The PID component is specified with a provenance-aware evaluation protocol; its operational benefit remains to be established using aligned, independently observed dynamic traces.
+\end{abstract}
+
+\begin{IEEEkeywords}
+ransomware detection, static analysis, dynamic analysis, active learning, explainable artificial intelligence, TreeSHAP, explanation fidelity, PID fusion, LightGBM
+\end{IEEEkeywords}
+
+\section{Introduction}
+\label{sec:introduction}
+
+Ransomware compresses the defender's decision window. A detector must identify a malicious program early enough to prevent encryption and lateral impact, yet much of the most discriminative evidence appears only after execution. Static analysis can score a portable executable (PE) before it runs and is therefore attractive for low-latency screening. Modern static detectors learn from byte distributions, header fields, imports, sections, and related PE attributes, and gradient-boosted trees remain strong tabular baselines on EMBER-style representations \cite{anderson2018ember,harang2020sorel}. Their speed, however, does not eliminate brittleness under packing, obfuscation, previously unseen variants, or shifts in the data-generating process. Dynamic analysis observes file-system, process, registry, and network activity and can reveal intent that static structure conceals \cite{kharraz2015cutting,sgandurra2016automated}. It introduces a different failure mode: meaningful behavior may emerge only after an expensive observation interval, and sleep-based or environment-aware malware may deliberately postpone it.
+
+Combining the two evidence sources is therefore appealing, but a fixed average assumes that their reliability is constant. That assumption is difficult to justify when behavioral evidence arrives sequentially and its informativeness changes over time. At the same time, the static detector itself presents two practical obstacles. First, a confident score does not explain which PE attributes drove the decision or whether an explanation reflects the model's actual behavior. Second, retraining against new campaigns requires expert labels, which are costly precisely for the packed, ambiguous, or ``grey-zone'' samples that are most informative. A useful system must consequently decide not only \emph{what} class to predict, but also \emph{when} to invoke dynamic evidence, \emph{which} samples deserve labels, and \emph{whether} its explanations survive quantitative scrutiny.
+
+This work addresses these coupled questions through a multi-stage design centered on a LightGBM static classifier, selectively acquired behavioral evidence, TreeSHAP explanations, and reproducible evaluation artifacts. The scientific problem is to improve evidence allocation without conflating three distinct claims: classification performance, label-selection efficiency, and explanation fidelity. We therefore evaluate active learning and fidelity with separate controls and reserve claims about adaptive fusion for data in which static and dynamic scores can be traced to the same samples and observation sessions. This distinction is especially important for security evaluation, where attractive aggregate metrics can conceal incomparable thresholds, unverified labels, or synthetic behavioral signals.
+
+The principal contributions are as follows:
+
+\begin{itemize}
+    \item \textbf{A provenance-aware adaptive fusion design.} We formulate a PID controller that updates the relative contribution of static and dynamic scores from their sequential discrepancy. The accompanying protocol requires paired observations, session-level state reset, validation-only gain and threshold selection, and comparison with static-only, dynamic-only, averaging, fixed-weight, P, and PI baselines. The currently verified artifact does not contain aligned real dynamic observations; accordingly, previously drafted PID accuracy and latency values are treated as hypotheses rather than paper results.
+
+    \item \textbf{An XAI-guided active-learning policy.} The query rule combines normalized predictive uncertainty with the directional balance and dispersion of signed TreeSHAP attributions. Under identical initial sets, query budgets, splits, and five random seeds, the complete policy reached $0.9749\pm0.0040$ ROC--AUC with 700 training labels. It exceeded uncertainty sampling in all five paired seeds for ROC--AUC, although its false-positive rate was lower in only two seeds. The result supports improved sample prioritization; it does not by itself measure analyst time or monetary savings.
+
+    \item \textbf{A controlled PE-feature fidelity assessment.} We replace selected feature coordinates with arithmetic means estimated exclusively from the training partition, and compare top-$|\mathrm{SHAP}|$ deletion with 20 equal-budget random masks. At $k=25$, the top-SHAP AUC drop was 0.1616, approximately 630 times the mean random drop of 0.000257. Faithfulness, explanation consistency, and contrastive separation are reported separately because no validated common-scale aggregation exists for an Overall Fidelity Score (OFS). The test establishes model-behavior fidelity in feature space, not the validity of a corresponding executable after masking.
+\end{itemize}
+
+The remainder of this paper is organized as follows. Section~III describes the multi-stage architecture, PID-based fusion, the explanation-guided query function, and the fidelity measures. Section~IV presents the experimental protocol and reproducibility controls. Section~V reports the active-learning and fidelity results and defines the evidence required for a valid fusion study. Section~VI concludes the paper and outlines data-provenance, dynamic-observation, and external-validation priorities.
+
+\section{Related Work}
+\label{sec:related-work}
+
+\subsection{Static and Dynamic Malware Detection}
+
+Static malware detectors infer maliciousness without executing a sample. Earlier systems relied on signatures and manually designed structural indicators; subsequent work learned directly from PE metadata, byte sequences, or vectorized feature families \cite{saxe2015deep,raff2018malware}. EMBER established a reproducible feature representation and benchmark for static PE classification \cite{anderson2018ember}, while SOREL-20M demonstrated the scale at which weakly supervised malware models can be studied \cite{harang2020sorel}. These resources enabled efficient model development, but strong in-distribution discrimination does not guarantee robustness to packing, concept drift, family shift, or novel ransomware behavior.
+
+Dynamic approaches execute or monitor suspicious programs and derive evidence from system calls, file operations, process creation, registry modification, and network activity. Such evidence can expose behavior that static representations obscure, and it is particularly relevant to ransomware because destructive intent manifests through sequences of resource access and modification \cite{kharraz2015cutting,sgandurra2016automated}. Sandboxing is nevertheless costly and susceptible to environmental checks, delayed execution, and sleep evasion. Hybrid systems seek to combine early static evidence with richer runtime observations, but commonly reported fixed rules or monolithic feature concatenation provide limited control over how confidence should change as dynamic evidence arrives. They also make latency claims difficult to interpret unless signal collection, inference, fusion, and end-to-end response time are measured separately.
+
+\subsection{Explainable Artificial Intelligence in Security}
+
+Post-hoc explanation methods assign relevance to input variables after a model has been trained. SHAP provides a game-theoretic attribution framework, and TreeSHAP computes exact or efficient Shapley-value explanations for tree ensembles \cite{lundberg2017unified,lundberg2020local}. In malware analysis, attribution maps can help analysts inspect which structural attributes influenced a decision. Security explanations, however, operate in a domain with correlated, constrained, and sometimes manipulable inputs. A visually plausible ranking is not evidence that the identified features govern the classifier, and perturbing isolated coordinates can create vectors that do not correspond to valid executables. Prior security-oriented evaluations have likewise shown that explanation quality must be tested rather than inferred from presentation quality \cite{warnecke2020evaluating}.
+
+The gap addressed by the present fidelity component is methodological: an explanation should be accompanied by controlled interventions, comparable random baselines, and explicit limits on what the intervention represents. Our evaluation therefore derives replacement values from the training partition, keeps the masking budget equal across SHAP-guided and random controls, verifies SHAP additivity, and reports faithfulness, consistency, and contrastive geometry separately. It avoids interpreting feature-space deletion as a semantics-preserving transformation of a PE file.
+
+\subsection{Active Learning for Malware Analysis}
+
+Pool-based active learning reduces annotation demand by repeatedly selecting unlabeled observations according to an acquisition function, obtaining oracle labels, and retraining the model \cite{settles2009active}. Uncertainty sampling is attractive because it is simple and model-agnostic, but its score only reflects proximity to the current decision boundary. In malware settings, boundary uncertainty may be caused by noise or class overlap, while confidently predicted samples can still rely on unstable or internally conflicting evidence. Diversity and representation-based selection alleviate some redundancy, yet they do not directly capture uncertainty in the model's explanation.
+
+Explanation-guided acquisition uses attribution structure as an additional view of model uncertainty. The approach studied here distinguishes predictive ambiguity from two properties of signed TreeSHAP values: directional entropy, which quantifies balance between evidence for and against the positive class, and SHAP variance, which captures dispersion across feature contributions. The resulting policy is evaluated against random sampling, predictive uncertainty alone, and partial ablations under a common label budget. This controlled comparison isolates the added value of explanation-derived signals while avoiding an unsupported conversion from classification quality to analyst-hours saved.
+
+% Bibliographic entries for the citation keys used above will be added in Phase 4.
+
+\end{document}
