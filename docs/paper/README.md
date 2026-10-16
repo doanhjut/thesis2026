@@ -8,6 +8,8 @@ and XAI Fidelity Verification."
 
 - `phase1.tex`: Phase 1 manuscript source (title, abstract, keywords,
   Introduction, and Related Work).
+- `PAPER_DEVELOPMENT_PLAN.md`: roadmap for the 20--26 page master manuscript,
+  evidence gates, figures, tables, and submission-quality review.
 - `references.bib`: bibliography placeholder to be completed in Phase 4.
 - `releases/ransomware-paper-ieee-phase1.zip`: importable Overleaf/LaTeX project.
 
