@@ -54,6 +54,7 @@ Chạy:
 python scripts/run_experiments.py recover-sorel-metadata `
   --manifest "outputs\recovered_manifest_sorel_test\row_manifest.csv" `
   --source-inspection "outputs\recovered_manifest_sorel_test\source_inspection.json" `
+  --source "D:\Code\Luanvan\data\archives\test-features.npz" `
   --meta-db "D:\Code\Luanvan\data\sorel20m\meta.db" `
   --missing-shas "D:\Code\Luanvan\data\sorel20m\shas_missing_ember_features.json" `
   --output "outputs\recovered_sorel_metadata"
@@ -76,6 +77,12 @@ Lượt căn chỉnh phát lại đúng projection của builder SOREL:
 các cột timestamp/tag có thể làm SQLite chọn index khác và đổi thứ tự toàn bộ
 dòng. Sau khi căn chỉnh đạt, runner mới truy vấn metadata đầy đủ theo 2.000
 SHA-256 ở lượt riêng. Audit lưu cả query plan và định nghĩa index để kiểm tra lại.
+
+Vì builder upstream không có `ORDER BY`, bản SQLite/PyTorch dùng để tạo NPZ có
+thể đã đi theo access path khác. Khi có `--source`, runner chỉ nạp vector nhãn
+nhẹ từ NPZ, thử query mặc định, `NOT INDEXED` và các index chứa `rl_fs_t`. Mapping
+chỉ được nhận nếu cả 4.195.042 nhãn khớp đúng thứ tự; ma trận feature 39 GB không
+được nạp vào RAM.
 
 ### Phương án B — Tạo paired dataset mới
 

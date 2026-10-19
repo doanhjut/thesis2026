@@ -84,6 +84,7 @@ def parser():
     sorel = sub.add_parser('recover-sorel-metadata', help='Map recovered SOREL NPZ row indices to meta.db SHA-256 and tags.')
     sorel.add_argument('--manifest', type=Path, required=True)
     sorel.add_argument('--source-inspection', type=Path, required=True)
+    sorel.add_argument('--source', type=Path, help='Original SOREL NPZ; loads only its label vector for full-order verification.')
     sorel.add_argument('--meta-db', type=Path, required=True)
     sorel.add_argument('--missing-shas', type=Path, required=True)
     sorel.add_argument('--output', type=Path, required=True)
@@ -143,7 +144,7 @@ def main(argv=None):
         if args.command == 'recover-sorel-metadata':
             result = recovery.recover_sorel_metadata(
                 args.manifest, args.source_inspection, args.meta_db, args.missing_shas,
-                args.output, args.test_split, args.hash_meta_db)
+                args.output, args.test_split, args.hash_meta_db, args.source)
             finish_manifest(args.output)
             print(json.dumps(result, ensure_ascii=False, indent=2))
             return 0

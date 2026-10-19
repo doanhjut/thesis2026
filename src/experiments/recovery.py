@@ -210,7 +210,7 @@ def _text_sha(value):
 
 
 def recover_sorel_metadata(manifest, source_inspection, meta_db, missing_shas, out,
-                           test_split=SOREL_TEST_SPLIT, hash_meta_db=False):
+                           test_split=SOREL_TEST_SPLIT, hash_meta_db=False, source=None):
     """Map official SOREL LightGBM NPZ row indices back to meta.db records.
 
     The official array builder iterates the SQLite test query without shuffling and
@@ -244,11 +244,25 @@ def recover_sorel_metadata(manifest, source_inspection, meta_db, missing_shas, o
     expected_source_rows = int(inspection['rows'])
     require(rows.source_index.between(0, expected_source_rows - 1).all(),
             'Manifest source_index exceeds the inspected NPZ row range.')
+    source_labels, source_path, source_label_sha256 = None, None, None
+    if source is not None:
+        source_path = Path(source).resolve()
+        require(source_path.is_file() and source_path.suffix.lower() == '.npz',
+                'The full-order verification source must be the original SOREL NPZ.')
+        label_entry = inspection.get('label_entry')
+        require(label_entry, 'source_inspection.json does not identify the NPZ label entry.')
+        source_labels = _load_labels(source_path, label_entry).astype(int)
+        require(len(source_labels) == expected_source_rows,
+                f'NPZ label vector has {len(source_labels)} rows; expected {expected_source_rows}.')
+        require(set(np.unique(source_labels)).issubset({0, 1}), 'NPZ label vector is not binary.')
+        source_label_sha256 = hashlib.sha256(np.asarray(source_labels, dtype='<i8').tobytes()).hexdigest()
     missing_values = json.loads(missing_shas.read_text(encoding='utf-8'))
     require(isinstance(missing_values, list), 'Missing-feature artifact must be a JSON list of SHA-256 strings.')
     missing = {_text_sha(value) for value in missing_values}
 
+    expected_labels = rows.label.to_numpy(dtype=int)
     connection = sqlite3.connect(f'file:{meta_db}?mode=ro', uri=True)
+    candidates = []
     try:
         columns = _sqlite_columns(connection, 'meta')
         needed = {'sha256', 'is_malware', 'rl_fs_t', *SOREL_TAGS}
@@ -257,81 +271,128 @@ def recover_sorel_metadata(manifest, source_inspection, meta_db, missing_shas, o
         selected_columns = ['sha256', 'is_malware', 'rl_fs_t', *optional, *SOREL_TAGS]
         boundary_query = 'select sha256 from meta where(rl_fs_t = ?)'
         boundary_shas = {_text_sha(value[0]) for value in connection.execute(boundary_query, (float(test_split),))}
-        # Reproduce the exact projection used by SOREL's LightGBM array builder.
-        # The upstream SQL has no ORDER BY, so adding timestamp/tag columns can
-        # change SQLite's selected index and therefore the iteration order.
-        query = f'select sha256,is_malware from meta where(rl_fs_t >= {float(test_split)})'
-        query_plan = [list(item) for item in connection.execute('explain query plan ' + query)]
-        index_definitions = [
-            {'name': name, 'sql': sql}
-            for name, sql in connection.execute(
-                "select name,sql from sqlite_master where type='index' and tbl_name='meta' order by name")
-        ]
-        cursor = connection.execute(query)
+        index_definitions = []
+        time_indexes = []
+        for index_row in connection.execute("pragma index_list('meta')"):
+            name = index_row[1]
+            quoted_name = name.replace('"', '""')
+            index_columns = [item[2] for item in connection.execute(f'pragma index_info("{quoted_name}")')]
+            sql_row = connection.execute(
+                "select sql from sqlite_master where type='index' and name=?", (name,)).fetchone()
+            index_definitions.append({'name': name, 'columns': index_columns,
+                                      'sql': sql_row[0] if sql_row else None})
+            if 'rl_fs_t' in index_columns:
+                time_indexes.append(name)
+
+        access_paths = [('default', '') , ('not_indexed', ' not indexed')]
+        for name in time_indexes:
+            quoted = name.replace('"', '""')
+            access_paths.append((f'index:{name}', f' indexed by "{quoted}"'))
         targets = set(map(int, rows.source_index))
-        inclusive_recovered, exclusive_recovered = {}, {}
-        inclusive_index, exclusive_index, database_test_rows = 0, 0, 0
-        boundary_rows_before_filter, boundary_rows_after_filter = len(boundary_shas), 0
-        for sha_value, is_malware in cursor:
-            database_test_rows += 1
-            record = {'sha256': _text_sha(sha_value), 'is_malware': is_malware}
-            on_boundary = record['sha256'] in boundary_shas
-            if record['sha256'] in missing:
-                continue
-            if inclusive_index in targets:
-                inclusive_recovered[inclusive_index] = record
-            inclusive_index += 1
-            if on_boundary:
-                boundary_rows_after_filter += 1
-                continue
-            if exclusive_index in targets:
-                exclusive_recovered[exclusive_index] = record
-            exclusive_index += 1
+
+        def scan_access(access_name, access_clause):
+            query = (f'select sha256,is_malware from meta{access_clause} '
+                     f'where(rl_fs_t >= {float(test_split)})')
+            query_plan = [list(item) for item in connection.execute('explain query plan ' + query)]
+            recovered = {'>=': {}, '>': {}}
+            positions = {'>=': 0, '>': 0}
+            full_matches = {'>=': 0, '>': 0}
+            first_mismatch = {'>=': None, '>': None}
+            database_rows = boundary_after = 0
+            for sha_value, is_malware in connection.execute(query):
+                database_rows += 1
+                record = {'sha256': _text_sha(sha_value), 'is_malware': int(is_malware)}
+                on_boundary = record['sha256'] in boundary_shas
+                if record['sha256'] in missing:
+                    continue
+                inclusive_position = positions['>=']
+                if inclusive_position in targets:
+                    recovered['>='][inclusive_position] = record
+                if source_labels is not None and inclusive_position < expected_source_rows:
+                    if record['is_malware'] == source_labels[inclusive_position]:
+                        full_matches['>='] += 1
+                    elif first_mismatch['>='] is None:
+                        first_mismatch['>='] = inclusive_position
+                positions['>='] += 1
+                if on_boundary:
+                    boundary_after += 1
+                    continue
+                exclusive_position = positions['>']
+                if exclusive_position in targets:
+                    recovered['>'][exclusive_position] = record
+                if source_labels is not None and exclusive_position < expected_source_rows:
+                    if record['is_malware'] == source_labels[exclusive_position]:
+                        full_matches['>'] += 1
+                    elif first_mismatch['>'] is None:
+                        first_mismatch['>'] = exclusive_position
+                positions['>'] += 1
+            return {
+                'access_path': access_name, 'query': query, 'query_plan': query_plan,
+                'database_rows': database_rows, 'boundary_after': boundary_after,
+                'positions': positions, 'recovered': recovered,
+                'full_matches': full_matches, 'first_mismatch': first_mismatch,
+            }
+
+        def make_candidate(scan, operator):
+            recovered = scan['recovered'][operator]
+            complete = len(recovered) == len(rows)
+            if complete:
+                ordered = [recovered[int(index)] for index in rows.source_index]
+                selected_labels = np.asarray([int(item['is_malware']) for item in ordered])
+                matching_selected = int(np.sum(selected_labels == expected_labels))
+            else:
+                ordered, selected_labels, matching_selected = None, None, 0
+            count = int(scan['positions'][operator])
+            full_match_count = (int(scan['full_matches'][operator])
+                                if source_labels is not None else None)
+            full_order_valid = source_labels is None or full_match_count == expected_source_rows
+            return {
+                'name': 'inclusive_boundary' if operator == '>=' else 'exclusive_boundary',
+                'operator': operator, 'access_path': scan['access_path'],
+                'query': scan['query'], 'query_plan': scan['query_plan'],
+                'filtered_rows': count, 'expected_rows': expected_source_rows,
+                'recovered_selected_rows': int(len(recovered)),
+                'matching_selected_labels': matching_selected,
+                'matching_all_npz_labels': full_match_count,
+                'first_npz_label_mismatch': scan['first_mismatch'][operator],
+                'valid': bool(count == expected_source_rows and complete and
+                              matching_selected == len(rows) and full_order_valid),
+                '_ordered': ordered, '_labels': selected_labels, '_scan': scan,
+            }
+
+        for access_name, access_clause in access_paths:
+            scan = scan_access(access_name, access_clause)
+            inclusive = make_candidate(scan, '>=')
+            candidates.append(inclusive)
+            if scan['boundary_after']:
+                candidates.append(make_candidate(scan, '>'))
+            if any(item['valid'] for item in candidates):
+                break
     finally:
         connection.close()
 
-    expected_labels = rows.label.to_numpy(dtype=int)
-
-    def candidate(name, operator, count, recovered):
-        complete = len(recovered) == len(rows)
-        if complete:
-            candidate_ordered = [recovered[int(index)] for index in rows.source_index]
-            candidate_labels = np.asarray([int(item['is_malware']) for item in candidate_ordered])
-            matching_labels = int(np.sum(candidate_labels == expected_labels))
-        else:
-            candidate_ordered, candidate_labels, matching_labels = None, None, 0
-        return {
-            'name': name, 'operator': operator, 'filtered_rows': int(count),
-            'expected_rows': expected_source_rows, 'recovered_selected_rows': int(len(recovered)),
-            'matching_selected_labels': matching_labels,
-            'valid': bool(count == expected_source_rows and complete and matching_labels == len(rows)),
-            '_ordered': candidate_ordered, '_labels': candidate_labels,
-        }
-
-    inclusive = candidate('inclusive_boundary', '>=', inclusive_index, inclusive_recovered)
-    candidates = [inclusive]
-    if not inclusive['valid'] and boundary_rows_after_filter:
-        candidates.append(candidate('exclusive_boundary', '>', exclusive_index, exclusive_recovered))
     valid = [item for item in candidates if item['valid']]
     alignment_audit = {
         'status': 'aligned' if len(valid) == 1 else 'not_aligned',
         'test_split_timestamp': float(test_split),
-        'database_rows_at_or_after_boundary_before_missing_filter': int(database_test_rows),
-        'boundary_rows_before_missing_filter': int(boundary_rows_before_filter),
-        'boundary_rows_after_missing_filter': int(boundary_rows_after_filter),
+        'npz_label_verification': {
+            'source': str(source_path) if source_path else None,
+            'rows': int(len(source_labels)) if source_labels is not None else None,
+            'canonical_int64_sha256': source_label_sha256,
+            'status': 'full_vector_required_for_acceptance' if source_labels is not None else 'not_supplied',
+        },
+        'boundary_rows_before_missing_filter': int(len(boundary_shas)),
         'missing_sha_count_all_splits': int(len(missing)),
-        'builder_query': query,
-        'builder_query_plan': query_plan,
         'meta_index_definitions': index_definitions,
         'candidates': [{key: value for key, value in item.items() if not key.startswith('_')}
                        for item in candidates],
     }
     write_json(out / 'sorel_alignment_audit.json', alignment_audit)
     require(len(valid) == 1,
-            f'Could not uniquely align SOREL metadata to NPZ: inclusive={inclusive_index}, '
-            f'exclusive={exclusive_index}, boundary_after_filter={boundary_rows_after_filter}, '
-            f'expected={expected_source_rows}. See sorel_alignment_audit.json.')
+            f'Could not align a SQLite access path to all {expected_source_rows} NPZ labels. '
+            'See sorel_alignment_audit.json.')
     chosen = valid[0]
+    chosen_scan = chosen['_scan']
     ordered_keys, metadata_labels = chosen['_ordered'], chosen['_labels']
 
     chosen_shas = [item['sha256'] for item in ordered_keys]
@@ -369,6 +430,8 @@ def recover_sorel_metadata(manifest, source_inspection, meta_db, missing_shas, o
         'inputs': {
             'row_manifest': str(manifest), 'row_manifest_sha256': sha256(manifest),
             'source_inspection': str(source_inspection), 'source_inspection_sha256': sha256(source_inspection),
+            'source_npz': str(source_path) if source_path else None,
+            'source_label_vector_sha256': source_label_sha256,
             'meta_db': str(meta_db), 'meta_db_size_bytes': meta_db.stat().st_size,
             'meta_db_sha256': sha256(meta_db) if hash_meta_db else None,
             'meta_db_sha256_status': 'computed' if hash_meta_db else 'skipped; use --hash-meta-db for the frozen manifest',
@@ -376,20 +439,22 @@ def recover_sorel_metadata(manifest, source_inspection, meta_db, missing_shas, o
         },
         'official_order_replay': {
             'test_split_timestamp': float(test_split),
-            'base_query': query,
-            'query_plan': query_plan,
+            'base_query': chosen['query'],
+            'query_plan': chosen['query_plan'],
+            'selected_access_path': chosen['access_path'],
             'selected_split_operator': chosen['operator'],
             'selected_split_policy': chosen['name'],
-            'database_test_rows_before_missing_filter': int(database_test_rows),
-            'boundary_rows_before_missing_filter': int(boundary_rows_before_filter),
-            'boundary_rows_after_missing_filter': int(boundary_rows_after_filter),
+            'database_test_rows_before_missing_filter': int(chosen_scan['database_rows']),
+            'boundary_rows_before_missing_filter': int(len(boundary_shas)),
+            'boundary_rows_after_missing_filter': int(chosen_scan['boundary_after']),
             'missing_sha_count_all_splits': int(len(missing)),
-            'inclusive_rows_after_missing_filter': int(inclusive_index),
-            'exclusive_rows_after_missing_filter': int(exclusive_index),
+            'inclusive_rows_after_missing_filter': int(chosen_scan['positions']['>=']),
+            'exclusive_rows_after_missing_filter': int(chosen_scan['positions']['>']),
             'test_rows_after_missing_filter': int(chosen['filtered_rows']),
             'expected_npz_rows': expected_source_rows,
             'selected_rows': int(len(rows)),
             'selected_labels_matching': int(np.sum(metadata_labels == expected_labels)),
+            'all_npz_labels_matching': chosen['matching_all_npz_labels'],
         },
         'selected_label_counts': {str(k): int(v) for k, v in augmented.label.value_counts().sort_index().items()},
         'selected_tag_counts': tag_counts,
@@ -400,7 +465,7 @@ def recover_sorel_metadata(manifest, source_inspection, meta_db, missing_shas, o
         },
         'limitations': [
             'The official LightGBM NPZ contains no SHA-256 or tags; this mapping replays the official SQLite iteration and missing-feature filter.',
-            'When inclusive and exclusive timestamp boundaries differ, a policy is accepted only if the complete NPZ row count and every selected binary label match; the chosen boundary is recorded in the audit.',
+            'When the NPZ label vector is supplied, an SQLite access path and timestamp boundary are accepted only if the complete row count and all NPZ labels match in order.',
             'All selected binary labels and the complete filtered row count must match, but exact feature-to-SHA confirmation additionally requires the corresponding SOREL ember_features LMDB.',
             'SOREL metadata and EMBER features do not provide executable behavior traces; PID still requires paired binaries or sandbox reports.',
         ],

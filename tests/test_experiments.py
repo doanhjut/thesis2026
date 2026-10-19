@@ -158,6 +158,7 @@ class DatasetGuardTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
             db, manifest, inspection = root / 'meta.db', root / 'row_manifest.csv', root / 'inspection.json'
+            source = root / 'test-features.npz'
             missing, output = root / 'missing.json', root / 'out'
             tag_schema = ','.join(f'{tag} integer' for tag in SOREL_TAGS)
             connection = sqlite3.connect(db)
@@ -183,19 +184,23 @@ class DatasetGuardTests(unittest.TestCase):
             connection.close()
             missing.write_text(json.dumps([raw_test[3][0]]))
             filtered = [item for i, item in enumerate(raw_test) if i != 3]
+            np.savez(source, np.zeros((len(filtered), 3), dtype=np.float32),
+                     np.asarray([item[1] for item in filtered], dtype=np.int64))
             source_indices = np.array([4, 0, 12])
             pd.DataFrame({
                 'row_id': [0, 1, 2], 'source_index': source_indices,
                 'label': [filtered[i][1] for i in source_indices],
                 'feature_sha256': ['a' * 64, 'b' * 64, 'c' * 64],
             }).to_csv(manifest, index=False)
-            inspection.write_text(json.dumps({'rows': len(filtered), 'features': 3}))
-            report = recover_sorel_metadata(manifest, inspection, db, missing, output, test_split=10.0)
+            inspection.write_text(json.dumps({'rows': len(filtered), 'features': 3, 'label_entry': 'arr_1.npy'}))
+            report = recover_sorel_metadata(manifest, inspection, db, missing, output,
+                                            test_split=10.0, source=source)
             self.assertEqual(report['status'], 'sorel_metadata_recovered')
             self.assertEqual(report['official_order_replay']['test_rows_after_missing_filter'], 14)
             self.assertEqual(report['official_order_replay']['inclusive_rows_after_missing_filter'], 16)
             self.assertEqual(report['official_order_replay']['boundary_rows_after_missing_filter'], 2)
             self.assertEqual(report['official_order_replay']['selected_split_operator'], '>')
+            self.assertEqual(report['official_order_replay']['all_npz_labels_matching'], 14)
             augmented = pd.read_csv(output / 'sorel_row_manifest.csv', dtype={'sha256': str})
             self.assertEqual(augmented.sha256.tolist(), [filtered[i][0] for i in source_indices])
             self.assertEqual(int(augmented.tag_ransomware.sum()), 2)
