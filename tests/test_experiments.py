@@ -11,7 +11,7 @@ from src.experiments.fidelity import mask_metrics
 from src.experiments.fusion import sequence_scores
 from src.experiments.gating import gate_counts, select_gate
 from src.experiments.provenance import audit
-from src.experiments.recovery import recover, sampled_source_indices
+from src.experiments.recovery import inspect_npz, recover, sampled_source_indices
 from src.experiments.signals import normalize, shap_signals
 from src.experiments.temporal import validate as validate_temporal
 from src.pid_fusion import PIDController, fuse_scores
@@ -131,6 +131,10 @@ class DatasetGuardTests(unittest.TestCase):
             labels = np.array([0] * 10 + [1] * 5)
             features = np.arange(len(labels) * 3, dtype=np.float32).reshape(len(labels), 3) / 10
             np.savez_compressed(source, features, labels)
+            inspected = inspect_npz(source)
+            self.assertEqual(inspected['rows'], 15)
+            self.assertEqual(inspected['features'], 3)
+            self.assertEqual(inspected['label_counts'], {'0': 10, '1': 5})
             selected = sampled_source_indices(labels, 4, 2, 42)
             permutation = pd.DataFrame({'position': np.arange(len(selected))}).sample(frac=1, random_state=42).position.to_numpy()
             source_ids = selected[permutation]

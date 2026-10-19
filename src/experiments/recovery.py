@@ -33,7 +33,18 @@ def inspect_npz(path, hash_source=False):
             arrays.append({'entry': name, 'shape': list(map(int, shape)), 'fortran_order': bool(fortran), 'dtype': str(dtype)})
     require(any(len(item['shape']) == 1 for item in arrays) and any(len(item['shape']) == 2 for item in arrays),
             'Expected one label vector and one feature matrix in NPZ.')
+    feature_info = next(item for item in arrays if len(item['shape']) == 2)
+    label_info = next(item for item in arrays if len(item['shape']) == 1)
+    require(feature_info['shape'][0] == label_info['shape'][0], 'Feature and label row counts differ in NPZ.')
+    label_key = label_info['entry'][:-4] if label_info['entry'].endswith('.npy') else label_info['entry']
+    with np.load(path) as source:
+        labels = np.asarray(source[label_key]).ravel()
+    values, counts = np.unique(labels, return_counts=True)
     result = {'path': str(path), 'size_bytes': path.stat().st_size, 'arrays': arrays,
+              'feature_entry': feature_info['entry'], 'label_entry': label_info['entry'],
+              'rows': int(feature_info['shape'][0]), 'features': int(feature_info['shape'][1]),
+              'label_counts': {str(value.item() if hasattr(value, 'item') else value): int(count)
+                               for value, count in zip(values, counts)},
               'source_sha256': sha256(path) if hash_source else None,
               'source_sha256_status': 'computed' if hash_source else 'skipped; use --hash-source for the frozen manifest'}
     return result
