@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
-from .common import choose_threshold, evaluate, require, source_metadata, stats, write_json
+from .common import choose_threshold, evaluate, low_fpr_metrics, require, source_metadata, stats, write_json
 from .signals import METHODS, WEIGHTS, acquisition_scores
 
 
@@ -32,6 +32,7 @@ def run(data, out, seeds=(11, 22, 33, 44, 55), initial_labels=200, rounds=5,
               'initial_labels': initial_labels, 'rounds': rounds, 'batch_size': batch_size,
               'trees': trees, 'model_parameters': params, 'methods': METHODS, 'weights': WEIGHTS,
               'target_validation_tpr': target_tpr, 'target_validation_auc': target_val_auc,
+              'low_fpr_operating_points': [.01, .05],
               'tie_break': 'ascending original CSV row ID',
               'oracle': 'Existing labels revealed only for queried rows; seed set stratified offline.',
               'budget': 'Training labels only; validation labels are additional; no measured analyst time.',
@@ -87,11 +88,13 @@ def run(data, out, seeds=(11, 22, 33, 44, 55), initial_labels=200, rounds=5,
                     test_p = model.predict(data.X[data.test], num_threads=threads)
                     validation = evaluate(data.y[data.validation], val_p, threshold)
                     testing = evaluate(data.y[data.test], test_p, threshold)
+                    low_fpr = low_fpr_metrics(data.y[data.validation], val_p,
+                                              data.y[data.test], test_p)
                     records.append({'seed': seed, 'method': method, 'round': rnd, 'n_labeled': len(labeled),
                                     'n_added': rnd * batch_size, 'threshold': threshold, **timing,
                                     'train_seconds': train_seconds, 'evaluation_seconds': perf_counter() - evaluation_start,
                                     **{f'val_{k}': v for k, v in validation.items()},
-                                    **{f'test_{k}': v for k, v in testing.items()}})
+                                    **{f'test_{k}': v for k, v in testing.items()}, **low_fpr})
                     for split, ids, probs in [('validation', data.validation, val_p), ('test', data.test, test_p)]:
                         for row_id, probability in zip(ids, probs):
                             writer.writerow({'seed': seed, 'method': method, 'round': rnd, 'n_labeled': len(labeled),

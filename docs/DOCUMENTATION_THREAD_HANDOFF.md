@@ -74,6 +74,14 @@ Verification đã pass 150 checkpoint AL, 120.000 dự đoán AL, 12.500 truy v�
 4. Tạo bản thảo bài báo sau khi có mô tả dataset/provenance đầy đủ hơn.
 5. Bổ sung phần PID sau khi hoàn tất thu thập quan sát động và chạy ablation.
 
+## Pipeline bổ sung đã sẵn sàng, chưa phải kết quả
+
+Mã hiện có ba lệnh xác nhận mới: `confirmatory-al`, `confirmatory-fidelity` và
+`temporal-fusion`. Giao thức, đầu vào và lệnh PowerShell nằm trong
+`docs/CONFIRMATORY_RUNBOOK.md`. Chưa đưa số từ các runner này vào tài liệu cho
+đến khi chạy trên static dataset có manifest và dynamic report quan sát thật,
+sau đó `verification.json` phải báo `passed`.
+
 ## Prompt mở thread mới
 
-> Hãy đóng vai cố vấn học thuật về Khoa học Máy tính và An toàn Thông tin. Thread này chỉ tập trung hoàn thiện tài liệu gồm luận văn, báo cáo, slide, bài báo và kịch bản bảo vệ. Hãy đọc `docs/DOCUMENTATION_THREAD_HANDOFF.md`, `docs/EXPERIMENT_PROTOCOL.md` và `results/measured_20261019_ember_identity/` trên nhánh `feat/reproducible-thesis-experiments`. Chỉ dùng số liệu đã kiểm chứng trong gói này; không trộn pilot cũ, artifact legacy hoặc tạo số liệu mới. Khi viết, phân biệt rõ kết quả đã chứng minh, kết quả còn yếu và thí nghiệm PID chưa có dữ liệu động thật. Trước tiên hãy kiểm tra cấu trúc tài liệu hiện tại và lập danh sách phần cần cập nhật theo mức ưu tiên.
+> Hãy đóng vai cố vấn học thuật về Khoa học Máy tính và An toàn Thông tin. Thread này chỉ tập trung hoàn thiện tài liệu gồm luận văn, báo cáo, slide, bài báo và kịch bản bảo vệ. Hãy đọc `docs/DOCUMENTATION_THREAD_HANDOFF.md`, `docs/EXPERIMENT_PROTOCOL.md`, `docs/CONFIRMATORY_RUNBOOK.md` và `results/measured_20261019_ember_identity/` trên nhánh `feat/reproducible-thesis-experiments`. Chỉ dùng số liệu đã kiểm chứng trong gói này; không trộn pilot cũ, artifact legacy hoặc tạo số liệu mới. Khi viết, phân biệt rõ kết quả đã chứng minh, kết quả còn yếu và thí nghiệm PID chưa có dữ liệu động thật. Trước tiên hãy kiểm tra cấu trúc tài liệu hiện tại và lập danh sách phần cần cập nhật theo mức ưu tiên.

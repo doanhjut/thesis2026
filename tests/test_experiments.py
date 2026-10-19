@@ -8,7 +8,8 @@ import sqlite3
 import numpy as np
 import pandas as pd
 
-from src.experiments.common import choose_threshold, evaluate, load_dataset, sha256
+from src.experiments.common import (choose_threshold, choose_threshold_at_max_fpr,
+                                    evaluate, load_dataset, low_fpr_metrics, sha256)
 from src.experiments.fidelity import mask_metrics
 from src.experiments.fusion import sequence_scores
 from src.experiments.gating import gate_counts, select_gate
@@ -18,6 +19,7 @@ from src.experiments.recovery import (SOREL_TAGS, inspect_npz, recover,
                                       sampled_source_indices)
 from src.experiments.signals import normalize, shap_signals
 from src.experiments.temporal import validate as validate_temporal
+from src.experiments.temporal_fusion import pid_trajectory, run as run_temporal_fusion
 from src.pid_fusion import PIDController, fuse_scores
 
 
@@ -28,6 +30,16 @@ class ExperimentMathTests(unittest.TestCase):
         threshold = choose_threshold(y, p, 0.75)
         self.assertEqual(threshold, 0.6)
         self.assertGreaterEqual(evaluate(y, p, threshold)['tpr'], 0.75)
+
+    def test_low_fpr_threshold_is_selected_only_from_validation(self):
+        y_val = np.array([0, 0, 0, 0, 1, 1])
+        p_val = np.array([.1, .2, .3, .9, .4, .8])
+        threshold = choose_threshold_at_max_fpr(y_val, p_val, .25)
+        measured = evaluate(y_val, p_val, threshold)
+        self.assertLessEqual(measured['fpr'], .25)
+        self.assertAlmostEqual(measured['tpr'], 1.0)
+        result = low_fpr_metrics(y_val, p_val, y_val, p_val, limits=(.25,))
+        self.assertEqual(result['test_tpr_at_val_fpr_25'], 1.0)
 
     def test_shap_signal_definition(self):
         phi = np.array([[1.0, -1.0], [2.0, 0.0], [0.0, 0.0]])
@@ -45,6 +57,18 @@ class ExperimentMathTests(unittest.TestCase):
         self.assertAlmostEqual(first, pid.update(0.4))
         self.assertAlmostEqual(fuse_scores(0.8, 0.2, 0.5), 0.5)
 
+    def test_pid_uses_elapsed_time_and_clips_integral(self):
+        fast = PIDController(0.0, 1.0, 0.0, integral_limits=(-.5, .5))
+        slow = PIDController(0.0, 1.0, 0.0, integral_limits=(-.5, .5))
+        self.assertLess(fast.update(.1, delta_t=1), slow.update(.1, delta_t=3))
+        for _ in range(20):
+            slow.update(1.0, delta_t=10)
+        self.assertEqual(slow.integral, .5)
+        derivative = PIDController(0.0, 0.0, 1.0)
+        derivative.update(.2, delta_t=5)
+        derivative.update(.4, delta_t=10)
+        self.assertAlmostEqual(derivative.last_terms['derivative'], .02)
+
     def test_sequence_scores_preserve_filtered_row_order(self):
         frame = pd.DataFrame({
             'sequence_id': ['b', 'a', 'b'],
@@ -57,6 +81,19 @@ class ExperimentMathTests(unittest.TestCase):
         self.assertEqual(weights.shape, (3,))
         np.testing.assert_allclose(scores, weights * frame.probability.to_numpy() +
                                    (1 - weights) * frame.p_dynamic.to_numpy())
+
+    def test_temporal_pid_uses_delta_t_and_resets_per_execution(self):
+        frame = pd.DataFrame({
+            'row_id': [1, 1, 2, 2], 'execution_id': ['a', 'a', 'b', 'b'],
+            'time_step': [0, 1, 0, 1], 'elapsed_seconds': [5., 15., 5., 25.],
+            'probability': [.8, .8, .8, .8], 'p_dynamic': [.4, .6, .4, .6],
+        }, index=[9, 3, 8, 2])
+        result = pid_trajectory(frame, (.85, .12, .35), integral_limits=(-1., 1.))
+        self.assertTrue(result.score.between(0, 1).all())
+        first = result.sort_values(['row_id', 'elapsed_seconds']).groupby('row_id').head(1)
+        np.testing.assert_allclose(first.pid_derivative, 0.)
+        later = result.sort_values(['row_id', 'elapsed_seconds']).groupby('row_id').tail(1)
+        self.assertNotEqual(later.iloc[0].pid_derivative, later.iloc[1].pid_derivative)
 
     def test_mask_metrics_are_directly_recomputable(self):
         y = np.array([0, 0, 1, 1])
@@ -79,6 +116,58 @@ class ExperimentMathTests(unittest.TestCase):
 
 
 class DatasetGuardTests(unittest.TestCase):
+    def test_temporal_fusion_end_to_end_replays_observed_fixture(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            al, temporal, output = root / 'al', root / 'temporal', root / 'fusion'
+            al.mkdir()
+            temporal.mkdir()
+            (al / 'config.json').write_text(json.dumps({
+                'kind': 'active_learning', 'rounds': 0,
+                'dataset': {'data_sha256': 'fixture-dataset'},
+            }))
+            labels = np.array([0, 1, 0, 1, 0, 1, 0, 1])
+            splits = ['validation'] * 4 + ['test'] * 4
+            static = np.array([.1, .8, .2, .7, .15, .75, .25, .65])
+            predictions = pd.DataFrame({
+                'row_id': np.arange(8), 'label': labels, 'split': splits,
+                'seed': 11, 'method': 'XAI_full', 'round': 0,
+                'probability': static,
+            })
+            predictions.to_csv(al / 'predictions.csv.gz', index=False)
+            rows = []
+            for row_id in range(8):
+                report = temporal / f'report_{row_id}.json'
+                report.write_text(json.dumps({'row_id': row_id, 'events': []}))
+                for step, elapsed in enumerate([5., 15.]):
+                    rows.append({
+                        'row_id': row_id, 'execution_id': f'run_{row_id}',
+                        'time_step': step, 'elapsed_seconds': elapsed,
+                        'p_dynamic': float(.2 + .5 * ((row_id + step) % 3) / 2),
+                        'evidence_status': 'observed',
+                        'report_path': report.name, 'report_sha256': sha256(report),
+                    })
+            measurements = temporal / 'dynamic_time_series.csv'
+            pd.DataFrame(rows).to_csv(measurements, index=False)
+            provenance = temporal / 'provenance.json'
+            provenance.write_text(json.dumps({
+                'signal_origin': 'observed', 'no_target_label_in_score': True,
+                'dataset_sha256': 'fixture-dataset',
+                'measurements_sha256': sha256(measurements),
+                'label_definition': 'fixture', 'dynamic_feature_definition': 'fixture events',
+                'dynamic_score_definition': 'fixed fixture scorer',
+                'dynamic_model_training_source': 'independent fixture',
+                'calibration_method': 'none fixture', 'sandbox_or_honeypot': 'fixture',
+                'collection_period': 'fixture', 'observation_windows_seconds': [5., 15.],
+            }))
+            result = run_temporal_fusion(al, measurements, provenance, output, target_tpr=.5)
+            self.assertEqual(result['status'], 'measured_from_observed_temporal_reports')
+            verified = json.loads((output / 'verification.json').read_text())
+            self.assertEqual(verified['status'], 'passed')
+            self.assertEqual(set(pd.read_csv(output / 'fusion_metrics.csv').fusion),
+                             {'Static_only', 'Dynamic_only', 'Average_50_50',
+                              'Fixed_weight', 'P', 'PI', 'PID'})
+
     def test_verified_identity_manifest_is_bound_to_rows_labels_and_features(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)

@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import roc_auc_score
 
-from .common import choose_threshold, evaluate, load_dataset, require, sha256
+from .common import choose_threshold, evaluate, load_dataset, low_fpr_metrics, require, sha256
 from .fidelity import explanation_geometry, mask_metrics
 
 
@@ -44,6 +44,11 @@ def verify_al(out, data):
             for name, value in computed.items():
                 close(value, getattr(row, f'{prefix}_{name}'), f'Metric mismatch: {prefix}_{name}')
             require(np.array_equal(g.prediction.to_numpy(), (g.probability >= threshold).astype(int)), 'Saved thresholded decisions differ.')
+        if 'test_standardized_pauc_fpr_05' in metrics.columns:
+            test = selected[selected.split == 'test']
+            low_fpr = low_fpr_metrics(val.label, val.probability, test.label, test.probability)
+            for name, value in low_fpr.items():
+                close(value, getattr(row, name), f'Low-FPR metric mismatch: {name}')
         selected_queries = query[(query.seed == row.seed) & (query.method == row.method) & (query['round'] <= row.round)]
         require(len(selected_queries) == row.round * config['batch_size'], 'Wrong query budget.')
         require(set(selected_queries.row_id) <= set(initial[str(row.seed)]['pool']), 'Query outside original pool.')
@@ -67,7 +72,12 @@ def verify_fidelity(out, data):
     ids = original.row_id.to_numpy()
     require(np.array_equal(ids, config['evaluation_row_ids']), 'Evaluation IDs changed.')
     require(set(ids) <= set(data.test), 'Fidelity rows are outside the test partition.')
-    close(baseline['mean'], data.X[data.train].mean(axis=0), 'Mask baseline is not the training mean.')
+    close(baseline['mean'], data.X[data.train].mean(axis=0), 'Saved training mean differs.')
+    kind = config.get('mask_baseline_kind', 'mean')
+    expected_mask = (data.X[data.train].mean(axis=0) if kind == 'mean'
+                     else np.median(data.X[data.train], axis=0))
+    saved_mask = baseline['mask'] if 'mask' in baseline.files else baseline['mean']
+    close(saved_mask, expected_mask, 'Mask baseline differs from the configured training statistic.')
     model = lgb.Booster(model_file=str(out / 'model.txt'))
     p = model.predict(data.X[ids], num_threads=2)
     close(p, original.p_original, 'Original Fidelity predictions mismatch.')
@@ -79,7 +89,7 @@ def verify_fidelity(out, data):
         require(all(len(set(a)) == row.k for a in selected), 'Repeated coordinates in mask.')
         require(np.all((selected >= 0) & (selected < data.X.shape[1])), 'Mask index out of bounds.')
         X = data.X[ids].copy()
-        X[np.arange(len(ids))[:, None], selected] = baseline['mean'][selected]
+        X[np.arange(len(ids))[:, None], selected] = saved_mask[selected]
         after = model.predict(X, num_threads=2)
         measured = mask_metrics(data.y[ids], p, after)
         for name, value in measured.items():

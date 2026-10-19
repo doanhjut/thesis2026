@@ -33,7 +33,7 @@ Ba đóng góp nên giữ làm trục trình bày, nhưng phải trả lời ri�
 
 **Vị trí:** `chapters/c2/c2_2.tex` — Mục 3.2; `chapters/c3/c3_2.tex` — Mục 4.2.
 
-**Bản gửi:** trình bày PID liên tục, rời rạc hóa theo Δt, chống tích lũy và trọng số động. Triển khai tham chiếu dùng tổng sai lệch và sai phân theo bước, với phép chặn trọng số; không tự đồng nghĩa đã có anti-windup cho tích phân. Cần đối chiếu cặp quy ước dấu sai lệch và nguồn nhận trọng số: đổi cả hai có thể tương đương, nhưng đổi một bên thì đổi hành vi.
+**Bản cập nhật:** triển khai temporal dùng `I_k=clip(I_{k-1}+e_kΔt_k)` và `D_k=(e_k-e_{k-1})/Δt_k`, đặt `D_0=0`, reset theo execution và chặn trực tiếp trạng thái tích phân để anti-windup. Sai lệch `e_k=p_static-p_dynamic,k`; dấu dương tăng trọng số static, dấu âm tăng trọng số dynamic. Đây là heuristic dung hợp điểm theo lịch sử bất đồng, không phải chứng minh ổn định điều khiển của một plant vật lý.
 
 **Cần cập nhật:** chỉ rõ e, trạng thái tích lũy, bước cập nhật, reset theo phiên, trọng số của nguồn nào, hệ số được chọn bằng cách nào. Tách **chứng minh điểm dung hợp nằm giữa hai đầu vào** khỏi **bằng chứng AUC/FPR tốt hơn**. O(1) chỉ nói về bước fusion khi đã có hai điểm.
 

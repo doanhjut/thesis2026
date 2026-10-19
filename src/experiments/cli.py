@@ -5,7 +5,8 @@ import json
 from pathlib import Path
 import traceback
 
-from . import active_learning, fidelity, fusion, gating, provenance, recovery, temporal
+from . import (active_learning, confirmatory, fidelity, fusion, gating,
+               provenance, recovery, robust_fidelity, temporal, temporal_fusion)
 from .common import DEFAULT_DATA, REPO, finish_manifest, load_dataset, require, write_json
 from .verification import verify_al, verify_fidelity, verify_saved_run
 
@@ -34,6 +35,39 @@ def parser():
     run.add_argument('--threads', type=int, default=2)
     run.add_argument('--target-tpr', type=float, default=.95)
     run.add_argument('--target-val-auc', type=float, help='Optional predeclared target for label-budget-to-quality analysis.')
+    confirm = sub.add_parser('confirmatory-al', help='Run cross-fold AL with a full-pool-relative label-efficiency target.')
+    confirm.add_argument('--data', type=Path, default=DEFAULT_DATA)
+    confirm.add_argument('--row-manifest', type=Path)
+    confirm.add_argument('--output', type=Path, required=True)
+    confirm.add_argument('--folds', type=int, default=5)
+    confirm.add_argument('--fold-seed', type=int, default=2026)
+    confirm.add_argument('--seeds', nargs='+', type=int, default=[11, 22, 33, 44, 55])
+    confirm.add_argument('--initial-labels', type=int, default=200)
+    confirm.add_argument('--rounds', type=int, default=10)
+    confirm.add_argument('--batch-size', type=int, default=100)
+    confirm.add_argument('--trees', type=int, default=60)
+    confirm.add_argument('--threads', type=int, default=2)
+    confirm.add_argument('--target-tpr', type=float, default=.95)
+    confirm.add_argument('--target-excess-auc-fraction', type=float, default=.95)
+    confirm_fidelity = sub.add_parser(
+        'confirmatory-fidelity',
+        help='Repeat Fidelity across folds, stochastic model seeds and mean/median masking baselines.')
+    confirm_fidelity.add_argument('--data', type=Path, default=DEFAULT_DATA)
+    confirm_fidelity.add_argument('--row-manifest', type=Path)
+    confirm_fidelity.add_argument('--split-dir', type=Path,
+                                  help='Directory containing fold_*.csv from confirmatory-al.')
+    confirm_fidelity.add_argument('--output', type=Path, required=True)
+    confirm_fidelity.add_argument('--seeds', nargs='+', type=int, default=[41, 42, 43, 44, 45])
+    confirm_fidelity.add_argument('--baselines', nargs='+', choices=['mean', 'median'],
+                                  default=['mean', 'median'])
+    confirm_fidelity.add_argument('--k', nargs='+', type=int, default=[10, 25, 50])
+    confirm_fidelity.add_argument('--random-masks', type=int, default=20)
+    confirm_fidelity.add_argument('--bootstrap', type=int, default=500)
+    confirm_fidelity.add_argument('--trees', type=int, default=100)
+    confirm_fidelity.add_argument('--threads', type=int, default=2)
+    confirm_fidelity.add_argument('--max-test-rows', type=int, default=1000)
+    confirm_fidelity.add_argument('--feature-fraction', type=float, default=.8)
+    confirm_fidelity.add_argument('--bagging-fraction', type=float, default=.8)
     audit = sub.add_parser('audit-data', help='Inspect the feature data and split without training.')
     audit.add_argument('--data', type=Path, default=DEFAULT_DATA)
     audit.add_argument('--row-manifest', type=Path)
@@ -70,6 +104,15 @@ def parser():
     temporal_validate.add_argument('--data', type=Path, required=True)
     temporal_validate.add_argument('--provenance', type=Path, required=True)
     temporal_validate.add_argument('--dataset-sha256')
+    temporal_pid = sub.add_parser(
+        'temporal-fusion',
+        help='Run Static/Dynamic/Average/Fixed/P/PI/PID on validated multi-time-step reports.')
+    temporal_pid.add_argument('--al-run', type=Path, required=True)
+    temporal_pid.add_argument('--temporal-data', type=Path, required=True)
+    temporal_pid.add_argument('--provenance', type=Path, required=True)
+    temporal_pid.add_argument('--output', type=Path, required=True)
+    temporal_pid.add_argument('--target-tpr', type=float, default=.95)
+    temporal_pid.add_argument('--integral-limits', nargs=2, type=float, default=[-5., 5.])
     inspect_source = sub.add_parser('inspect-source', help='Inspect a large NPZ without loading its feature matrix into memory.')
     inspect_source.add_argument('--source', type=Path, required=True)
     inspect_source.add_argument('--output', type=Path)
@@ -114,6 +157,28 @@ def main(argv=None):
                 finish_manifest(args.output)
             print(json.dumps(data.audit, ensure_ascii=False, indent=2))
             return 0
+        if args.command == 'confirmatory-al':
+            result = confirmatory.run(
+                args.data, args.row_manifest, args.output, args.folds, args.fold_seed,
+                args.seeds, args.initial_labels, args.rounds, args.batch_size,
+                args.trees, args.threads, args.target_tpr,
+                args.target_excess_auc_fraction,
+            )
+            finish_manifest(args.output)
+            print(json.dumps({'status': result['status'], 'output': str(args.output.resolve())},
+                             ensure_ascii=False, indent=2))
+            return 0
+        if args.command == 'confirmatory-fidelity':
+            result = robust_fidelity.run(
+                args.data, args.row_manifest, args.output, args.split_dir,
+                args.seeds, args.baselines, args.k, args.random_masks,
+                args.bootstrap, args.trees, args.threads, args.max_test_rows,
+                args.feature_fraction, args.bagging_fraction,
+            )
+            finish_manifest(args.output)
+            print(json.dumps({'status': result['status'], 'output': str(args.output.resolve())},
+                             ensure_ascii=False, indent=2))
+            return 0
         if args.command == 'verify':
             print(json.dumps(verify_saved_run(args.run, args.data), ensure_ascii=False, indent=2))
             return 0
@@ -136,6 +201,15 @@ def main(argv=None):
             return 0
         if args.command == 'validate-temporal':
             print(json.dumps(temporal.validate(args.data, args.provenance, args.dataset_sha256), ensure_ascii=False, indent=2))
+            return 0
+        if args.command == 'temporal-fusion':
+            result = temporal_fusion.run(
+                args.al_run, args.temporal_data, args.provenance, args.output,
+                args.target_tpr, tuple(args.integral_limits),
+            )
+            finish_manifest(args.output)
+            print(json.dumps({'status': result['status'], 'output': str(args.output.resolve())},
+                             ensure_ascii=False, indent=2))
             return 0
         if args.command == 'inspect-source':
             result = recovery.inspect_npz(args.source, args.hash_source)

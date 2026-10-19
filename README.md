@@ -81,6 +81,8 @@ python scripts/run_experiments.py gate \
   --max-early-fpr 0.02
 ```
 
+Giao thức xác nhận nhiều fold cho AL và Fidelity, cùng hợp đồng dữ liệu PID theo thời gian, được mô tả tại [`docs/CONFIRMATORY_RUNBOOK.md`](docs/CONFIRMATORY_RUNBOOK.md). Các lệnh chính là `confirmatory-al`, `confirmatory-fidelity`, `prepare-temporal`, `validate-temporal` và `temporal-fusion`.
+
 Để kiểm chứng riêng I và D, tạo mẫu nhiều time step trên mỗi PE:
 
 ```bash
@@ -105,13 +107,16 @@ Lệnh `prepare-dynamic`/`fusion` cũ chỉ xử lý một dynamic score trên m
 Ở bước quan sát rời rạc `k`:
 
 ```text
-e[k]        = P_static[k] - P_dynamic[k]
-u[k]        = Kp e[k] + Ki Σ(i=0..k)e[i] + Kd(e[k] - e[k-1])
+e[k]        = P_static - P_dynamic[k]
+Δt[k]       = elapsed[k] - elapsed[k-1]
+I[k]        = clip(I[k-1] + e[k] Δt[k], I_min, I_max)
+D[k]        = (e[k] - e[k-1]) / Δt[k], với D[0] = 0
+u[k]        = Kp e[k] + Ki I[k] + Kd D[k]
 w_static[k] = clip(sigmoid(u[k]), 0.1, 0.9)
 P_fused[k]  = w_static[k] P_static[k] + (1-w_static[k]) P_dynamic[k]
 ```
 
-Các hệ số mặc định `Kp=0.85`, `Ki=0.12`, `Kd=0.35` chỉ là cấu hình cần đối chứng. Pipeline chọn cấu hình trên validation và đánh giá một lần trên test. Công thức hiện là PID theo bước quan sát, chưa có `Δt` hay anti-windup; không tự tạo cam kết độ trễ.
+Các hệ số mặc định `Kp=0.85`, `Ki=0.12`, `Kd=0.35` chỉ là cấu hình tham chiếu. Runner temporal chọn gain trên validation và đánh giá một lần trên test. Integral clipping là chính sách anti-windup; trạng thái reset theo từng PE execution. Đây là heuristic điều chỉnh trọng số theo lịch sử bất đồng giữa hai điểm, không phải định lý ổn định của một plant vật lý và không tự tạo cam kết độ trễ.
 
 Active Learning dùng `U = 1 - 2|p-0.5|`. Từ SHAP có dấu `φ`, đặt tổng phần dương `A+`, độ lớn phần âm `A-`, `q=A+/(A++A-)`, rồi tính entropy nhị phân `H(q)` và `V=Var_j(φ_j)`. Từng tín hiệu được min-max trên pool tại vòng hiện tại trước khi ghép theo trọng số khai báo trong `src/experiments/signals.py`.
 

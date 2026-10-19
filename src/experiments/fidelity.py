@@ -64,11 +64,15 @@ def explanation_geometry(X, phi, y, mean, std, epsilon=1e-12):
 
 
 def run(data, out, seed=42, k_values=(10, 25, 50), repetitions=20, bootstrap=500,
-        trees=100, threads=2, max_test_rows=1000):
+        trees=100, threads=2, max_test_rows=1000, mask_baseline='mean',
+        feature_fraction=1., bagging_fraction=1.):
     require(repetitions >= 2 and bootstrap >= 2 and trees > 0 and threads > 0, 'Invalid Fidelity parameters.')
     require(len(k_values) > 0 and len(set(k_values)) == len(k_values) and
             all(0 < k <= data.X.shape[1] for k in k_values), 'top-k must be unique positive values within the feature dimension.')
     require(max_test_rows >= 4, 'At least four evaluation rows are required.')
+    require(mask_baseline in {'mean', 'median'}, 'Mask baseline must be mean or median.')
+    require(0 < feature_fraction <= 1 and 0 < bagging_fraction <= 1,
+            'Feature and bagging fractions must be in (0,1].')
     out.mkdir(parents=True, exist_ok=False)
     start = perf_counter()
     data.save_split(out)
@@ -77,11 +81,14 @@ def run(data, out, seed=42, k_values=(10, 25, 50), repetitions=20, bootstrap=500
         test, _ = train_test_split(test, train_size=max_test_rows, random_state=seed, stratify=data.y[test])
     params = dict(n_estimators=trees, num_leaves=15, max_depth=4, learning_rate=.1,
                   min_child_samples=20, n_jobs=threads, random_state=seed,
-                  deterministic=True, force_col_wise=True, verbosity=-1)
+                  deterministic=True, force_col_wise=True, verbosity=-1,
+                  feature_fraction=feature_fraction, bagging_fraction=bagging_fraction,
+                  bagging_freq=1 if bagging_fraction < 1 else 0)
     config = {'kind': 'fidelity', 'dataset': data.audit, 'model_parameters': params, 'seed': seed,
               'k_values': list(k_values), 'random_repetitions': repetitions, 'bootstrap_repetitions': bootstrap,
               'evaluation_row_ids': test.tolist(), 'epsilon': 1e-12,
-              'mask_baseline': 'Training-column arithmetic mean; only feature vectors are altered.',
+              'mask_baseline_kind': mask_baseline,
+              'mask_baseline': f'Training-column {mask_baseline}; only feature vectors are altered.',
               'shap': 'Native TreeSHAP on raw log-odds; bias excluded from ranking.',
               'ff': 'Mean absolute probability change divided by original probability + epsilon; unclipped.',
               'ec': 'Pearson correlation of upper-triangle cosine similarities: train-standardized features versus signed SHAP.',
@@ -110,9 +117,13 @@ def run(data, out, seed=42, k_values=(10, 25, 50), repetitions=20, bootstrap=500
     train_seconds = perf_counter() - train_start
     booster = model.booster_
     booster.save_model(str(out / 'model.txt'))
-    mean, std = data.X[data.train].mean(axis=0), data.X[data.train].std(axis=0)
+    mean = data.X[data.train].mean(axis=0)
+    median = np.median(data.X[data.train], axis=0)
+    baseline = mean if mask_baseline == 'mean' else median
+    std = data.X[data.train].std(axis=0)
     std[std == 0] = 1.
-    np.savez_compressed(out / 'train_baseline.npz', mean=mean, std=std)
+    np.savez_compressed(out / 'train_baseline.npz', mean=mean, median=median,
+                        mask=baseline, std=std)
     X, y = data.X[test], data.y[test]
     original = booster.predict(X, num_threads=threads)
     phi, bias, raw, shap_seconds, error = native_shap(booster, X, threads)
@@ -131,7 +142,7 @@ def run(data, out, seed=42, k_values=(10, 25, 50), repetitions=20, bootstrap=500
                     rng = np.random.default_rng(np.random.SeedSequence([seed, k, replicate]))
                     selected = np.stack([rng.choice(X.shape[1], k, replace=False) for _ in test])
                 masked = X.copy()
-                masked[row_indices, selected] = mean[selected]
+                masked[row_indices, selected] = baseline[selected]
                 p = booster.predict(masked, num_threads=threads)
                 records.append({'method': method, 'k': k, 'replicate': replicate,
                                 **mask_metrics(y, original, p),

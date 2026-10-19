@@ -76,6 +76,26 @@ def choose_threshold(y_validation, p_validation, target=0.95):
     return float(positives[math.ceil(target * len(positives)) - 1])
 
 
+def choose_threshold_at_max_fpr(y_validation, p_validation, max_fpr):
+    """Select a validation-only threshold with the best TPR under an FPR cap.
+
+    The empirical FPR is discrete.  Ties are resolved by lower FPR and then a
+    higher threshold, so the choice is deterministic and conservative.
+    """
+    y = binary_labels(y_validation)
+    p = probabilities(p_validation)
+    require(len(y) == len(p) and 0 <= max_fpr < 1, 'Invalid low-FPR threshold inputs.')
+    top = float(np.nextafter(p.max(), np.inf))
+    thresholds = np.r_[top, np.unique(p)[::-1]]
+    feasible = []
+    for threshold in thresholds:
+        measured = evaluate(y, p, float(threshold))
+        if measured['fpr'] <= max_fpr + 1e-15:
+            feasible.append((measured['tpr'], -measured['fpr'], float(threshold)))
+    require(feasible, 'No feasible threshold under the requested FPR cap.')
+    return max(feasible)[2]
+
+
 def evaluate(y, scores, threshold):
     y, p = binary_labels(y), probabilities(scores)
     require(len(y) == len(p) and np.isfinite(threshold), 'Invalid metric inputs.')
@@ -83,6 +103,28 @@ def evaluate(y, scores, threshold):
     return {'auc': float(roc_auc_score(y, p)), 'ap': float(average_precision_score(y, p)),
             'fpr': float(fp / (fp + tn)), 'tpr': float(tp / (tp + fn)),
             'tn': int(tn), 'fp': int(fp), 'fn': int(fn), 'tp': int(tp)}
+
+
+def low_fpr_metrics(y_validation, p_validation, y_test, p_test, limits=(.01, .05)):
+    """Evaluate test decisions at validation-selected low-FPR operating points."""
+    result = {}
+    y_test, p_test = binary_labels(y_test), probabilities(p_test)
+    require(len(y_test) == len(p_test), 'Invalid low-FPR test inputs.')
+    for limit in limits:
+        require(0 < limit < 1, 'Low-FPR limits must be in (0,1).')
+        tag = f'{int(round(limit * 100)):02d}'
+        threshold = choose_threshold_at_max_fpr(y_validation, p_validation, limit)
+        validation = evaluate(y_validation, p_validation, threshold)
+        testing = evaluate(y_test, p_test, threshold)
+        result.update({
+            f'threshold_at_val_fpr_{tag}': threshold,
+            f'val_fpr_at_cap_{tag}': validation['fpr'],
+            f'val_tpr_at_fpr_{tag}': validation['tpr'],
+            f'test_fpr_at_val_cap_{tag}': testing['fpr'],
+            f'test_tpr_at_val_fpr_{tag}': testing['tpr'],
+        })
+    result['test_standardized_pauc_fpr_05'] = float(roc_auc_score(y_test, p_test, max_fpr=.05))
+    return result
 
 
 @dataclass
