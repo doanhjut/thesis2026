@@ -90,6 +90,14 @@ def parser():
     sorel.add_argument('--output', type=Path, required=True)
     sorel.add_argument('--test-split', type=float, default=recovery.SOREL_TEST_SPLIT)
     sorel.add_argument('--hash-meta-db', action='store_true', help='Hash the multi-GB SQLite file; slow but useful for a frozen run.')
+    ember = sub.add_parser('recover-ember-dataset', help='Build a SHA-aligned mini CSV from EMBER 2018 X/y/JSONL test files.')
+    ember.add_argument('--data-dir', type=Path, required=True)
+    ember.add_argument('--output', type=Path, required=True)
+    ember.add_argument('--n-negative', type=int, default=1500)
+    ember.add_argument('--n-positive', type=int, default=500)
+    ember.add_argument('--seed', type=int, default=42)
+    ember.add_argument('--features', type=int, default=2381)
+    ember.add_argument('--hash-source-files', action='store_true')
     return p
 
 
@@ -145,6 +153,13 @@ def main(argv=None):
             result = recovery.recover_sorel_metadata(
                 args.manifest, args.source_inspection, args.meta_db, args.missing_shas,
                 args.output, args.test_split, args.hash_meta_db, args.source)
+            finish_manifest(args.output)
+            print(json.dumps(result, ensure_ascii=False, indent=2))
+            return 0
+        if args.command == 'recover-ember-dataset':
+            result = recovery.recover_ember_dataset(
+                args.data_dir, args.output, args.n_negative, args.n_positive,
+                args.seed, args.features, args.hash_source_files)
             finish_manifest(args.output)
             print(json.dumps(result, ensure_ascii=False, indent=2))
             return 0

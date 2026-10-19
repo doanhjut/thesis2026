@@ -13,7 +13,8 @@ from src.experiments.fusion import sequence_scores
 from src.experiments.gating import gate_counts, select_gate
 from src.experiments.provenance import audit
 from src.experiments.recovery import (SOREL_TAGS, inspect_npz, recover,
-                                      recover_sorel_metadata, sampled_source_indices)
+                                      recover_ember_dataset, recover_sorel_metadata,
+                                      sampled_source_indices)
 from src.experiments.signals import normalize, shap_signals
 from src.experiments.temporal import validate as validate_temporal
 from src.pid_fusion import PIDController, fuse_scores
@@ -204,6 +205,31 @@ class DatasetGuardTests(unittest.TestCase):
             augmented = pd.read_csv(output / 'sorel_row_manifest.csv', dtype={'sha256': str})
             self.assertEqual(augmented.sha256.tolist(), [filtered[i][0] for i in source_indices])
             self.assertEqual(int(augmented.tag_ransomware.sum()), 2)
+
+    def test_ember_recovery_preserves_feature_label_and_sha_alignment(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            data, output = root / 'ember', root / 'out'
+            data.mkdir()
+            labels = np.asarray([0] * 10 + [1] * 5, dtype='<f4')
+            features = np.arange(len(labels) * 3, dtype='<f4').reshape(len(labels), 3)
+            labels.tofile(data / 'y_test.dat')
+            features.tofile(data / 'X_test.dat')
+            with (data / 'test_features.jsonl').open('w') as stream:
+                for index, label in enumerate(labels.astype(int)):
+                    stream.write(json.dumps({
+                        'sha256': f'{index:064x}', 'appeared': '2018-01',
+                        'label': int(label), 'avclass': 'family' if label else None,
+                    }) + '\n')
+            report = recover_ember_dataset(data, output, n_negative=4, n_positive=2,
+                                           seed=42, features=3)
+            self.assertEqual(report['status'], 'ember_dataset_recovered')
+            self.assertEqual(report['output']['metadata_labels_matching'], 6)
+            manifest = pd.read_csv(output / 'ember_row_manifest.csv', dtype={'sha256': str})
+            mini = pd.read_csv(output / 'ember_mini_dataset.csv')
+            self.assertEqual(manifest.sha256.tolist(), [f'{index:064x}' for index in manifest.source_index])
+            np.testing.assert_array_equal(manifest.label, mini.label)
+            np.testing.assert_allclose(mini.drop(columns='label').to_numpy(), features[manifest.source_index])
 
 
 if __name__ == '__main__':

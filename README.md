@@ -59,7 +59,7 @@ python scripts/run_experiments.py audit-pid-inputs \
   --output outputs/pid_input_audit
 ```
 
-Nếu có archive NPZ lớn trên máy khác, `inspect-source` đọc header mà không nạp ma trận feature; `recover-manifest` tái tạo source index từ sampling/shuffle cũ. Với NPZ SOREL, dùng tiếp `recover-sorel-metadata` cùng `meta.db` và danh sách missing-feature chính thức để lấy SHA-256/tag; không ghép JSONL EMBER 2018 vào SOREL. Xem `docs/PID_INPUT_CHECKLIST.md` để lấy lệnh PowerShell cụ thể.
+Nếu có archive NPZ lớn trên máy khác, `inspect-source` đọc header mà không nạp ma trận feature; `recover-manifest` tái tạo source index từ sampling/shuffle cũ. Với NPZ SOREL, `recover-sorel-metadata` chỉ lấy SHA/tag khi thứ tự nhãn được xác minh; không ghép JSONL EMBER 2018 vào SOREL. Khi mapping SOREL không phục hồi được, `recover-ember-dataset` tạo một CSV mới từ bộ ba EMBER `X_test.dat`/`y_test.dat`/`test_features.jsonl` vốn có cùng thứ tự. Xem `docs/PID_INPUT_CHECKLIST.md` để lấy lệnh PowerShell cụ thể.
 
 Phần static uncertainty gate có thể đo trước khi có sandbox data. Runner tách validation thành hai phần rời nhau: một phần fit Platt calibration, phần còn lại chọn threshold; test chỉ dùng đánh giá:
 

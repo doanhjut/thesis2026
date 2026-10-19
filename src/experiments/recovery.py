@@ -472,3 +472,107 @@ def recover_sorel_metadata(manifest, source_inspection, meta_db, missing_shas, o
     }
     write_json(out / 'sorel_metadata_recovery_report.json', report)
     return report
+
+
+def recover_ember_dataset(data_dir, out, n_negative=1500, n_positive=500, seed=42,
+                          features=2381, hash_source_files=False):
+    """Create an identity-preserving mini dataset from aligned EMBER 2018 files."""
+    data_dir, out = Path(data_dir).resolve(), Path(out)
+    x_path, y_path = data_dir / 'X_test.dat', data_dir / 'y_test.dat'
+    jsonl_path = data_dir / 'test_features.jsonl'
+    for path in [x_path, y_path, jsonl_path]:
+        require(path.is_file(), f'Missing EMBER test artifact: {path}')
+    if out.exists():
+        require(out.is_dir() and not any(out.iterdir()), 'Output directory must be new or empty.')
+    else:
+        out.mkdir(parents=True)
+
+    require(y_path.stat().st_size % np.dtype('<f4').itemsize == 0, 'y_test.dat size is not valid float32 data.')
+    labels_raw = np.memmap(y_path, dtype='<f4', mode='r')
+    require(np.isfinite(labels_raw).all(), 'EMBER test labels contain non-finite values.')
+    require(set(np.unique(labels_raw)).issubset({0.0, 1.0}), 'EMBER test set must contain only binary labels 0/1.')
+    labels = np.asarray(labels_raw, dtype=int)
+    expected_x_bytes = len(labels) * int(features) * np.dtype('<f4').itemsize
+    require(x_path.stat().st_size == expected_x_bytes,
+            f'X_test.dat size mismatch: expected {expected_x_bytes}, got {x_path.stat().st_size}.')
+
+    selected = sampled_source_indices(labels, n_negative, n_positive, seed)
+    permutation = _final_shuffle_order(len(selected), seed)
+    source_indices = selected[permutation]
+    selected_set = set(map(int, selected))
+    metadata = {}
+    line_count = 0
+    with jsonl_path.open('r', encoding='utf-8') as stream:
+        for line_count, line in enumerate(stream, start=1):
+            index = line_count - 1
+            if index not in selected_set:
+                continue
+            obj = json.loads(line)
+            sample_sha = _text_sha(obj.get('sha256'))
+            require(int(obj.get('label')) == int(labels[index]),
+                    f'EMBER JSONL label differs from y_test.dat at row {index}.')
+            metadata[index] = {
+                'sha256': sample_sha, 'appeared': obj.get('appeared'),
+                'avclass': obj.get('avclass'), 'label': int(obj.get('label')),
+            }
+    require(line_count == len(labels),
+            f'EMBER JSONL rows ({line_count}) differ from y_test.dat rows ({len(labels)}).')
+    require(len(metadata) == len(selected),
+            f'Only recovered metadata for {len(metadata)}/{len(selected)} selected EMBER rows.')
+
+    matrix = np.memmap(x_path, dtype='<f4', mode='r', shape=(len(labels), int(features)))
+    selected_features = np.asarray(matrix[source_indices], dtype=np.float32).copy()
+    selected_labels = labels[source_indices]
+    mini = pd.DataFrame(selected_features, columns=[str(index) for index in range(int(features))])
+    mini['label'] = selected_labels
+    mini_path = out / 'ember_mini_dataset.csv'
+    mini.to_csv(mini_path, index=False, encoding='utf-8-sig')
+
+    ordered_metadata = [metadata[int(index)] for index in source_indices]
+    manifest = pd.DataFrame({
+        'row_id': np.arange(len(source_indices)), 'source_index': source_indices,
+        'label': selected_labels, 'sha256': [item['sha256'] for item in ordered_metadata],
+        'appeared': [item['appeared'] for item in ordered_metadata],
+        'avclass': [item['avclass'] for item in ordered_metadata],
+        'source_feature_float32_sha256': [
+            hashlib.sha256(np.asarray(row, dtype='<f4').tobytes()).hexdigest()
+            for row in selected_features
+        ],
+    })
+    require(manifest.sha256.is_unique, 'Selected EMBER SHA-256 identifiers are not unique.')
+    manifest.to_csv(out / 'ember_row_manifest.csv', index=False)
+
+    report = {
+        'status': 'ember_dataset_recovered',
+        'source': {
+            'data_dir': str(data_dir), 'rows': int(len(labels)), 'features': int(features),
+            'label_counts': {str(value): int(np.sum(labels == value)) for value in np.unique(labels)},
+            'x_test': str(x_path), 'x_test_size_bytes': x_path.stat().st_size,
+            'y_test': str(y_path), 'y_test_sha256': sha256(y_path),
+            'test_features_jsonl': str(jsonl_path), 'jsonl_rows': int(line_count),
+            'x_test_sha256': sha256(x_path) if hash_source_files else None,
+            'jsonl_sha256': sha256(jsonl_path) if hash_source_files else None,
+            'large_source_hash_status': 'computed' if hash_source_files else 'skipped; use --hash-source-files for a frozen run',
+        },
+        'sampling': {'seed': int(seed), 'n_label_0': int(n_negative), 'n_label_1': int(n_positive),
+                     'final_shuffle': 'pandas.DataFrame.sample(frac=1, random_state=seed)'},
+        'output': {
+            'dataset': str(mini_path.resolve()), 'dataset_sha256': sha256(mini_path),
+            'manifest': str((out / 'ember_row_manifest.csv').resolve()),
+            'selected_rows': int(len(manifest)),
+            'selected_label_counts': {str(value): int(np.sum(selected_labels == value))
+                                      for value in np.unique(selected_labels)},
+            'metadata_labels_matching': int(len(manifest)),
+            'unique_sha256': int(manifest.sha256.nunique()),
+        },
+        'label_semantics': {
+            'label': 'EMBER 2018 benign/malware binary label',
+            'avclass': 'Optional weak malware-family name from EMBER metadata; not a verified ransomware label',
+        },
+        'limitations': [
+            'This dataset provides static features and sample identity but no executable binaries or behavior traces.',
+            'PID evaluation still requires dynamic reports aligned to these SHA-256 values or a separate paired executable corpus.',
+        ],
+    }
+    write_json(out / 'ember_recovery_report.json', report)
+    return report

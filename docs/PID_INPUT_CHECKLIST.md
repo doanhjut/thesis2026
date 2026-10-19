@@ -84,6 +84,29 @@ nhẹ từ NPZ, thử query mặc định, `NOT INDEXED` và các index chứa `
 chỉ được nhận nếu cả 4.195.042 nhãn khớp đúng thứ tự; ma trận feature 39 GB không
 được nạp vào RAM.
 
+### Phương án thay thế — tập EMBER 2018 có định danh hàng
+
+Nếu không access path nào của `meta.db` khớp toàn bộ vector nhãn SOREL, không
+gán SHA/tag cho NPZ bằng suy đoán. Ba tệp EMBER 2018 hiện có được sinh cùng thứ
+tự và có thể tạo một tập static mới với định danh kiểm tra được:
+
+```powershell
+python scripts/run_experiments.py recover-ember-dataset `
+  --data-dir "D:\Code\Luanvan\data\ember2018" `
+  --output "outputs\ember_identity_dataset"
+```
+
+Runner kiểm tra kích thước `X_test.dat`, đọc nhãn từ `y_test.dat`, stream đúng
+thứ tự `test_features.jsonl`, so nhãn từng mẫu được chọn và xuất:
+
+- `ember_mini_dataset.csv`: 2.000 hàng × 2.381 feature cùng nhãn;
+- `ember_row_manifest.csv`: `row_id`, source index, SHA-256, thời điểm, AVClass;
+- `ember_recovery_report.json`: hash, phân bố và giới hạn kết luận.
+
+EMBER chỉ xác nhận benign/malware và định danh mẫu. `avclass` là weak family
+name, không tự động trở thành nhãn ransomware. Bộ này vẫn không thay thế binary
+hoặc sandbox report cần cho PID.
+
 ### Phương án B — Tạo paired dataset mới
 
 Cung cấp một manifest:
