@@ -1,0 +1,29 @@
+{
+  "files": [
+    {
+      "path": "data/processed/real_mini_dataset.csv",
+      "sha256": "c733cc0c3e0950fa1d05d57d34c69d0a034383e0c1a2fde0e6878b9e2e8c3668",
+      "bytes": 28750345
+    },
+    {
+      "path": "outputs/confirmatory_pilot_unverified_al_20261019/config.json",
+      "sha256": "5bab7507e3d348b8fbb17e35c6edfc5f28a1a17177ca2337374c1efa6207878e",
+      "bytes": 36042
+    },
+    {
+      "path": "outputs/confirmatory_pilot_unverified_al_20261019/verification.json",
+      "sha256": "3bb1a21fbdf472be8b8ccb29fbbedda1fc225eef2a690dd7105ab443e4b758ef",
+      "bytes": 822
+    },
+    {
+      "path": "outputs/confirmatory_pilot_unverified_fidelity_20261019/config.json",
+      "sha256": "649245efebee14f52c37116a49a041ca5980e9c4b98106a1c846150e079d7279",
+      "bytes": 2826
+    },
+    {
+      "path": "outputs/confirmatory_pilot_unverified_fidelity_20261019/verification.json",
+      "sha256": "271f1c1bb321527b4913e02b23290f1f949c6a5f768875fe333d139786016c7e",
+      "bytes": 8791
+    }
+  ]
+}

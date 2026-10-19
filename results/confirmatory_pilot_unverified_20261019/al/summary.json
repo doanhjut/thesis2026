@@ -1,0 +1,174 @@
+{
+  "status": "confirmatory_measured",
+  "outer_folds": 5,
+  "al_seeds_per_fold": 5,
+  "fold_seed_pairs_per_method": 25,
+  "full_pool_reference": {
+    "validation_auc": {
+      "mean": 0.9665066666666668,
+      "sd": 0.0220604522971664,
+      "n": 5
+    },
+    "test_auc": {
+      "mean": 0.9718533333333333,
+      "sd": 0.011049801405957998,
+      "n": 5
+    }
+  },
+  "methods": [
+    {
+      "method": "Random",
+      "n_fold_seed_pairs": 25,
+      "test_auc_mean": 0.9718533333,
+      "test_auc_sd": 0.0100870425,
+      "test_ap_mean": 0.9445744243,
+      "test_ap_sd": 0.0165762994,
+      "test_fpr_mean": 0.1826666667,
+      "test_fpr_sd": 0.1150362262,
+      "test_tpr_mean": 0.928,
+      "test_tpr_sd": 0.0606904715,
+      "test_standardized_pauc_fpr_05_mean": 0.900034188,
+      "test_standardized_pauc_fpr_05_sd": 0.02452917,
+      "test_tpr_at_val_fpr_01_mean": 0.752,
+      "test_tpr_at_val_fpr_01_sd": 0.0197905701,
+      "test_fpr_at_val_cap_01_mean": 0.0106666667,
+      "test_fpr_at_val_cap_01_sd": 0.0106284036,
+      "test_tpr_at_val_fpr_05_mean": 0.874,
+      "test_tpr_at_val_fpr_05_sd": 0.0262995564,
+      "test_fpr_at_val_cap_05_mean": 0.0486666667,
+      "test_fpr_at_val_cap_05_sd": 0.0124721913
+    },
+    {
+      "method": "U+H",
+      "n_fold_seed_pairs": 25,
+      "test_auc_mean": 0.9718533333,
+      "test_auc_sd": 0.0100870425,
+      "test_ap_mean": 0.9445744243,
+      "test_ap_sd": 0.0165762994,
+      "test_fpr_mean": 0.1826666667,
+      "test_fpr_sd": 0.1150362262,
+      "test_tpr_mean": 0.928,
+      "test_tpr_sd": 0.0606904715,
+      "test_standardized_pauc_fpr_05_mean": 0.900034188,
+      "test_standardized_pauc_fpr_05_sd": 0.02452917,
+      "test_tpr_at_val_fpr_01_mean": 0.752,
+      "test_tpr_at_val_fpr_01_sd": 0.0197905701,
+      "test_fpr_at_val_cap_01_mean": 0.0106666667,
+      "test_fpr_at_val_cap_01_sd": 0.0106284036,
+      "test_tpr_at_val_fpr_05_mean": 0.874,
+      "test_tpr_at_val_fpr_05_sd": 0.0262995564,
+      "test_fpr_at_val_cap_05_mean": 0.0486666667,
+      "test_fpr_at_val_cap_05_sd": 0.0124721913
+    },
+    {
+      "method": "U+V",
+      "n_fold_seed_pairs": 25,
+      "test_auc_mean": 0.9718533333,
+      "test_auc_sd": 0.0100870425,
+      "test_ap_mean": 0.9445744243,
+      "test_ap_sd": 0.0165762994,
+      "test_fpr_mean": 0.1826666667,
+      "test_fpr_sd": 0.1150362262,
+      "test_tpr_mean": 0.928,
+      "test_tpr_sd": 0.0606904715,
+      "test_standardized_pauc_fpr_05_mean": 0.900034188,
+      "test_standardized_pauc_fpr_05_sd": 0.02452917,
+      "test_tpr_at_val_fpr_01_mean": 0.752,
+      "test_tpr_at_val_fpr_01_sd": 0.0197905701,
+      "test_fpr_at_val_cap_01_mean": 0.0106666667,
+      "test_fpr_at_val_cap_01_sd": 0.0106284036,
+      "test_tpr_at_val_fpr_05_mean": 0.874,
+      "test_tpr_at_val_fpr_05_sd": 0.0262995564,
+      "test_fpr_at_val_cap_05_mean": 0.0486666667,
+      "test_fpr_at_val_cap_05_sd": 0.0124721913
+    },
+    {
+      "method": "Uncertainty",
+      "n_fold_seed_pairs": 25,
+      "test_auc_mean": 0.9718533333,
+      "test_auc_sd": 0.0100870425,
+      "test_ap_mean": 0.9445744243,
+      "test_ap_sd": 0.0165762994,
+      "test_fpr_mean": 0.1826666667,
+      "test_fpr_sd": 0.1150362262,
+      "test_tpr_mean": 0.928,
+      "test_tpr_sd": 0.0606904715,
+      "test_standardized_pauc_fpr_05_mean": 0.900034188,
+      "test_standardized_pauc_fpr_05_sd": 0.02452917,
+      "test_tpr_at_val_fpr_01_mean": 0.752,
+      "test_tpr_at_val_fpr_01_sd": 0.0197905701,
+      "test_fpr_at_val_cap_01_mean": 0.0106666667,
+      "test_fpr_at_val_cap_01_sd": 0.0106284036,
+      "test_tpr_at_val_fpr_05_mean": 0.874,
+      "test_tpr_at_val_fpr_05_sd": 0.0262995564,
+      "test_fpr_at_val_cap_05_mean": 0.0486666667,
+      "test_fpr_at_val_cap_05_sd": 0.0124721913
+    },
+    {
+      "method": "XAI_full",
+      "n_fold_seed_pairs": 25,
+      "test_auc_mean": 0.9718533333,
+      "test_auc_sd": 0.0100870425,
+      "test_ap_mean": 0.9445744243,
+      "test_ap_sd": 0.0165762994,
+      "test_fpr_mean": 0.1826666667,
+      "test_fpr_sd": 0.1150362262,
+      "test_tpr_mean": 0.928,
+      "test_tpr_sd": 0.0606904715,
+      "test_standardized_pauc_fpr_05_mean": 0.900034188,
+      "test_standardized_pauc_fpr_05_sd": 0.02452917,
+      "test_tpr_at_val_fpr_01_mean": 0.752,
+      "test_tpr_at_val_fpr_01_sd": 0.0197905701,
+      "test_fpr_at_val_cap_01_mean": 0.0106666667,
+      "test_fpr_at_val_cap_01_sd": 0.0106284036,
+      "test_tpr_at_val_fpr_05_mean": 0.874,
+      "test_tpr_at_val_fpr_05_sd": 0.0262995564,
+      "test_fpr_at_val_cap_05_mean": 0.0486666667,
+      "test_fpr_at_val_cap_05_sd": 0.0124721913
+    }
+  ],
+  "target_reach": [
+    {
+      "method": "Random",
+      "reached": 25,
+      "total": 25,
+      "mean_labels_reached": 392.0,
+      "median_labels_reached": 400.0
+    },
+    {
+      "method": "U+H",
+      "reached": 25,
+      "total": 25,
+      "mean_labels_reached": 316.0,
+      "median_labels_reached": 300.0
+    },
+    {
+      "method": "U+V",
+      "reached": 25,
+      "total": 25,
+      "mean_labels_reached": 328.0,
+      "median_labels_reached": 300.0
+    },
+    {
+      "method": "Uncertainty",
+      "reached": 25,
+      "total": 25,
+      "mean_labels_reached": 324.0,
+      "median_labels_reached": 300.0
+    },
+    {
+      "method": "XAI_full",
+      "reached": 25,
+      "total": 25,
+      "mean_labels_reached": 340.0,
+      "median_labels_reached": 400.0
+    }
+  ],
+  "elapsed_seconds": 3567.540982227016,
+  "limitations": [
+    "AL seeds nested in one fold share validation/test rows; fold-seed rows are not independent population samples.",
+    "Outer test folds are row-stratified, not malware-family-held-out or temporal.",
+    "Label counts measure oracle queries, not analyst wall-clock hours.",
+    "A positive conclusion requires paired effects and uncertainty; a favorable grand mean alone is insufficient."
+  ]
+}

@@ -1,0 +1,405 @@
+{
+  "status": "passed",
+  "runs": [
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 0,
+      "seed": 41,
+      "mask_baseline": "mean"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 0,
+      "seed": 41,
+      "mask_baseline": "median"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 0,
+      "seed": 42,
+      "mask_baseline": "mean"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 0,
+      "seed": 42,
+      "mask_baseline": "median"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 0,
+      "seed": 43,
+      "mask_baseline": "mean"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 0,
+      "seed": 43,
+      "mask_baseline": "median"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 0,
+      "seed": 44,
+      "mask_baseline": "mean"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 0,
+      "seed": 44,
+      "mask_baseline": "median"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 0,
+      "seed": 45,
+      "mask_baseline": "mean"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 0,
+      "seed": 45,
+      "mask_baseline": "median"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 1,
+      "seed": 41,
+      "mask_baseline": "mean"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 1,
+      "seed": 41,
+      "mask_baseline": "median"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 1,
+      "seed": 42,
+      "mask_baseline": "mean"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 1,
+      "seed": 42,
+      "mask_baseline": "median"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 1,
+      "seed": 43,
+      "mask_baseline": "mean"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 1,
+      "seed": 43,
+      "mask_baseline": "median"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 1,
+      "seed": 44,
+      "mask_baseline": "mean"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 1,
+      "seed": 44,
+      "mask_baseline": "median"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 1,
+      "seed": 45,
+      "mask_baseline": "mean"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 1,
+      "seed": 45,
+      "mask_baseline": "median"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 2,
+      "seed": 41,
+      "mask_baseline": "mean"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 2,
+      "seed": 41,
+      "mask_baseline": "median"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 2,
+      "seed": 42,
+      "mask_baseline": "mean"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 2,
+      "seed": 42,
+      "mask_baseline": "median"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 2,
+      "seed": 43,
+      "mask_baseline": "mean"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 2,
+      "seed": 43,
+      "mask_baseline": "median"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 2,
+      "seed": 44,
+      "mask_baseline": "mean"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 2,
+      "seed": 44,
+      "mask_baseline": "median"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 2,
+      "seed": 45,
+      "mask_baseline": "mean"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 2,
+      "seed": 45,
+      "mask_baseline": "median"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 3,
+      "seed": 41,
+      "mask_baseline": "mean"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 3,
+      "seed": 41,
+      "mask_baseline": "median"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 3,
+      "seed": 42,
+      "mask_baseline": "mean"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 3,
+      "seed": 42,
+      "mask_baseline": "median"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 3,
+      "seed": 43,
+      "mask_baseline": "mean"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 3,
+      "seed": 43,
+      "mask_baseline": "median"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 3,
+      "seed": 44,
+      "mask_baseline": "mean"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 3,
+      "seed": 44,
+      "mask_baseline": "median"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 3,
+      "seed": 45,
+      "mask_baseline": "mean"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 3,
+      "seed": 45,
+      "mask_baseline": "median"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 4,
+      "seed": 41,
+      "mask_baseline": "mean"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 4,
+      "seed": 41,
+      "mask_baseline": "median"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 4,
+      "seed": 42,
+      "mask_baseline": "mean"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 4,
+      "seed": 42,
+      "mask_baseline": "median"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 4,
+      "seed": 43,
+      "mask_baseline": "mean"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 4,
+      "seed": 43,
+      "mask_baseline": "median"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 4,
+      "seed": 44,
+      "mask_baseline": "mean"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 4,
+      "seed": 44,
+      "mask_baseline": "median"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 4,
+      "seed": 45,
+      "mask_baseline": "mean"
+    },
+    {
+      "status": "passed",
+      "mask_batches_replayed": 63,
+      "prediction_records": 25200,
+      "fold": 4,
+      "seed": 45,
+      "mask_baseline": "median"
+    }
+  ]
+}

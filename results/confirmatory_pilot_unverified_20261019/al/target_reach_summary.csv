@@ -1,0 +1,6 @@
+method,reached,total,mean_labels_reached,median_labels_reached
+Random,25,25,392.0,400.0
+U+H,25,25,316.0,300.0
+U+V,25,25,328.0,300.0
+Uncertainty,25,25,324.0,300.0
+XAI_full,25,25,340.0,400.0

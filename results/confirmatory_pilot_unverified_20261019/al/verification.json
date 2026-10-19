@@ -1,0 +1,40 @@
+{
+  "status": "passed",
+  "folds": [
+    {
+      "status": "passed",
+      "checkpoints_replayed": 275,
+      "prediction_records": 220000,
+      "query_records": 25000,
+      "fold": 0
+    },
+    {
+      "status": "passed",
+      "checkpoints_replayed": 275,
+      "prediction_records": 220000,
+      "query_records": 25000,
+      "fold": 1
+    },
+    {
+      "status": "passed",
+      "checkpoints_replayed": 275,
+      "prediction_records": 220000,
+      "query_records": 25000,
+      "fold": 2
+    },
+    {
+      "status": "passed",
+      "checkpoints_replayed": 275,
+      "prediction_records": 220000,
+      "query_records": 25000,
+      "fold": 3
+    },
+    {
+      "status": "passed",
+      "checkpoints_replayed": 275,
+      "prediction_records": 220000,
+      "query_records": 25000,
+      "fold": 4
+    }
+  ]
+}

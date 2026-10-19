@@ -1,0 +1,44 @@
+{
+  "overall": "pilot_only_not_final_thesis_evidence",
+  "contributions": [
+    {
+      "name": "XAI explanation quality",
+      "status": "supported_in_feature_space_pilot",
+      "evidence": [
+        "Top-SHAP deletion AUC drop exceeds random masks for k=10,25,50 under mean and median baselines.",
+        "Within-fold rank stability: Spearman=0.6137; Jaccard top-10=0.6806."
+      ],
+      "limits": [
+        "Feature masking may be out-of-distribution.",
+        "No causal claim at executable level.",
+        "Dataset identity is unverified."
+      ]
+    },
+    {
+      "name": "XAI-Guided Active Learning",
+      "status": "partially_supported_in_pilot",
+      "evidence": [
+        "U+H beats Random by mean ROC-AULC 0.009260 and wins 5/5 folds.",
+        "U+H beats Uncertainty by mean ROC-AULC 0.001091 and wins 5/5 folds.",
+        "U+H uses 76 fewer labels than Random on average to validation target."
+      ],
+      "limits": [
+        "XAI_full is not the best ablation; it trails U+H by 0.000719 ROC-AULC and 24 labels.",
+        "Label counts are oracle queries, not measured analyst hours.",
+        "Effect versus Uncertainty is small."
+      ]
+    },
+    {
+      "name": "PID temporal fusion",
+      "status": "not_evaluated",
+      "evidence": [],
+      "limits": [
+        "Requires real dynamic reports at multiple time points, aligned sample identities and a frozen dynamic scorer."
+      ]
+    }
+  ],
+  "ofs": {
+    "value": null,
+    "reason": "No validated common-scale normalization and weighting rule; components are reported separately."
+  }
+}

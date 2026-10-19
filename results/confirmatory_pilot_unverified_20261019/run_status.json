@@ -1,0 +1,43 @@
+{
+  "status": "completed_pilot_unverified",
+  "date": "2026-10-19",
+  "repository_commit": "dbcdb471e15a3b631c916ad389b1beb371a33afc",
+  "dataset": {
+    "path": "data/processed/real_mini_dataset.csv",
+    "sha256": "c733cc0c3e0950fa1d05d57d34c69d0a034383e0c1a2fde0e6878b9e2e8c3668",
+    "rows": 2000,
+    "features": 2381,
+    "label_counts": {
+      "0": 1500,
+      "1": 500
+    },
+    "row_manifest": null,
+    "provenance_status": "unverified"
+  },
+  "experiments": {
+    "active_learning": {
+      "status": "passed",
+      "outer_folds": 5,
+      "seeds_per_fold": 5,
+      "methods": 5,
+      "checkpoints_replayed": 1375,
+      "prediction_records_replayed": 1100000,
+      "query_records_replayed": 125000,
+      "raw_output": "outputs/confirmatory_pilot_unverified_al_20261019"
+    },
+    "fidelity": {
+      "status": "passed",
+      "folds": 5,
+      "model_seeds": 5,
+      "mask_baselines": 2,
+      "runs_replayed": 50,
+      "mask_batches_replayed": 3150,
+      "prediction_records_replayed": 1260000,
+      "raw_output": "outputs/confirmatory_pilot_unverified_fidelity_20261019"
+    },
+    "pid_fusion": {
+      "status": "not_run",
+      "reason": "No real paired dynamic behavior reports aligned to static row identities."
+    }
+  }
+}
