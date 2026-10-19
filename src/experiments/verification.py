@@ -122,7 +122,9 @@ def verify_saved_run(out, data_path=None):
         config = json.loads((folder / 'config.json').read_text())
         audit = config['dataset']
         # Replay exactly the saved split rather than relying on current defaults.
-        data = load_dataset(data_path or audit['data_path'], split_file=folder / 'split_manifest.csv')
+        saved_manifest = folder / 'source_manifest.csv'
+        data = load_dataset(data_path or audit['data_path'], split_file=folder / 'split_manifest.csv',
+                            row_manifest=saved_manifest if saved_manifest.exists() else None)
         result[name] = verifier(folder, data)
     require(len(result) > 1, 'No supported measured experiment found in this directory.')
     return result

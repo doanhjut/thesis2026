@@ -94,6 +94,7 @@ class Dataset:
     validation: np.ndarray
     test: np.ndarray
     audit: dict
+    identity_manifest: pd.DataFrame | None
 
     def save_split(self, out):
         split = np.empty(len(self.y), dtype=object)
@@ -103,9 +104,11 @@ class Dataset:
         write_json(out / 'splits.json', {name: ids.tolist() for name, ids in
                    [('train_pool', self.train), ('validation', self.validation), ('test', self.test)]})
         write_json(out / 'data_audit.json', self.audit)
+        if self.identity_manifest is not None:
+            self.identity_manifest.to_csv(out / 'source_manifest.csv', index=False)
 
 
-def load_dataset(path=DEFAULT_DATA, split_seed=42, split_file=None):
+def load_dataset(path=DEFAULT_DATA, split_seed=42, split_file=None, row_manifest=None):
     path = Path(path).resolve()
     frame = pd.read_csv(path, encoding='utf-8-sig')
     require('label' in frame.columns, 'Input requires an explicit label column; no label-column guessing.')
@@ -130,12 +133,44 @@ def load_dataset(path=DEFAULT_DATA, split_seed=42, split_file=None):
         split_description = {'kind': 'stratified_random_rows', 'seed': split_seed, 'fractions': [.6, .2, .2]}
     for subset in [train, val, test]:
         binary_labels(y[subset])
+    identity, provenance_status, provenance = None, 'unverified', {}
+    limitations = [DATA_LIMITATION]
+    if row_manifest:
+        manifest_path = Path(row_manifest).resolve()
+        identity = pd.read_csv(manifest_path, dtype={'sha256': str})
+        required = {'row_id', 'label', 'sha256'}
+        require(required.issubset(identity.columns), f'Row manifest requires columns {sorted(required)}.')
+        require(identity.row_id.is_unique and set(identity.row_id) == set(ids),
+                'Row manifest must identify every dataset row exactly once.')
+        identity = identity.sort_values('row_id').reset_index(drop=True)
+        require(np.array_equal(identity.label.to_numpy(dtype=int), y), 'Row-manifest labels differ from dataset labels.')
+        require(identity.sha256.notna().all() and identity.sha256.str.fullmatch(r'[0-9a-fA-F]{64}').all(),
+                'Row manifest requires a valid SHA-256 for every row.')
+        require(identity.sha256.str.lower().is_unique, 'Row-manifest SHA-256 values must be unique.')
+        if 'source_feature_float32_sha256' in identity:
+            feature_hashes = [hashlib.sha256(np.asarray(row, dtype='<f4').tobytes()).hexdigest() for row in X]
+            require(np.array_equal(identity.source_feature_float32_sha256.astype(str), np.asarray(feature_hashes)),
+                    'Row-manifest feature hashes differ from the CSV features after float32 round-trip.')
+        provenance_status = 'verified_static_identity'
+        provenance = {
+            'row_manifest_path': str(manifest_path), 'row_manifest_sha256': sha256(manifest_path),
+            'identity_rows': int(len(identity)), 'unique_sha256': int(identity.sha256.nunique()),
+            'appeared_min': None if 'appeared' not in identity else str(identity.appeared.dropna().min()),
+            'appeared_max': None if 'appeared' not in identity else str(identity.appeared.dropna().max()),
+            'avclass_nonmissing': None if 'avclass' not in identity else int(identity.avclass.notna().sum()),
+        }
+        limitations = [
+            'Static row identity, SHA-256 and binary labels are verified against the supplied EMBER manifest.',
+            'EMBER label 1 means generic malware, not ransomware; AVClass is optional weak family metadata.',
+            'A random row split does not establish family-held-out, temporal/zero-day or cross-dataset generalization.',
+            'Static EMBER artifacts contain no executable behavior traces; they do not validate PID fusion.',
+        ]
     audit = {'data_path': str(path), 'data_sha256': sha256(path), 'rows': len(y), 'features': X.shape[1],
              'feature_names': list(features.columns), 'exact_duplicate_vectors': 0, 'split': split_description,
              'class_counts': {name: {str(k): int(np.sum(y[ix] == k)) for k in [0, 1]}
                              for name, ix in [('train_pool', train), ('validation', val), ('test', test)]},
-             'provenance_status': 'unverified', 'limitations': [DATA_LIMITATION]}
-    return Dataset(X, y, list(features.columns), train, val, test, audit)
+             'provenance_status': provenance_status, **provenance, 'limitations': limitations}
+    return Dataset(X, y, list(features.columns), train, val, test, audit, identity)
 
 
 def finish_manifest(out):

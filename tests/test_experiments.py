@@ -1,6 +1,7 @@
 import tempfile
 import unittest
 from pathlib import Path
+import hashlib
 import json
 import sqlite3
 
@@ -78,6 +79,24 @@ class ExperimentMathTests(unittest.TestCase):
 
 
 class DatasetGuardTests(unittest.TestCase):
+    def test_verified_identity_manifest_is_bound_to_rows_labels_and_features(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            data, manifest = root / 'data.csv', root / 'manifest.csv'
+            frame = pd.DataFrame({'0': np.arange(20, dtype=float),
+                                  '1': np.arange(20, dtype=float) / 3,
+                                  'label': [0, 1] * 10})
+            frame.to_csv(data, index=False)
+            hashes = [hashlib.sha256(np.asarray(row, dtype='<f4').tobytes()).hexdigest()
+                      for row in frame[['0', '1']].to_numpy()]
+            pd.DataFrame({'row_id': np.arange(20), 'label': frame.label,
+                          'sha256': [f'{index:064x}' for index in range(20)],
+                          'source_feature_float32_sha256': hashes}).to_csv(manifest, index=False)
+            loaded = load_dataset(data, row_manifest=manifest)
+            self.assertEqual(loaded.audit['provenance_status'], 'verified_static_identity')
+            self.assertEqual(loaded.audit['unique_sha256'], 20)
+            self.assertIsNotNone(loaded.identity_manifest)
+
     def test_duplicate_feature_vectors_are_rejected(self):
         with tempfile.TemporaryDirectory() as folder:
             path = Path(folder) / 'data.csv'

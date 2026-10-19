@@ -97,7 +97,12 @@ def run(data, out, seed=42, k_values=(10, 25, 50), repetitions=20, bootstrap=500
     if data.X.shape[1] == 2381:
         write_json(out / 'feature_groups.json', ember_schema(schema_source))
         config['schema_source_sha256'] = sha256(schema_source)
-        config['schema_status'] = 'Extractor reference; original CSV extraction provenance remains unverified.'
+        config['schema_status'] = (
+            'EMBER v2 dimension and row identity verified; bundled extractor is a schema reference, '
+            'not a reconstruction of the original release toolchain.'
+            if data.audit['provenance_status'] == 'verified_static_identity'
+            else 'Extractor reference; original CSV extraction provenance remains unverified.'
+        )
     write_json(out / 'config.json', config)
     model = lgb.LGBMClassifier(**params)
     train_start = perf_counter()

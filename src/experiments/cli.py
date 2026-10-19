@@ -16,6 +16,7 @@ def parser():
     run = sub.add_parser('run', help='Train and evaluate AL and/or Fidelity from a feature CSV.')
     run.add_argument('--only', choices=['all', 'al', 'fidelity'], default='all')
     run.add_argument('--data', type=Path, default=DEFAULT_DATA)
+    run.add_argument('--row-manifest', type=Path, help='Optional row_id/label/SHA-256 manifest for verified static provenance.')
     run.add_argument('--output', type=Path, required=True, help='A NEW output directory; never overwrites an old run.')
     run.add_argument('--split-file', type=Path, help='Optional complete row_id,split CSV; groups/time splits must be defined upstream.')
     run.add_argument('--split-seed', type=int, default=42)
@@ -35,6 +36,7 @@ def parser():
     run.add_argument('--target-val-auc', type=float, help='Optional predeclared target for label-budget-to-quality analysis.')
     audit = sub.add_parser('audit-data', help='Inspect the feature data and split without training.')
     audit.add_argument('--data', type=Path, default=DEFAULT_DATA)
+    audit.add_argument('--row-manifest', type=Path)
     audit.add_argument('--split-file', type=Path)
     audit.add_argument('--split-seed', type=int, default=42)
     audit.add_argument('--output', type=Path)
@@ -105,7 +107,7 @@ def main(argv=None):
     args = parser().parse_args(argv)
     try:
         if args.command == 'audit-data':
-            data = load_dataset(args.data, args.split_seed, args.split_file)
+            data = load_dataset(args.data, args.split_seed, args.split_file, args.row_manifest)
             if args.output:
                 args.output.mkdir(parents=True, exist_ok=False)
                 data.save_split(args.output)
@@ -176,7 +178,7 @@ def main(argv=None):
             print(json.dumps({'status': result['status'], 'output': str(args.output)}, ensure_ascii=False))
             return 0
 
-        data = load_dataset(args.data, args.split_seed, args.split_file)
+        data = load_dataset(args.data, args.split_seed, args.split_file, args.row_manifest)
         args.output.mkdir(parents=True, exist_ok=False)
         status = {'started_at_utc': datetime.now(timezone.utc).isoformat(), 'command': vars(args).copy(),
                   'status': 'running', 'experiments': {},
@@ -215,7 +217,7 @@ def main(argv=None):
             'Các bảng .tex, CSV và biểu đồ PDF/PNG được sinh từ dự đoán đã lưu. '
             'Bộ mặc định không chạy PID khi chưa có tín hiệu động thật. '
             'Không dùng các log demo hay bảng cũ trong results/ làm bằng chứng của lần chạy này.\n\n'
-            + data.audit['limitations'][0] + '\n', encoding='utf-8')
+            + '\n'.join(f'- {item}' for item in data.audit['limitations']) + '\n', encoding='utf-8')
         finish_manifest(args.output)
         print(json.dumps({'status': status['status'], 'output': str(args.output.resolve()), 'fusion': status['fusion']}, ensure_ascii=False, indent=2))
         return 0

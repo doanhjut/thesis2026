@@ -41,6 +41,16 @@ python scripts/run_experiments.py run \
   --output outputs/thesis_run
 ```
 
+Khi dataset có manifest SHA-256 theo hàng, truyền manifest để runner xác minh
+định danh, nhãn và feature hash trước khi huấn luyện:
+
+```bash
+python scripts/run_experiments.py run \
+  --data outputs/ember_identity_dataset/ember_mini_dataset.csv \
+  --row-manifest outputs/ember_identity_dataset/ember_row_manifest.csv \
+  --output outputs/ember_measured_run
+```
+
 Đầu ra gồm config, split cố định, model/checkpoint, dự đoán từng mẫu, truy vấn AL, mask Fidelity, bảng CSV/LaTeX, biểu đồ PDF/PNG, báo cáo Markdown và SHA-256 của artifact. Đường replay riêng nạp lại model và tái tính dự đoán/chỉ số:
 
 ```bash

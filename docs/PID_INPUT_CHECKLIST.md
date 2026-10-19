@@ -107,6 +107,18 @@ EMBER chỉ xác nhận benign/malware và định danh mẫu. `avclass` là wea
 name, không tự động trở thành nhãn ransomware. Bộ này vẫn không thay thế binary
 hoặc sandbox report cần cho PID.
 
+Chạy thí nghiệm static với manifest để mọi config/report mang đúng provenance:
+
+```powershell
+python scripts/run_experiments.py run `
+  --data "outputs\ember_identity_dataset\ember_mini_dataset.csv" `
+  --row-manifest "outputs\ember_identity_dataset\ember_row_manifest.csv" `
+  --output "outputs\ember_measured_run"
+```
+
+Runner kiểm tra đủ `row_id`, nhãn, SHA-256 duy nhất và hash float32 của từng
+vector trước khi chia dữ liệu hoặc huấn luyện.
+
 ### Phương án B — Tạo paired dataset mới
 
 Cung cấp một manifest:
