@@ -41,7 +41,7 @@ python scripts/run_experiments.py run \
   --output outputs/thesis_run
 ```
 
-Đầu ra gồm config, split cố định, model/checkpoint, dự đoán từng mẫu, truy vấn AL, mask Fidelity, bảng CSV/LaTeX, biểu đồ PDF/PNG, báo cáo Markdown và SHA-256 của artifact. Kiểm tra độc lập bằng cách nạp lại model và tái tính dự đoán/chỉ số:
+Đầu ra gồm config, split cố định, model/checkpoint, dự đoán từng mẫu, truy vấn AL, mask Fidelity, bảng CSV/LaTeX, biểu đồ PDF/PNG, báo cáo Markdown và SHA-256 của artifact. Đường replay riêng nạp lại model và tái tính dự đoán/chỉ số:
 
 ```bash
 python scripts/run_experiments.py verify --run outputs/thesis_run
@@ -49,27 +49,44 @@ python scripts/run_experiments.py verify --run outputs/thesis_run
 
 Có thể cấp split hoàn chỉnh bằng CSV gồm `row_id,split`, trong đó `split` nhận đúng ba giá trị `train_pool`, `validation`, `test`. Đây là cách nên dùng khi đã có split theo họ, thời gian hoặc nguồn dữ liệu.
 
-## Thu thập và chạy PID
+## Gate và dữ liệu cần cho PID
 
-Tạo mẫu quan sát động khớp chính xác với các dòng validation/test của lần chạy AL:
-
-```bash
-python scripts/run_experiments.py prepare-dynamic \
-  --al-run outputs/thesis_run/al \
-  --output outputs/thesis_run/dynamic_template
-```
-
-Điền `dynamic_measurements.csv`, lưu báo cáo quan sát riêng cho từng mẫu trong thư mục này và hoàn thiện `provenance.json`. Sau khi cập nhật `measurements_sha256`, chạy:
+Kiểm tra repository có đủ PE, mapping và report động hay chưa. Exit code `3` nghĩa là còn blocker dữ liệu:
 
 ```bash
-python scripts/run_experiments.py fusion \
-  --al-run outputs/thesis_run/al \
-  --dynamic-data outputs/thesis_run/dynamic_template/dynamic_measurements.csv \
-  --provenance outputs/thesis_run/dynamic_template/provenance.json \
-  --output outputs/thesis_fusion
+python scripts/run_experiments.py audit-pid-inputs \
+  --data data/processed/real_mini_dataset.csv \
+  --output outputs/pid_input_audit
 ```
 
-Điểm động phải được tạo bằng quy tắc cố định không đọc nhãn đích. `sequence_id` và `sequence_order` phải phản ánh phiên quan sát thật; trạng thái PID được reset giữa các phiên và giữa validation/test. Thời gian runner báo cáo chỉ là thời gian replay phép dung hợp, không phải độ trễ sandbox, model hay I/O đầu cuối.
+Phần static uncertainty gate có thể đo trước khi có sandbox data. Runner tách validation thành hai phần rời nhau: một phần fit Platt calibration, phần còn lại chọn threshold; test chỉ dùng đánh giá:
+
+```bash
+python scripts/run_experiments.py gate \
+  --al-run outputs/thesis_run/al \
+  --output outputs/static_gate \
+  --max-early-fnr 0.02 \
+  --max-early-fpr 0.02
+```
+
+Để kiểm chứng riêng I và D, tạo mẫu nhiều time step trên mỗi PE:
+
+```bash
+python scripts/run_experiments.py prepare-temporal \
+  --al-run outputs/thesis_run/al \
+  --output outputs/pid_temporal_input \
+  --windows 5 15 30 60
+```
+
+Sau khi thu thập, hoàn thiện `dynamic_time_series.csv` và `provenance.json`, cập nhật SHA-256 rồi kiểm tra:
+
+```bash
+python scripts/run_experiments.py validate-temporal \
+  --data outputs/pid_temporal_input/dynamic_time_series.csv \
+  --provenance outputs/pid_temporal_input/provenance.json
+```
+
+Lệnh `prepare-dynamic`/`fusion` cũ chỉ xử lý một dynamic score trên mỗi mẫu. Nó có thể so sánh weighting tĩnh–động nhưng không đủ để quy lợi ích riêng cho I và D. Thí nghiệm PID chính phải dùng nhiều time step, reset theo từng PE execution và report có hash hợp lệ.
 
 ## Công thức được cài đặt
 

@@ -20,9 +20,9 @@ Tài liệu này là checklist trước khi đưa số liệu vào luận văn h
 
 ## PID và dung hợp tĩnh–động
 
-- Một `row_id` phải ghép được với đúng mẫu/phiên quan sát và một báo cáo có SHA-256. Không suy ra điểm động từ label, điểm tĩnh hoặc nhiễu ngẫu nhiên.
+- Một `row_id` phải ghép được với đúng PE/SHA-256. Mỗi `execution_id` có nhiều time step và báo cáo có SHA-256; không suy ra điểm động từ label, điểm tĩnh hoặc nhiễu ngẫu nhiên.
 - Quy tắc biến log thành `p_dynamic` phải được khóa trước test và ghi rõ đó là xác suất đã hiệu chuẩn hay risk score.
-- Session validation và test không giao nhau. Reset PID theo session; nếu mỗi session chỉ có một quan sát thì không được diễn giải lợi ích lịch sử riêng của I và D.
+- Execution validation và test không giao nhau. Reset PID theo PE execution; nếu mỗi execution chỉ có một quan sát thì P/PI/PID không định danh được lợi ích lịch sử riêng của I và D.
 - Chọn gain, trọng số cố định và threshold chỉ trên validation. So sánh `Static`, `Dynamic`, `Average`, `Fixed`, `P`, `PI`, `PID` trên cùng test.
 - Bảng 2×2 `Random/XAI_full × Fixed/PID` trả lời hiệu ứng riêng và tương tác của hai đóng góp. Difference-in-differences phải được báo, kể cả bằng không hoặc trái giả thuyết.
 - Đo riêng thời gian thu tín hiệu động, trích đặc trưng, suy luận static/dynamic, dung hợp và end-to-end. Không suy thời gian từ công thức PID.

@@ -1,14 +1,18 @@
 import tempfile
 import unittest
 from pathlib import Path
+import json
 
 import numpy as np
 import pandas as pd
 
-from src.experiments.common import choose_threshold, evaluate, load_dataset
+from src.experiments.common import choose_threshold, evaluate, load_dataset, sha256
 from src.experiments.fidelity import mask_metrics
 from src.experiments.fusion import sequence_scores
+from src.experiments.gating import gate_counts, select_gate
+from src.experiments.provenance import audit
 from src.experiments.signals import normalize, shap_signals
+from src.experiments.temporal import validate as validate_temporal
 from src.pid_fusion import PIDController, fuse_scores
 
 
@@ -58,6 +62,16 @@ class ExperimentMathTests(unittest.TestCase):
         self.assertAlmostEqual(result['auc_after'], 1.0)
         self.assertAlmostEqual(result['mean_absolute_probability_change'], 0.1)
 
+    def test_gate_selection_respects_early_error_constraints(self):
+        y = np.array([0, 0, 0, 1, 1, 1])
+        p = np.array([0.01, 0.1, 0.45, 0.55, 0.9, 0.99])
+        low, high, selected, _ = select_gate(y, p, max_early_fnr=0, max_early_fpr=0)
+        self.assertLessEqual(low, 0.55)
+        self.assertGreaterEqual(high, 0.45)
+        self.assertEqual(selected['early_false_negatives'], 0)
+        self.assertEqual(selected['early_false_positives'], 0)
+        self.assertEqual(gate_counts(y, p, low, high), selected)
+
 
 class DatasetGuardTests(unittest.TestCase):
     def test_duplicate_feature_vectors_are_rejected(self):
@@ -73,6 +87,41 @@ class DatasetGuardTests(unittest.TestCase):
             pd.DataFrame({'x': np.arange(10), 'label': [0, 1, 0, 1, 0.5, 1, 0, 1, 0, 1]}).to_csv(path, index=False)
             with self.assertRaisesRegex(ValueError, 'binary classes'):
                 load_dataset(path)
+
+    def test_pid_input_audit_reports_missing_identity_and_evidence(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            (root / 'data').mkdir()
+            path = root / 'data/features.csv'
+            pd.DataFrame({'x': [1.0, 2.0], 'label': [0, 1]}).to_csv(path, index=False)
+            result = audit(path, repo=root)
+            self.assertEqual(result['status'], 'blocked')
+            self.assertEqual(result['dataset']['identifier_columns'], [])
+            self.assertGreaterEqual(len(result['blockers']), 3)
+
+    def test_temporal_schema_requires_multiple_ordered_observations(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            data = root / 'dynamic.csv'
+            provenance = root / 'provenance.json'
+            report = root / 'report.json'
+            report.write_text('{"events": []}')
+            pd.DataFrame({
+                'row_id': [1, 1], 'execution_id': ['run1', 'run1'],
+                'time_step': [0, 1], 'elapsed_seconds': [5.0, 15.0],
+                'p_dynamic': [0.2, 0.7], 'evidence_status': ['observed', 'observed'],
+                'report_path': ['report.json', 'report.json'], 'report_sha256': [sha256(report), sha256(report)],
+            }).to_csv(data, index=False)
+            provenance.write_text(json.dumps({
+                'signal_origin': 'observed', 'no_target_label_in_score': True,
+                'dataset_sha256': 'abc', 'measurements_sha256': sha256(data),
+                'label_definition': 'test', 'dynamic_feature_definition': 'test',
+                'dynamic_score_definition': 'test', 'dynamic_model_training_source': 'test',
+                'calibration_method': 'test', 'sandbox_or_honeypot': 'test', 'collection_period': 'test',
+            }))
+            result = validate_temporal(data, provenance, 'abc')
+            self.assertEqual(result['status'], 'valid_schema')
+            self.assertEqual(result['scored_rows'], 2)
 
 
 if __name__ == '__main__':

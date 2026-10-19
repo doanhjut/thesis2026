@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 import traceback
 
-from . import active_learning, fidelity, fusion
+from . import active_learning, fidelity, fusion, gating, provenance, temporal
 from .common import DEFAULT_DATA, REPO, finish_manifest, load_dataset, require, write_json
 from .verification import verify_al, verify_fidelity, verify_saved_run
 
@@ -50,6 +50,24 @@ def parser():
     pid.add_argument('--provenance', type=Path, required=True)
     pid.add_argument('--output', type=Path, required=True)
     pid.add_argument('--target-tpr', type=float, default=.95)
+    pid_audit = sub.add_parser('audit-pid-inputs', help='Check whether paired PE and dynamic evidence exist for PID experiments.')
+    pid_audit.add_argument('--data', type=Path, default=DEFAULT_DATA)
+    pid_audit.add_argument('--output', type=Path)
+    gate = sub.add_parser('gate', help='Calibrate saved final AL probabilities and evaluate a validation-selected static uncertainty gate.')
+    gate.add_argument('--al-run', type=Path, required=True)
+    gate.add_argument('--output', type=Path, required=True)
+    gate.add_argument('--calibration-fraction', type=float, default=.5)
+    gate.add_argument('--partition-seed', type=int, default=2026)
+    gate.add_argument('--max-early-fnr', type=float, default=.02)
+    gate.add_argument('--max-early-fpr', type=float, default=.02)
+    temporal_template = sub.add_parser('prepare-temporal', help='Create a multi-time-step dynamic observation template for PID.')
+    temporal_template.add_argument('--al-run', type=Path, required=True)
+    temporal_template.add_argument('--output', type=Path, required=True)
+    temporal_template.add_argument('--windows', nargs='+', type=float, default=[5, 15, 30, 60])
+    temporal_validate = sub.add_parser('validate-temporal', help='Validate collected temporal dynamic observations before PID evaluation.')
+    temporal_validate.add_argument('--data', type=Path, required=True)
+    temporal_validate.add_argument('--provenance', type=Path, required=True)
+    temporal_validate.add_argument('--dataset-sha256')
     return p
 
 
@@ -66,6 +84,26 @@ def main(argv=None):
             return 0
         if args.command == 'verify':
             print(json.dumps(verify_saved_run(args.run, args.data), ensure_ascii=False, indent=2))
+            return 0
+        if args.command == 'audit-pid-inputs':
+            result = provenance.audit(args.data, output=args.output)
+            if args.output:
+                finish_manifest(args.output)
+            print(json.dumps(result, ensure_ascii=False, indent=2))
+            return 0 if result['status'] == 'ready' else 3
+        if args.command == 'gate':
+            result = gating.run(args.al_run, args.output, args.calibration_fraction, args.partition_seed,
+                                args.max_early_fnr, args.max_early_fpr)
+            finish_manifest(args.output)
+            print(json.dumps({'status': result['status'], 'output': str(args.output.resolve())}, ensure_ascii=False, indent=2))
+            return 0
+        if args.command == 'prepare-temporal':
+            result = temporal.prepare(args.al_run, args.output, args.windows)
+            finish_manifest(args.output)
+            print(json.dumps(result, ensure_ascii=False, indent=2))
+            return 0
+        if args.command == 'validate-temporal':
+            print(json.dumps(temporal.validate(args.data, args.provenance, args.dataset_sha256), ensure_ascii=False, indent=2))
             return 0
         if args.command == 'prepare-dynamic':
             result = fusion.prepare_dynamic_template(args.al_run, args.output)
