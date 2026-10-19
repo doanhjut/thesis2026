@@ -1,0 +1,135 @@
+{
+  "status": "measured",
+  "scope": [
+    "Static row identity, SHA-256 and binary labels are verified against the supplied EMBER manifest.",
+    "EMBER label 1 means generic malware, not ransomware; AVClass is optional weak family metadata.",
+    "A random row split does not establish family-held-out, temporal/zero-day or cross-dataset generalization.",
+    "Static EMBER artifacts contain no executable behavior traces; they do not validate PID fusion."
+  ],
+  "n_seeds": 5,
+  "final_training_labels": 700,
+  "additional_validation_labels": 400,
+  "final": {
+    "Random": {
+      "auc": {
+        "mean": 0.9375666666666665,
+        "sd": 0.013694078201097661,
+        "n": 5
+      },
+      "ap": {
+        "mean": 0.8846903586988475,
+        "sd": 0.014571757647209421,
+        "n": 5
+      },
+      "fpr": {
+        "mean": 0.5086666666666667,
+        "sd": 0.09965496029356044,
+        "n": 5
+      },
+      "tpr": {
+        "mean": 0.974,
+        "sd": 0.027018512172212572,
+        "n": 5
+      }
+    },
+    "U+H": {
+      "auc": {
+        "mean": 0.9524000000000001,
+        "sd": 0.00538351392885927,
+        "n": 5
+      },
+      "ap": {
+        "mean": 0.9226785085833399,
+        "sd": 0.011114797269735004,
+        "n": 5
+      },
+      "fpr": {
+        "mean": 0.46333333333333326,
+        "sd": 0.10464224768228172,
+        "n": 5
+      },
+      "tpr": {
+        "mean": 0.968,
+        "sd": 0.022803508501982733,
+        "n": 5
+      }
+    },
+    "U+V": {
+      "auc": {
+        "mean": 0.9530266666666666,
+        "sd": 0.006538068012290219,
+        "n": 5
+      },
+      "ap": {
+        "mean": 0.9215539106177502,
+        "sd": 0.011793265124947107,
+        "n": 5
+      },
+      "fpr": {
+        "mean": 0.522,
+        "sd": 0.03969326839094455,
+        "n": 5
+      },
+      "tpr": {
+        "mean": 0.984,
+        "sd": 0.011401754250991391,
+        "n": 5
+      }
+    },
+    "Uncertainty": {
+      "auc": {
+        "mean": 0.95002,
+        "sd": 0.0072320505775025894,
+        "n": 5
+      },
+      "ap": {
+        "mean": 0.9231875156332954,
+        "sd": 0.012030365382675656,
+        "n": 5
+      },
+      "fpr": {
+        "mean": 0.5006666666666667,
+        "sd": 0.06832926817176437,
+        "n": 5
+      },
+      "tpr": {
+        "mean": 0.9739999999999999,
+        "sd": 0.013416407864998751,
+        "n": 5
+      }
+    },
+    "XAI_full": {
+      "auc": {
+        "mean": 0.9548933333333333,
+        "sd": 0.009818531232091452,
+        "n": 5
+      },
+      "ap": {
+        "mean": 0.9244268595539185,
+        "sd": 0.016929098717208255,
+        "n": 5
+      },
+      "fpr": {
+        "mean": 0.534,
+        "sd": 0.11023711816907326,
+        "n": 5
+      },
+      "tpr": {
+        "mean": 0.982,
+        "sd": 0.013038404810405309,
+        "n": 5
+      }
+    }
+  },
+  "counts": {
+    "models": 150,
+    "queries": 12500,
+    "prediction_records": 120000
+  },
+  "max_shap_additivity_error": 3.552713678800501e-15,
+  "elapsed_seconds": 84.90289250016212,
+  "limitations": [
+    "Seeds share one test set; SD is not a population confidence interval.",
+    "No conclusion about labels/time saved unless that quantity is separately measured."
+  ]
+}

@@ -1,0 +1,119 @@
+{
+  "scope": "EMBER 2018 static binary malware classification on one stratified random row split.",
+  "active_learning": {
+    "final_xai_test_auc_mean": 0.9548933333333333,
+    "final_xai_test_auc_sd": 0.009818531232091452,
+    "final_xai_test_ap_mean": 0.9244268595539185,
+    "comparisons": [
+      {
+        "baseline": "Random",
+        "auc_difference_mean": 0.017326666666666712,
+        "auc_wins": 4,
+        "ap_difference_mean": 0.03973650085507099,
+        "ap_wins": 4,
+        "fpr_difference_mean": 0.025333333333333374,
+        "fpr_wins_lower_is_better": 2,
+        "n_seeds": 5
+      },
+      {
+        "baseline": "Uncertainty",
+        "auc_difference_mean": 0.004873333333333374,
+        "auc_wins": 4,
+        "ap_difference_mean": 0.0012393439206230372,
+        "ap_wins": 3,
+        "fpr_difference_mean": 0.03333333333333335,
+        "fpr_wins_lower_is_better": 2,
+        "n_seeds": 5
+      },
+      {
+        "baseline": "U+H",
+        "auc_difference_mean": 0.0024933333333333474,
+        "auc_wins": 3,
+        "ap_difference_mean": 0.001748350970578505,
+        "ap_wins": 3,
+        "fpr_difference_mean": 0.07066666666666668,
+        "fpr_wins_lower_is_better": 2,
+        "n_seeds": 5
+      },
+      {
+        "baseline": "U+V",
+        "auc_difference_mean": 0.0018666666666667276,
+        "auc_wins": 4,
+        "ap_difference_mean": 0.0028729489361681406,
+        "ap_wins": 3,
+        "fpr_difference_mean": 0.01200000000000001,
+        "fpr_wins_lower_is_better": 2,
+        "n_seeds": 5
+      }
+    ],
+    "normalized_test_auc_aulc_xai": 0.9272199999999999,
+    "normalized_test_auc_aulc_uncertainty": 0.9235193333333334,
+    "normalized_test_auc_aulc_difference": 0.0037006666666665744,
+    "target_validation_auc": 0.95,
+    "target_reached_runs": 0,
+    "target_total_runs": 25,
+    "label_saving_claim_supported": false,
+    "reason": "No method/seed reached the predeclared validation AUC target; all methods used 700 training labels.",
+    "mean_query_seconds_xai_rounds_1_to_5": 0.4227441001683472,
+    "mean_query_seconds_uncertainty_rounds_1_to_5": 0.024648380186408518,
+    "xai_query_overhead_vs_uncertainty_ratio": 17.15098911049151,
+    "xai_query_time_as_fraction_of_xai_training_time": 0.17040198962053232
+  },
+  "fidelity": {
+    "baseline_test_auc": 0.9688,
+    "deletion_comparisons": [
+      {
+        "k": 10,
+        "baseline_auc": 0.9688,
+        "top_shap_auc_after": 0.9033333333333332,
+        "top_shap_auc_drop": 0.0654666666666667,
+        "random_auc_after_mean": 0.96857,
+        "random_auc_drop_mean": 0.00022999999999995686,
+        "top_shap_mean_absolute_probability_change": 0.1296971671704622,
+        "random_mean_absolute_probability_change": 0.00256319091641804,
+        "random_replicates": 20
+      },
+      {
+        "k": 25,
+        "baseline_auc": 0.9688,
+        "top_shap_auc_after": 0.8379333333333333,
+        "top_shap_auc_drop": 0.1308666666666667,
+        "random_auc_after_mean": 0.9680099999999999,
+        "random_auc_drop_mean": 0.00078999999999996,
+        "top_shap_mean_absolute_probability_change": 0.2060768195930073,
+        "random_mean_absolute_probability_change": 0.006067113994178785,
+        "random_replicates": 20
+      },
+      {
+        "k": 50,
+        "baseline_auc": 0.9688,
+        "top_shap_auc_after": 0.6041000000000001,
+        "top_shap_auc_drop": 0.3646999999999999,
+        "random_auc_after_mean": 0.9672683333333334,
+        "random_auc_drop_mean": 0.001531666666666611,
+        "top_shap_mean_absolute_probability_change": 0.2404885651038111,
+        "random_mean_absolute_probability_change": 0.011108707398845908,
+        "random_replicates": 20
+      }
+    ],
+    "ec": 0.40922240969774126,
+    "cf": 0.43040363676867993,
+    "ofs": null,
+    "ofs_reason": "No validated common-scale aggregation rule; report components separately.",
+    "supported": "TreeSHAP ranks model-sensitive coordinates under the declared tabular masking intervention.",
+    "unsupported": "Causal or executable-level validity of the masked PE samples."
+  },
+  "static_gate": {
+    "xai_routed_fraction_mean": 0.493,
+    "xai_early_fnr_mean": 0.014000000000000002,
+    "xai_early_fpr_mean": 0.015333333333333334,
+    "uncertainty_routed_fraction_mean": 0.5349999999999999,
+    "routed_fraction_xai_minus_uncertainty": -0.041999999999999926,
+    "limitation": "Routed rows have no dynamic final decision; this is not end-to-end PID evidence."
+  },
+  "pid": {
+    "status": "not_run",
+    "reason": "Requires actual dynamic reports aligned to validation/test IDs; use prepare-dynamic then fusion.",
+    "claim_supported": false
+  }
+}

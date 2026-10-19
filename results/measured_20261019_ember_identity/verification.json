@@ -1,0 +1,13 @@
+{
+  "al": {
+    "status": "passed",
+    "checkpoints_replayed": 150,
+    "prediction_records": 120000,
+    "query_records": 12500
+  },
+  "fidelity": {
+    "status": "passed",
+    "mask_batches_replayed": 63,
+    "prediction_records": 25200
+  }
+}

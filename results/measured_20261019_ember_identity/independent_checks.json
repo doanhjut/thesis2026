@@ -1,0 +1,33 @@
+{
+  "run_status_completed": true,
+  "al_replay_passed": true,
+  "fidelity_replay_passed": true,
+  "static_gate_replay_passed": true,
+  "metrics_row_count_expected": true,
+  "metrics_expected_rows": 150,
+  "metrics_actual_rows": 150,
+  "round_zero_matched_within_seed": true,
+  "uploaded_al_summary_matches_metrics": true,
+  "uploaded_fidelity_summary_matches_mask_metrics": true,
+  "split_row_ids_unique": true,
+  "split_rows": 2000,
+  "split_counts": {
+    "test": {
+      "0": 300,
+      "1": 100
+    },
+    "train_pool": {
+      "0": 900,
+      "1": 300
+    },
+    "validation": {
+      "0": 300,
+      "1": 100
+    }
+  },
+  "target_validation_auc": 0.95,
+  "target_reached_runs": 0,
+  "target_total_runs": 25,
+  "static_gate_raw_decisions_available_in_package": false,
+  "code_commit_recorded_in_uploaded_run_status": false
+}

@@ -1,0 +1,81 @@
+{
+  "status": "measured",
+  "evaluation_rows": 400,
+  "baseline_test_roc_auc": 0.9688,
+  "baseline_test_average_precision": 0.9363374639437181,
+  "max_shap_additivity_error": 7.993605777301127e-15,
+  "deletion_comparisons": [
+    {
+      "k": 10,
+      "auc_before": 0.9688,
+      "top_shap_auc_after": 0.9033333333333332,
+      "top_shap_auc_drop": 0.06546666666666678,
+      "top_shap_auc_drop_bootstrap_test_ci95": [
+        0.03950916666666664,
+        0.09610416666666673
+      ],
+      "random_auc_after_mean": 0.96857,
+      "random_auc_drop_mean": 0.00022999999999997466,
+      "random_auc_drop_sd_across_masks": 0.0011597489141446167,
+      "top_shap_ff_raw": 9.102630219117074,
+      "top_shap_mean_absolute_probability_change": 0.12969716717046223,
+      "random_mean_absolute_probability_change": 0.0025631909164180854
+    },
+    {
+      "k": 25,
+      "auc_before": 0.9688,
+      "top_shap_auc_after": 0.8379333333333333,
+      "top_shap_auc_drop": 0.1308666666666667,
+      "top_shap_auc_drop_bootstrap_test_ci95": [
+        0.0889941666666667,
+        0.17384916666666647
+      ],
+      "random_auc_after_mean": 0.9680099999999998,
+      "random_auc_drop_mean": 0.0007900000000000019,
+      "random_auc_drop_sd_across_masks": 0.0013790453516369257,
+      "top_shap_ff_raw": 26.575718352708996,
+      "top_shap_mean_absolute_probability_change": 0.20607681959300733,
+      "random_mean_absolute_probability_change": 0.0060671139941788285
+    },
+    {
+      "k": 50,
+      "auc_before": 0.9688,
+      "top_shap_auc_after": 0.6041000000000001,
+      "top_shap_auc_drop": 0.3646999999999999,
+      "top_shap_auc_drop_bootstrap_test_ci95": [
+        0.30523333333333336,
+        0.4332641666666666
+      ],
+      "random_auc_after_mean": 0.9672683333333334,
+      "random_auc_drop_mean": 0.0015316666666666367,
+      "random_auc_drop_sd_across_masks": 0.0017307495925311656,
+      "top_shap_ff_raw": 25.754391360893607,
+      "top_shap_mean_absolute_probability_change": 0.24048856510381117,
+      "random_mean_absolute_probability_change": 0.011108707398845955
+    }
+  ],
+  "ec": 0.40922240969774126,
+  "ec_reason": null,
+  "ec_pair_count": 79800,
+  "cf": 0.43040363676867993,
+  "cf_numerator": 0.9300498562506205,
+  "cf_denominator_max_sample_shap_norm": 2.1608782472952117,
+  "ofs": null,
+  "ofs_reason": "No validated common-scale aggregation rule; report components separately.",
+  "limitations": [
+    "Static row identity, SHA-256 and binary labels are verified against the supplied EMBER manifest.",
+    "EMBER label 1 means generic malware, not ransomware; AVClass is optional weak family metadata.",
+    "A random row split does not establish family-held-out, temporal/zero-day or cross-dataset generalization.",
+    "Static EMBER artifacts contain no executable behavior traces; they do not validate PID fusion.",
+    "One fitted model; test bootstrap is conditional on that model.",
+    "Masking is not a validated transformation of executable PE files.",
+    "EC pairs share samples; no naive independent-pair p-value.",
+    "CF describes class separation, not causality or explanation correctness."
+  ],
+  "timings": {
+    "train_seconds": 1.1764527997002006,
+    "native_shap_seconds": 0.02775039989501238,
+    "mask_prediction_seconds": 0.9023525998927653,
+    "total_seconds": 5.443073499947786
+  }
+}

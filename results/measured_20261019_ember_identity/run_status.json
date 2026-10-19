@@ -1,0 +1,52 @@
+{
+  "started_at_utc": "2026-10-19T08:53:20.352755+00:00",
+  "command": {
+    "command": "run",
+    "only": "all",
+    "data": "outputs\\ember_identity_dataset\\ember_mini_dataset.csv",
+    "row_manifest": "outputs\\ember_identity_dataset\\ember_row_manifest.csv",
+    "output": "outputs\\ember_measured_run",
+    "split_file": null,
+    "split_seed": 42,
+    "seeds": [
+      11,
+      22,
+      33,
+      44,
+      55
+    ],
+    "initial_labels": 200,
+    "rounds": 5,
+    "batch_size": 100,
+    "al_trees": 60,
+    "fidelity_trees": 100,
+    "fidelity_seed": 42,
+    "k": [
+      10,
+      25,
+      50
+    ],
+    "random_masks": 20,
+    "bootstrap": 500,
+    "max_fidelity_test_rows": 1000,
+    "threads": 2,
+    "target_tpr": 0.95,
+    "target_val_auc": 0.95
+  },
+  "status": "completed_selected_experiments",
+  "experiments": {
+    "al": {
+      "status": "measured",
+      "models": 150
+    },
+    "fidelity": {
+      "status": "measured",
+      "evaluation_rows": 400
+    }
+  },
+  "fusion": {
+    "status": "not_run",
+    "reason": "Requires actual dynamic reports aligned to validation/test IDs; use prepare-dynamic then fusion."
+  },
+  "finished_at_utc": "2026-10-19T08:55:05.788397+00:00"
+}

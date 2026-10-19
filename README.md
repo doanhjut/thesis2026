@@ -117,6 +117,8 @@ Active Learning dùng `U = 1 - 2|p-0.5|`. Từ SHAP có dấu `φ`, đặt tổn
 
 ## Kết quả đã đo
 
+Gói mới nhất dùng dữ liệu EMBER 2018 có định danh hàng đã kiểm tra nằm tại [`results/measured_20261019_ember_identity`](results/measured_20261019_ember_identity/README.md). Gói chứa artifact được tải lên, bảng tái tính độc lập, biểu đồ và hash. Đây là nguồn số liệu nên ưu tiên cho phần AL/Fidelity/static gate; báo cáo trong gói ghi rõ các kết luận chưa được dữ liệu ủng hộ.
+
 Gói báo cáo gọn của lần chạy mặc định ngày 2026-10-14 nằm tại [`results/measured_20261014`](results/measured_20261014/README.md). Gói này chứa bảng, biểu đồ, config, tóm tắt và kết quả verification. Checkpoint và dự đoán từng mẫu không được commit vì toàn bộ run có kích thước khoảng 28 MB; có thể tái tạo bằng lệnh mặc định ở trên.
 
 Kết quả calibration/static gate và audit đầu vào PID ngày 19/10/2026 nằm tại [`results/measured_20261019_gate`](results/measured_20261019_gate/README.md).
