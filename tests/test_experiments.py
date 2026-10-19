@@ -2,6 +2,7 @@ import tempfile
 import unittest
 from pathlib import Path
 import json
+import sqlite3
 
 import numpy as np
 import pandas as pd
@@ -11,7 +12,8 @@ from src.experiments.fidelity import mask_metrics
 from src.experiments.fusion import sequence_scores
 from src.experiments.gating import gate_counts, select_gate
 from src.experiments.provenance import audit
-from src.experiments.recovery import inspect_npz, recover, sampled_source_indices
+from src.experiments.recovery import (SOREL_TAGS, inspect_npz, recover,
+                                      recover_sorel_metadata, sampled_source_indices)
 from src.experiments.signals import normalize, shap_signals
 from src.experiments.temporal import validate as validate_temporal
 from src.pid_fusion import PIDController, fuse_scores
@@ -151,6 +153,46 @@ class DatasetGuardTests(unittest.TestCase):
             manifest = pd.read_csv(output / 'row_manifest.csv', dtype={'sha256': str})
             np.testing.assert_array_equal(manifest.source_index, source_ids)
             self.assertTrue(manifest.sha256.str.len().eq(64).all())
+
+    def test_sorel_metadata_recovery_replays_test_order_and_missing_filter(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            db, manifest, inspection = root / 'meta.db', root / 'row_manifest.csv', root / 'inspection.json'
+            missing, output = root / 'missing.json', root / 'out'
+            tag_schema = ','.join(f'{tag} integer' for tag in SOREL_TAGS)
+            connection = sqlite3.connect(db)
+            connection.execute(
+                f'create table meta(sha256 text, is_malware integer, rl_fs_t real, '
+                f'rl_ls_const_positives integer,{tag_schema})')
+            placeholders = ','.join(['?'] * (4 + len(SOREL_TAGS)))
+            connection.execute(f'insert into meta values({placeholders})',
+                               [f'{999:064x}', 0, 5.0, 0, *([0] * len(SOREL_TAGS))])
+            raw_test = []
+            for index in range(15):
+                sha = f'{index:064x}'
+                label = index % 2
+                tags = [0] * len(SOREL_TAGS)
+                tags[SOREL_TAGS.index('ransomware')] = int(index in {5, 13})
+                connection.execute(f'insert into meta values({placeholders})',
+                                   [sha, label, 20.0 + index, label * 3, *tags])
+                raw_test.append((sha, label, tags))
+            connection.commit()
+            connection.close()
+            missing.write_text(json.dumps([raw_test[3][0]]))
+            filtered = [item for i, item in enumerate(raw_test) if i != 3]
+            source_indices = np.array([4, 0, 12])
+            pd.DataFrame({
+                'row_id': [0, 1, 2], 'source_index': source_indices,
+                'label': [filtered[i][1] for i in source_indices],
+                'feature_sha256': ['a' * 64, 'b' * 64, 'c' * 64],
+            }).to_csv(manifest, index=False)
+            inspection.write_text(json.dumps({'rows': len(filtered), 'features': 3}))
+            report = recover_sorel_metadata(manifest, inspection, db, missing, output, test_split=10.0)
+            self.assertEqual(report['status'], 'sorel_metadata_recovered')
+            self.assertEqual(report['official_order_replay']['test_rows_after_missing_filter'], 14)
+            augmented = pd.read_csv(output / 'sorel_row_manifest.csv', dtype={'sha256': str})
+            self.assertEqual(augmented.sha256.tolist(), [filtered[i][0] for i in source_indices])
+            self.assertEqual(int(augmented.tag_ransomware.sum()), 2)
 
 
 if __name__ == '__main__':

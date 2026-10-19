@@ -81,6 +81,14 @@ def parser():
     recover.add_argument('--n-positive', type=int, default=500)
     recover.add_argument('--seed', type=int, default=42)
     recover.add_argument('--hash-source', action='store_true')
+    sorel = sub.add_parser('recover-sorel-metadata', help='Map recovered SOREL NPZ row indices to meta.db SHA-256 and tags.')
+    sorel.add_argument('--manifest', type=Path, required=True)
+    sorel.add_argument('--source-inspection', type=Path, required=True)
+    sorel.add_argument('--meta-db', type=Path, required=True)
+    sorel.add_argument('--missing-shas', type=Path, required=True)
+    sorel.add_argument('--output', type=Path, required=True)
+    sorel.add_argument('--test-split', type=float, default=recovery.SOREL_TEST_SPLIT)
+    sorel.add_argument('--hash-meta-db', action='store_true', help='Hash the multi-GB SQLite file; slow but useful for a frozen run.')
     return p
 
 
@@ -129,6 +137,13 @@ def main(argv=None):
         if args.command == 'recover-manifest':
             result = recovery.recover(args.source, args.mini, args.output, args.metadata_jsonl,
                                       args.n_negative, args.n_positive, args.seed, args.hash_source)
+            finish_manifest(args.output)
+            print(json.dumps(result, ensure_ascii=False, indent=2))
+            return 0
+        if args.command == 'recover-sorel-metadata':
+            result = recovery.recover_sorel_metadata(
+                args.manifest, args.source_inspection, args.meta_db, args.missing_shas,
+                args.output, args.test_split, args.hash_meta_db)
             finish_manifest(args.output)
             print(json.dumps(result, ensure_ascii=False, indent=2))
             return 0

@@ -39,6 +39,32 @@ Runner tái tạo sampling và shuffle cũ, stream đúng 2.000 source rows, r�
 
 Lần đóng băng cuối nên thêm `--hash-source`. Hash file hàng chục GB sẽ mất nhiều thời gian nên chưa cần dùng ở bước inspect đầu tiên.
 
+### Ánh xạ SOREL source index sang SHA-256 và tag
+
+Khi `recover-manifest` đã đạt, không dùng `ember2018/test_features.jsonl`: JSONL
+đó thuộc EMBER 2018 và không cùng thứ tự mẫu với SOREL. NPZ LightGBM chính thức
+chỉ chứa feature và nhãn malware nhị phân. Cần hai artifact đúng bản SOREL:
+
+- `processed-data/meta.db` (khoảng 3,5 GB), chứa SHA-256, timestamp, nhãn và tag;
+- `shas_missing_ember_features.json` từ repository SOREL-20M chính thức.
+
+Chạy:
+
+```powershell
+python scripts/run_experiments.py recover-sorel-metadata `
+  --manifest "outputs\recovered_manifest_sorel_test\row_manifest.csv" `
+  --source-inspection "outputs\recovered_manifest_sorel_test\source_inspection.json" `
+  --meta-db "D:\Code\Luanvan\data\sorel20m\meta.db" `
+  --missing-shas "D:\Code\Luanvan\data\sorel20m\shas_missing_ember_features.json" `
+  --output "outputs\recovered_sorel_metadata"
+```
+
+Công cụ phát lại truy vấn test và bộ lọc missing-feature của mã SOREL chính thức,
+kiểm tra tổng số dòng sau lọc bằng số dòng NPZ, rồi kiểm tra nhãn tại đủ 2.000
+source index trước khi xuất `sorel_row_manifest.csv`. `tag_ransomware` là weak
+multi-label tag của SOREL, không được mô tả như family ground truth. Lần đóng
+băng cuối có thể thêm `--hash-meta-db`.
+
 ### Phương án B — Tạo paired dataset mới
 
 Cung cấp một manifest:

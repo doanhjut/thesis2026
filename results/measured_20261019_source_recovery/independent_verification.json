@@ -1,0 +1,46 @@
+{
+  "status": "verified_uploaded_recovery_package",
+  "artifact_hash_checks": {
+    "recovery_report.json": {
+      "expected": "63774db9eaf57184d5914ee118cd884f5cfa5d9c2105e75ec38810af2f1a28fa",
+      "actual": "63774db9eaf57184d5914ee118cd884f5cfa5d9c2105e75ec38810af2f1a28fa",
+      "match": true
+    },
+    "row_manifest.csv": {
+      "expected": "1d1119bbb797ed34b2803f4a805c1f9c00bf334d5bac6b87eb426d229bde5e24",
+      "actual": "1d1119bbb797ed34b2803f4a805c1f9c00bf334d5bac6b87eb426d229bde5e24",
+      "match": true
+    },
+    "source_inspection.json": {
+      "expected": "321defa7dca61279521b8637d9eb62c6813205f01443d19f012a1577e598a5a8",
+      "actual": "321defa7dca61279521b8637d9eb62c6813205f01443d19f012a1577e598a5a8",
+      "match": true
+    }
+  },
+  "manifest_checks": {
+    "rows": 2000,
+    "row_id_contiguous": true,
+    "unique_source_indices": 2000,
+    "source_indices_within_bounds": true,
+    "source_index_min": 5146,
+    "source_index_max": 4194008,
+    "label_counts": {
+      "0": 1500,
+      "1": 500
+    },
+    "labels_match_repository_csv": true,
+    "feature_hashes_match_repository_csv": true,
+    "duplicate_feature_hashes": 0
+  },
+  "csv_byte_identity": {
+    "repository_sha256": "c733cc0c3e0950fa1d05d57d34c69d0a034383e0c1a2fde0e6878b9e2e8c3668",
+    "reported_windows_sha256": "e5511cc5ee04b79840a37ca9d435edbfa4e1bf34117d7989477a467cc1946e07",
+    "repository_with_crlf_sha256": "e5511cc5ee04b79840a37ca9d435edbfa4e1bf34117d7989477a467cc1946e07",
+    "difference_explained_by_lf_to_crlf_conversion": true
+  },
+  "limits": [
+    "The source archive SHA-256 was not computed in this run.",
+    "The source-to-mini feature check used rtol=1e-6 and atol=1e-8; reported maximum absolute difference is 120.0, so it is a tolerance match rather than byte equality.",
+    "No SHA-256 or SOREL tag metadata was supplied; label 1 remains generic malware."
+  ]
+}

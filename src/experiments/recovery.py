@@ -2,6 +2,7 @@
 import hashlib
 import json
 from pathlib import Path
+import sqlite3
 import zipfile
 
 import numpy as np
@@ -9,6 +10,13 @@ import numpy.lib.format as npformat
 import pandas as pd
 
 from .common import require, sha256, write_json
+
+
+SOREL_TEST_SPLIT = 1547279640.0
+SOREL_TAGS = [
+    'adware', 'flooder', 'ransomware', 'dropper', 'spyware', 'packed',
+    'crypto_miner', 'file_infector', 'installer', 'worm', 'downloader',
+]
 
 
 def _header(stream):
@@ -182,4 +190,135 @@ def recover(source, mini, out, metadata_jsonl=None, n_negative=1500, n_positive=
         'label_semantics': 'unverified: label 1 must not be renamed ransomware without source documentation.',
     }
     write_json(out / 'recovery_report.json', report)
+    return report
+
+
+def _sqlite_columns(connection, table):
+    return {row[1] for row in connection.execute(f'PRAGMA table_info({table})')}
+
+
+def _text_sha(value):
+    if isinstance(value, bytes):
+        value = value.decode('ascii')
+    value = str(value)
+    require(len(value) == 64 and all(char in '0123456789abcdefABCDEF' for char in value),
+            f'Invalid SHA-256 value in SOREL metadata: {value!r}')
+    return value.lower()
+
+
+def recover_sorel_metadata(manifest, source_inspection, meta_db, missing_shas, out,
+                           test_split=SOREL_TEST_SPLIT, hash_meta_db=False):
+    """Map official SOREL LightGBM NPZ row indices back to meta.db records.
+
+    The official array builder iterates the SQLite test query without shuffling and
+    removes records without EMBER features. This function reproduces that order,
+    checks the complete filtered row count and verifies the binary label at every
+    selected source index before exporting SHA-256 and weak malware tags.
+    """
+    manifest, source_inspection = Path(manifest).resolve(), Path(source_inspection).resolve()
+    meta_db, missing_shas, out = Path(meta_db).resolve(), Path(missing_shas).resolve(), Path(out)
+    require(manifest.is_file(), 'Recovered row_manifest.csv does not exist.')
+    require(source_inspection.is_file(), 'source_inspection.json does not exist.')
+    require(meta_db.is_file(), 'SOREL meta.db does not exist.')
+    require(missing_shas.is_file(), 'shas_missing_ember_features.json does not exist.')
+    out.mkdir(parents=True, exist_ok=False)
+
+    rows = pd.read_csv(manifest)
+    required_manifest = {'row_id', 'source_index', 'label'}
+    require(required_manifest.issubset(rows.columns),
+            f'Manifest requires columns {sorted(required_manifest)}.')
+    require(not rows[list(required_manifest)].isna().any().any(), 'Manifest identifiers or labels contain missing values.')
+    require(rows.row_id.is_unique and rows.source_index.is_unique, 'Manifest row_id and source_index must be unique.')
+    require(np.array_equal(np.sort(rows.row_id.astype(int)), np.arange(len(rows))),
+            'Manifest row_id must contain every integer from 0 to N-1.')
+    rows['source_index'] = rows.source_index.astype(np.int64)
+    rows['label'] = rows.label.astype(int)
+
+    inspection = json.loads(source_inspection.read_text(encoding='utf-8'))
+    expected_source_rows = int(inspection['rows'])
+    require(rows.source_index.between(0, expected_source_rows - 1).all(),
+            'Manifest source_index exceeds the inspected NPZ row range.')
+    missing_values = json.loads(missing_shas.read_text(encoding='utf-8'))
+    require(isinstance(missing_values, list), 'Missing-feature artifact must be a JSON list of SHA-256 strings.')
+    missing = {_text_sha(value) for value in missing_values}
+
+    connection = sqlite3.connect(f'file:{meta_db}?mode=ro', uri=True)
+    try:
+        columns = _sqlite_columns(connection, 'meta')
+        needed = {'sha256', 'is_malware', 'rl_fs_t', *SOREL_TAGS}
+        require(needed.issubset(columns), f'SOREL meta table is missing columns: {sorted(needed - columns)}')
+        optional = ['rl_ls_const_positives'] if 'rl_ls_const_positives' in columns else []
+        selected_columns = ['sha256', 'is_malware', 'rl_fs_t', *optional, *SOREL_TAGS]
+        query = 'select ' + ','.join(selected_columns) + ' from meta where(rl_fs_t >= ?)'
+        cursor = connection.execute(query, (float(test_split),))
+        targets = set(map(int, rows.source_index))
+        recovered, filtered_index, database_test_rows = {}, 0, 0
+        for values in cursor:
+            database_test_rows += 1
+            record = dict(zip(selected_columns, values))
+            record['sha256'] = _text_sha(record['sha256'])
+            if record['sha256'] in missing:
+                continue
+            if filtered_index in targets:
+                recovered[filtered_index] = record
+            filtered_index += 1
+    finally:
+        connection.close()
+
+    require(filtered_index == expected_source_rows,
+            f'Filtered SOREL test rows ({filtered_index}) differ from inspected NPZ rows ({expected_source_rows}); '
+            'the meta.db, split, missing-feature list or NPZ release is not aligned.')
+    require(len(recovered) == len(rows),
+            f'Only recovered metadata for {len(recovered)}/{len(rows)} selected source indices.')
+
+    ordered = [recovered[int(index)] for index in rows.source_index]
+    metadata_labels = np.asarray([int(item['is_malware']) for item in ordered])
+    require(np.array_equal(metadata_labels, rows.label.to_numpy(dtype=int)),
+            'SOREL metadata labels do not match the NPZ labels at selected source indices.')
+
+    augmented = rows.copy()
+    augmented['sha256'] = [item['sha256'] for item in ordered]
+    augmented['first_seen_timestamp'] = [item['rl_fs_t'] for item in ordered]
+    augmented['meta_is_malware'] = metadata_labels
+    if optional:
+        augmented['av_positive_count'] = [item['rl_ls_const_positives'] for item in ordered]
+    for tag in SOREL_TAGS:
+        augmented['tag_' + tag] = [int(item[tag] is not None and float(item[tag]) != 0.0) for item in ordered]
+    augmented.to_csv(out / 'sorel_row_manifest.csv', index=False)
+
+    tag_counts = {tag: int(augmented['tag_' + tag].sum()) for tag in SOREL_TAGS}
+    report = {
+        'status': 'sorel_metadata_recovered',
+        'inputs': {
+            'row_manifest': str(manifest), 'row_manifest_sha256': sha256(manifest),
+            'source_inspection': str(source_inspection), 'source_inspection_sha256': sha256(source_inspection),
+            'meta_db': str(meta_db), 'meta_db_size_bytes': meta_db.stat().st_size,
+            'meta_db_sha256': sha256(meta_db) if hash_meta_db else None,
+            'meta_db_sha256_status': 'computed' if hash_meta_db else 'skipped; use --hash-meta-db for the frozen manifest',
+            'missing_shas': str(missing_shas), 'missing_shas_sha256': sha256(missing_shas),
+        },
+        'official_order_replay': {
+            'test_split_timestamp': float(test_split),
+            'query': query,
+            'database_test_rows_before_missing_filter': int(database_test_rows),
+            'missing_sha_count_all_splits': int(len(missing)),
+            'test_rows_after_missing_filter': int(filtered_index),
+            'expected_npz_rows': expected_source_rows,
+            'selected_rows': int(len(rows)),
+            'selected_labels_matching': int(np.sum(metadata_labels == rows.label.to_numpy(dtype=int))),
+        },
+        'selected_label_counts': {str(k): int(v) for k, v in augmented.label.value_counts().sort_index().items()},
+        'selected_tag_counts': tag_counts,
+        'ransomware_tagged_selected_rows': int(tag_counts['ransomware']),
+        'label_semantics': {
+            'label': 'SOREL-20M is_malware binary label',
+            'tag_ransomware': 'SOREL-20M weak multi-label ransomware tag; not a verified malware-family ground truth',
+        },
+        'limitations': [
+            'The official LightGBM NPZ contains no SHA-256 or tags; this mapping replays the official SQLite iteration and missing-feature filter.',
+            'All selected binary labels and the complete filtered row count must match, but exact feature-to-SHA confirmation additionally requires the corresponding SOREL ember_features LMDB.',
+            'SOREL metadata and EMBER features do not provide executable behavior traces; PID still requires paired binaries or sandbox reports.',
+        ],
+    }
+    write_json(out / 'sorel_metadata_recovery_report.json', report)
     return report

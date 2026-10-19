@@ -1,0 +1,33 @@
+{
+  "path": "D:\\Code\\Luanvan\\data\\archives\\test-features.npz",
+  "size_bytes": 39987140938,
+  "arrays": [
+    {
+      "entry": "arr_0.npy",
+      "shape": [
+        4195042,
+        2381
+      ],
+      "fortran_order": false,
+      "dtype": "float32"
+    },
+    {
+      "entry": "arr_1.npy",
+      "shape": [
+        4195042
+      ],
+      "fortran_order": false,
+      "dtype": "int64"
+    }
+  ],
+  "feature_entry": "arr_0.npy",
+  "label_entry": "arr_1.npy",
+  "rows": 4195042,
+  "features": 2381,
+  "label_counts": {
+    "0": 2834428,
+    "1": 1360614
+  },
+  "source_sha256": null,
+  "source_sha256_status": "skipped; use --hash-source for the frozen manifest"
+}
