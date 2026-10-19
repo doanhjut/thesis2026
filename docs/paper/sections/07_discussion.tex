@@ -1,0 +1,116 @@
+\section{Discussion}
+\label{sec:discussion}
+
+\subsection{Why Explanation Signals Can Complement Uncertainty}
+
+The active-learning result suggests that output ambiguity and explanation
+geometry capture related but non-identical information. Predictive uncertainty
+depends on one scalar. Directional entropy distinguishes one-sided support from
+strong opposing contributions, while SHAP variance distinguishes diffuse from
+concentrated attributions. Their usefulness is plausible in a PE setting where
+benign-looking structural metadata may coexist with suspicious imports, sections,
+or byte patterns. Two samples near $p=0.5$ need not be equally informative if one
+contains little evidence and the other contains a conflict among large effects.
+
+The ablation results also caution against assigning each signal an unconditional
+benefit. $U+H$ had a favorable mean FPR but lower TPR and AUC than $\xfull$;
+$U+V$ had relatively strong AP but unstable FPR. The full weighted score performed
+best on mean AUC and AP, yet the weights were evaluated on one local dataset and
+were not optimized through an independent outer validation study. A larger study
+should compare fixed preregistered weights, validation-only tuning, rank
+aggregation, and diversity-aware batch selection. It should also test whether
+acquisition becomes redundant when many high-scoring pool samples are near
+duplicates.
+
+The current result demonstrates ranking improvement at equal training-label
+counts. It does not demonstrate label savings, because a target validation
+performance was not declared before the run, and it does not demonstrate labor
+savings, because expert annotation was simulated by label revelation. A
+deployment study would measure time per label, adjudication, abstention, and
+mislabeling, ideally with multiple analysts.
+
+\subsection{What the Fidelity Experiment Establishes}
+
+The deletion control answers a model-behavior question: if the coordinates that
+TreeSHAP ranks highest are replaced by a training statistic, does predictive
+ranking degrade more than under random replacement? Across all three budgets the
+answer is yes, and the effect grows with $k$. The random baseline is essential.
+Without it, an AUC decrease could be attributed merely to modifying input
+coordinates. The small random drops show that the same nominal number of
+uniformly selected coordinates usually has little effect on this model.
+
+The experiment does not establish executable-level fidelity. A PE representation
+contains dependent quantities: sizes, offsets, counts, hashes, and directory
+metadata may obey structural constraints. Coordinate-wise mean replacement can
+violate those constraints or create a vector far from the data manifold. Even
+equal $k$ does not ensure equal perturbation magnitude; some selected values may
+already equal their means, while a top-SHAP coordinate may be far from baseline.
+The artifact records the actual number of changed coordinates and probability
+change, but a stronger protocol would mask semantically coupled groups, quantify
+out-of-distribution distance, and where possible reconstruct and validate a PE
+file.
+
+The approximately 630-fold ratio at $k=25$ should not be marketed as a universal
+improvement factor. It divides by a random-control mean close to zero and can vary
+substantially with baseline, $k$, model, split, and random seed. The more stable
+statement is that the absolute top-SHAP AUC drop (0.1616) is materially larger
+than the random mean (0.000257) under the frozen protocol, with a conditional
+paired-bootstrap interval [0.1222, 0.2078].
+
+EC and CF add geometric context but do not certify an explanation. EC depends on
+the chosen feature standardization, cosine similarity, and Pearson comparison.
+CF uses test labels and is sensitive to centroid structure and outliers. Because
+FF, EC, and CF measure different constructs and do not naturally share a bounded
+scale, an aggregate OFS would require a preregistered normalization, justified
+weights, sensitivity analysis, and ideally correlation with external expert or
+task outcomes. Reporting the components separately is scientifically stronger
+than selecting a convenient weighted average after observing them.
+
+\subsection{Role of PID in the Multi-Stage System}
+
+The PID proposal is motivated by sequential disagreement, but its value cannot be
+inferred from the controller form. A fixed average may be difficult to beat if
+the two sources are stable and calibrated. A proportional rule may be sufficient
+if sessions are short. Integral state can accumulate bias, and a derivative term
+can amplify noisy score changes. These possibilities make P/PI/PID ablations
+necessary rather than ceremonial.
+
+A proper dynamic study must distinguish the value of the source from the value
+of fusion. Static-only versus Dynamic-only quantifies individual ranking; Average
+and validation-selected Fixed establish simple fusion baselines; P, PI, and PID
+test whether state and temporal change contribute. The same paired inputs must be
+used for every rule. If PID does not improve the baselines, the correct outcome
+is to report that result and prefer the simpler model.
+
+The claim about ``sleep evasion'' also requires care. PID cannot create behavior
+that a sandbox never observes. A longer or adaptive observation policy may expose
+delayed behavior; the controller can only reweight scores after dynamic evidence
+arrives. Likewise, sub-millisecond arithmetic replay is not evidence of a
+15-ms end-to-end decision if process startup and observation take seconds. A
+future latency table should separately report static extraction, static inference,
+queueing, environment startup, dynamic observation, dynamic scoring, fusion, and
+end-to-end time, including median and tail quantiles.
+
+\subsection{Operational Implications}
+
+The framework is best understood as an allocation system. Static analysis
+provides broad, early coverage. A gate allocates expensive observation to selected
+cases. Active learning allocates expert labels to selected training samples.
+Fidelity testing allocates trust by requiring explanations to pass controlled
+behavioral checks. These allocation decisions operate at different time scales
+and should have independent service-level metrics.
+
+For a security operations center, the most immediate verified use is model
+maintenance: rank uncertain pool items using $\xfull$, present the selected PE
+records and evidence to analysts, and retain the queries and subsequent model
+versions. The fidelity protocol can serve as a release-time diagnostic for each
+candidate model. The dynamic/PID path should remain disabled as a performance
+claim until collection and validation gates pass; a software implementation can
+exist before its operational efficacy has been established.
+
+Reproducibility artifacts support audit and incident review. A model checkpoint,
+query list, split manifest, prediction table, and hash make it possible to answer
+why a reported metric changed. They do not replace governance requirements such
+as sample-handling authorization, privacy controls, malware containment, or
+documented label definitions. High-quality operational evidence combines both
+computational traceability and trustworthy data lineage.

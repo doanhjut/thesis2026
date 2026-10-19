@@ -1,0 +1,128 @@
+\section{Introduction}
+\label{sec:introduction}
+
+Ransomware compresses the defender's decision window. A detector must identify a
+malicious program early enough to prevent encryption and lateral impact, yet much
+of the most discriminative evidence appears only after execution. Static analysis
+can score a Windows portable executable (PE) before it runs and is therefore
+attractive for low-latency screening. Modern static detectors learn from byte
+distributions, header fields, imports, sections, strings, and related PE
+attributes; tree ensembles remain strong tabular baselines on EMBER-style
+representations \cite{anderson2018ember,harang2020sorel,ke2017lightgbm}. Their
+speed, however, does not remove brittleness under packing, obfuscation, family or
+temporal shift, and manipulation of non-functional PE content
+\cite{ucci2019survey,gibert2020rise,arp2022dos}.
+
+Dynamic analysis observes execution through file-system, process, registry,
+memory, and network events. It can reveal destructive intent that a static
+representation conceals and is especially relevant to ransomware, whose impact
+is expressed through sequences of discovery, access, modification, and
+encryption \cite{alrimy2018survey,kharraz2015cutting,bacci2021ransomware}.
+Dynamic evidence nevertheless has its own failure modes. It costs time and
+compute, its coverage depends on the analysis environment, and environment-aware
+or sleep-delayed malware may withhold behavior during the observation window
+\cite{sgandurra2016automated,sikorski2012practical}. Hybrid detection is thus a
+natural design choice, but an unqualified average assumes that the reliability of
+static and dynamic scores is fixed. This is hard to justify when behavioral
+evidence arrives sequentially and may change in informativeness across a session.
+
+The static model also creates two operational problems. First, continuous
+adaptation requires labels for emerging, obfuscated, or ambiguous samples.
+Expert attention is limited, so the system should prioritize examples that are
+informative for retraining rather than annotate an arbitrary stream. Classical
+uncertainty sampling selects points close to the current decision boundary
+\cite{settles2009active,cohn1996active}, but output ambiguity alone does not reveal
+whether the model relies on internally conflicting or concentrated evidence.
+Second, an explanation graphic is not proof that the identified features govern
+the prediction. Attribution methods can be unstable, can be evaluated using
+unrealistic perturbations, and can encourage causal interpretations unsupported
+by a predictive model \cite{guidotti2018survey,yeh2019infidelity,
+warnecke2020evaluating}. In malware analysis this concern is acute because PE
+features are constrained and correlated: changing an isolated coordinate in a
+vector need not correspond to any executable file.
+
+This paper studies the intersection of those problems through a multi-stage
+framework centered on a LightGBM static classifier and native TreeSHAP
+attributions. The framework includes an uncertainty gate for allocating dynamic
+analysis, a stateful PID rule for fusing aligned static and dynamic evidence, an
+active-learning acquisition score derived from prediction and explanation
+signals, and a controlled fidelity protocol. The work deliberately separates
+three claims that are often blended: predictive performance, label-selection
+quality, and explanation fidelity. Each requires different controls. Moreover,
+the available artifact supports quantitative conclusions for active learning and
+feature-space fidelity, but not for PID fusion, because it does not contain
+independently observed dynamic scores aligned with the static samples. Treating
+that absence as a result would turn a system design into an empirical claim.
+
+We organize the investigation around three research questions:
+
+\begin{itemize}
+    \item \textbf{RQ1:} At a fixed training-label budget, does a query score that
+    combines predictive uncertainty with signed TreeSHAP geometry improve ranking
+    performance over random and uncertainty-only acquisition?
+    \item \textbf{RQ2:} Under an explicitly defined feature-space intervention,
+    does deleting the largest absolute TreeSHAP contributions change model
+    behavior more than random deletion with the same coordinate budget?
+    \item \textbf{RQ3:} What evidence and controls are required to determine
+    whether stateful PID fusion improves over static-only, dynamic-only, fixed,
+    and simpler P/PI rules without confusing fusion time with dynamic-analysis or
+    end-to-end latency?
+\end{itemize}
+
+The principal contributions are as follows.
+
+\begin{itemize}
+    \item \textbf{A provenance-aware multi-stage specification.} We formulate a
+    static--dynamic architecture and a discrete PID update whose state is reset at
+    independent session boundaries. The evaluation protocol locks gains,
+    thresholds, and fusion baselines on validation data, requires one-to-one
+    evidence linkage, and distinguishes offline score replay from signal
+    acquisition and end-to-end latency. This contribution is a falsifiable design;
+    no PID performance value is reported without aligned real observations.
+
+    \item \textbf{An explanation-guided acquisition policy with controlled
+    ablations.} The query score combines normalized predictive uncertainty,
+    directional entropy of positive versus negative TreeSHAP mass, and variance
+    across signed feature contributions. Under identical initial sets, splits,
+    budgets, and five paired seeds, the full policy reached
+    $0.9749\pm0.0040$ ROC--AUC with 700 training labels. The AUC difference from
+    uncertainty sampling was positive in all five seeds. We report AP, FPR, TPR,
+    partial ablations, learning curves, and query-time scope rather than reducing
+    the outcome to a single favorable metric.
+
+    \item \textbf{A controlled fidelity assessment for PE feature vectors.}
+    Native TreeSHAP additivity is checked on raw log-odds, selected coordinates
+    are replaced by arithmetic means estimated only from the training partition,
+    and top-$|\mathrm{SHAP}|$ deletion is compared with 20 uniform random masks at
+    each budget. At $k=25$, the top-SHAP AUC drop was 0.1616, approximately 630
+    times the mean random drop of 0.000257. Faithfulness, explanation consistency,
+    and contrastive separation are reported separately because they have
+    different scales and assumptions; an Overall Fidelity Score (OFS) is not
+    constructed without a validated aggregation rule.
+
+    \item \textbf{A replay-oriented evidence package.} The measured run records
+    fixed splits, source hashes, 150 model checkpoints, query decisions,
+    per-sample predictions, mask indices, and pre/post-mask scores. Independent
+    verification replayed 120,000 active-learning predictions, 12,500 query
+    records, 63 mask batches, and 25,200 fidelity predictions. This supports
+    computational traceability while explicitly not claiming provenance that the
+    source CSV does not provide.
+\end{itemize}
+
+The evaluation is intentionally described as a row-disjoint internal pilot. The
+CSV contains 2,000 rows and 2,381 numeric coordinates, but the repository does
+not establish the original PE identities, collection dates, malware families, or
+whether every positive label specifically denotes ransomware. Consequently, the
+paper does not call the experiment a SOREL-20M benchmark, a family-held-out
+test, a temporal test, or a zero-day evaluation. These limits reduce the scope of
+the conclusion, but they also make the evidence auditable and prevent an
+attractive system narrative from outrunning its data.
+
+The remainder of this paper is structured as follows. Section~\ref{sec:related}
+positions the work relative to static/dynamic detection, active learning, and
+security XAI. Section~\ref{sec:problem} defines the problem, threat model, and
+claim boundaries. Section~\ref{sec:method} presents the architecture, PID
+specification, acquisition policy, and fidelity measures. Sections~\ref{sec:exp}
+and~\ref{sec:results} describe the reproducible protocol and measured outcomes.
+Sections~\ref{sec:discussion} and~\ref{sec:threats} discuss implications and
+validity threats, and Section~\ref{sec:conclusion} concludes the paper.

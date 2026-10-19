@@ -1,0 +1,47 @@
+\section{Conclusion and Future Work}
+\label{sec:conclusion}
+
+This paper presented a multi-stage framework for PE malware detection that
+connects evidence fusion, explanation-guided model adaptation, and quantitative
+explanation evaluation. The framework uses a LightGBM static classifier and
+native TreeSHAP, defines a stateful PID rule for aligned static--dynamic scores,
+selects active-learning queries through predictive uncertainty, directional
+entropy, and signed SHAP variance, and tests feature rankings with controlled
+deletion and equal-budget random masks.
+
+The verified evidence supports two conclusions within a row-disjoint internal
+pilot. First, the full acquisition policy improved ranking at a fixed 700-label
+training budget: mean ROC--AUC was 0.9749, compared with 0.9691 for uncertainty
+sampling and 0.9634 for random selection. The full policy exceeded uncertainty
+sampling in AUC for all five paired seeds. Its FPR was lower in only two seeds,
+so the result does not establish stable false-positive reduction. Second,
+top-$|\mathrm{SHAP}|$ deletion affected the fixed fidelity model much more than
+random deletion. At $k=25$, AUC fell from 0.9802 to 0.8185, while random masks
+retained mean AUC 0.9799. This supports the relevance of the SHAP ranking to model
+behavior under training-mean replacement, not causal or executable-level
+validity.
+
+The paper makes no empirical PID performance claim. The repository lacks real
+dynamic observations aligned to the static validation/test rows, and fusion
+replay time would not measure the cost of acquiring such observations. The
+controller, validation grid, state policy, baselines, and factorial evaluation
+are specified so that a subsequent experiment can test rather than assume its
+benefit.
+
+Three priorities govern future work. First, a dataset manifest must establish
+file identities, collection time, source, family, license, and label semantics;
+this enables temporal, family-held-out, and external validation. Second, dynamic
+reports should be collected under a locked observation policy and paired to the
+static rows, followed by Static/Dynamic/Average/Fixed/P/PI/PID ablations and
+separate latency decomposition. Third, fidelity evaluation should move from
+coordinate-wise means toward schema-aware group interventions, manifold checks,
+and, where possible, functionality-preserving PE transformations. Further work
+should also compare diversity-aware acquisition, multiple fitted fidelity models,
+analyst annotation cost, and robustness to poisoning or explanation manipulation.
+
+The broader methodological lesson is that a multi-stage security system should
+not be validated by one headline AUC. Its classifier, acquisition policy,
+explanations, evidence fusion, and operational timing answer different questions.
+Keeping those claims separate---and attaching each to replayable evidence---is a
+necessary condition for credible progress from a thesis prototype toward a
+deployable detection workflow.

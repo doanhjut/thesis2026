@@ -1,0 +1,140 @@
+\section{Related Work}
+\label{sec:related}
+
+\subsection{Static PE Malware Detection}
+
+Static malware analysis extracts evidence without executing the suspect object.
+Traditional workflows combine signatures, disassembly, imported functions,
+strings, and manually engineered indicators \cite{sikorski2012practical}. Machine
+learning expanded that workflow by learning discriminative patterns from fixed
+representations. Saxe and Berlin combined structural attributes with a neural
+network \cite{saxe2015deep}, whereas Raff \emph{et al.} studied learning directly
+from raw executable bytes \cite{raff2018malware}. Tree ensembles remain attractive
+for structured PE data because they train efficiently and expose native feature
+contribution mechanisms. LightGBM uses histogram-based learning and leaf-wise
+tree growth to scale gradient boosting \cite{ke2017lightgbm}; it is the static
+learner used in this work.
+
+Public resources improved comparability. EMBER introduced a documented static PE
+feature representation and benchmark data \cite{anderson2018ember}. SOREL-20M
+increased the scale and supplied metadata and labels suitable for large-scale
+experiments \cite{harang2020sorel}. Such benchmarks do not remove evaluation
+pitfalls. Random row splits can overestimate operational generalization when
+near-duplicates, collection sources, families, or time periods cross partitions.
+Arp \emph{et al.} identify these and related methodological traps in security
+machine learning \cite{arp2022dos}. Surveys likewise emphasize distribution
+shift, adversarial manipulation, and the difference between laboratory accuracy
+and deployed detection \cite{ucci2019survey,gibert2020rise}.
+
+The present work uses the EMBER v2 dimensional schema only as a reference for
+2,381 input coordinates. A matching dimension is insufficient to infer the
+origin of the vectors. We therefore separate model reproducibility from dataset
+provenance and restrict empirical claims to the audited CSV.
+
+\subsection{Dynamic and Hybrid Ransomware Analysis}
+
+Ransomware detection benefits from behavioral evidence because extortion and
+encryption ultimately require interactions with host resources. Prior work has
+modeled file operations, entropy changes, API calls, registry activity, process
+behavior, and network events \cite{alrimy2018survey,kok2019ransomware,
+bacci2021ransomware}. Kharraz \emph{et al.} analyzed ransomware behavior and
+defensive opportunities beyond file signatures \cite{kharraz2015cutting}.
+Dynamic-analysis systems such as EldeRan demonstrate that runtime features can
+support early detection, while also exposing limitations of constrained
+sandboxing \cite{sgandurra2016automated}.
+
+Dynamic observation is not free. Execution must be initiated, monitored, and
+terminated; event collection and feature construction incur latency; and malware
+may detect virtualization, require user interaction, or delay its payload. A
+hybrid detector can route ambiguous static cases to dynamic analysis, but two
+questions remain. First, the gate must be evaluated for coverage: confident
+static mistakes may never be escalated. Second, fusion should be compared with
+simple baselines using the same paired signals. A stateful controller cannot be
+credited for the benefit of merely adding an informative dynamic source.
+
+PID controllers are foundational feedback mechanisms with well-understood
+practical strengths and limitations \cite{astrom2001future}. Their application to
+probability fusion is heuristic rather than a physical-control guarantee. A
+discrete update may smooth or adapt weights across a meaningful sequence, but it
+does not itself establish calibration, closed-loop stability, lower FPR, or lower
+end-to-end latency. This paper therefore contributes an explicit validation
+protocol and reserves performance claims until the required paired observations
+exist.
+
+\subsection{Active Learning for Security Data}
+
+Pool-based active learning alternates between model fitting, acquisition from an
+unlabeled pool, oracle annotation, and retraining. Uncertainty sampling is a
+widely used baseline because it selects observations close to the model's current
+decision boundary \cite{settles2009active}. Earlier statistical formulations also
+view active learning as the selection of observations expected to reduce model
+uncertainty or prediction error \cite{cohn1996active}. Alternative strategies use
+committees, expected error reduction, representation diversity, density, or
+combinations thereof.
+
+Security data complicate this loop. Class imbalance affects both training and
+operating-point metrics; campaign drift can invalidate a previously useful query
+rule; and an adaptive adversary may influence which samples enter the pool
+\cite{gama2014concept,arp2022dos}. Furthermore, predictive uncertainty is only one
+kind of ignorance. Two samples can have the same output probability while their
+evidence differs: one may have weak contributions throughout, while another may
+contain large positive and negative attributions that cancel. The latter pattern
+is relevant to obfuscated or hybrid-looking samples, but it is invisible to a
+margin-only score.
+
+Our acquisition function treats signed explanation geometry as an additional
+signal. It does not assume that SHAP variance is posterior model uncertainty or
+variance across an ensemble; it is explicitly the across-coordinate variance of
+the signed TreeSHAP vector for one sample. The design is tested through partial
+ablations (uncertainty plus entropy and uncertainty plus variance), a full
+combination, random selection, and uncertainty-only selection under matched
+budgets and initial sets.
+
+\subsection{Explainable AI and Fidelity in Security}
+
+Model-agnostic explanation methods such as LIME approximate a local decision
+surface \cite{ribeiro2016why}. SHAP unifies additive feature attributions through
+Shapley values \cite{lundberg2017unified}, and TreeSHAP enables exact or efficient
+attribution for tree ensembles \cite{lundberg2020local}. These methods are useful
+for inspecting models, but interpretability is not a single measurable property.
+Faithfulness concerns whether highlighted inputs affect predictions; stability
+concerns how explanations change under related inputs or model changes; and
+contrastive structure concerns whether explanations distinguish cases of
+interest. A method can perform well on one axis and poorly on another.
+
+Evaluation research has exposed additional difficulties. Yeh \emph{et al.}
+formalize infidelity and sensitivity \cite{yeh2019infidelity}; Hooker \emph{et al.}
+show that feature-removal evaluation can itself induce distribution shift
+\cite{hooker2019benchmark}; and Warnecke \emph{et al.} analyze explanation methods
+in security settings where feature semantics and attacker manipulation matter
+\cite{warnecke2020evaluating}. A zero replacement is particularly questionable
+when zero is meaningful or far from the training distribution. Replacing a
+coordinate with a training statistic is more defensible as a model-level
+intervention, but still need not preserve a valid PE.
+
+Table~\ref{tab:related-gap} summarizes the positioning. The contribution is not
+the claim that uncertainty, SHAP, or masking is new in isolation. It is the
+controlled connection among explanation-derived acquisition, paired ablations,
+same-budget deletion controls, explicit replay verification, and a strict
+separation between measured components and an unevaluated static--dynamic fusion
+design.
+
+\begin{table*}[t]
+\centering
+\caption{Representative literature and the evaluation gap addressed in this work. A check mark means that the cited work centrally evaluates the property; ``partial'' indicates a related but different scope.}
+\label{tab:related-gap}
+\scriptsize
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{p{2.2cm}p{2.9cm}*{5}{>{\centering\arraybackslash}p{1.5cm}}}
+\toprule
+Research line & Representative sources & Static PE & Dynamic & Active learning & XAI fidelity & Replay artifacts \\
+\midrule
+Static malware ML & \cite{saxe2015deep,raff2018malware,anderson2018ember,harang2020sorel} & \checkmark & -- & -- & -- & partial \\
+Dynamic ransomware analysis & \cite{kharraz2015cutting,sgandurra2016automated,bacci2021ransomware} & partial & \checkmark & -- & -- & partial \\
+Active learning & \cite{cohn1996active,settles2009active} & domain independent & -- & \checkmark & -- & method dependent \\
+General XAI & \cite{ribeiro2016why,lundberg2017unified,lundberg2020local} & domain independent & domain independent & -- & partial & -- \\
+Fidelity evaluation & \cite{yeh2019infidelity,hooker2019benchmark,warnecke2020evaluating} & partial & partial & -- & \checkmark & partial \\
+This work & TreeSHAP-guided queries plus controlled deletion and a PID validation protocol & \checkmark & protocol & \checkmark & \checkmark & \checkmark \\
+\bottomrule
+\end{tabular}
+\end{table*}

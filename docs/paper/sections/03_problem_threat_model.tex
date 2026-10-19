@@ -1,0 +1,110 @@
+\section{Problem Formulation and Threat Model}
+\label{sec:problem}
+
+\subsection{Objects, Scores, and Decisions}
+
+Let $x\in\mathbb{R}^{d}$ denote a static PE feature vector with $d=2381$ in the
+available pilot. A static classifier $f_{\mathrm{s}}$ produces a bounded score
+$\pstatic=f_{\mathrm{s}}(x)\in[0,1]$. The implementation uses this score as a
+probability-like output, but the fusion design does not assume perfect
+calibration. If dynamic analysis is invoked, an independently specified mapping
+$f_{\mathrm{d}}$ converts observed behavior $z$ into a bounded dynamic score
+$\pdynamic=f_{\mathrm{d}}(z)\in[0,1]$. The meaning of $\pdynamic$---calibrated
+probability or risk score---must be fixed before evaluation.
+
+The architecture contains a conceptual uncertainty gate $g(\pstatic)$. A common
+deployment form uses two validation-selected thresholds $\tau_{\mathrm{low}}$ and
+$\tau_{\mathrm{high}}$: scores outside the interval can receive an early static
+decision, while scores inside it are escalated for behavioral observation. The
+present measured artifacts do not evaluate this gate or its coverage. In
+particular, they do not establish how often a confident static error would bypass
+dynamic analysis. The fusion protocol instead evaluates all supplied, aligned
+static--dynamic pairs; any future gate study must report both conditional quality
+and the fraction of traffic escalated.
+
+For each evaluated score $p$, a threshold $t$ maps the score to
+$\widehat{y}=\mathbb{1}[p\geq t]$. Thresholds are selected on the validation
+partition for a target true-positive rate (TPR) of 0.95 and are then frozen for
+test evaluation. The test TPR is still reported because a validation target does
+not ensure exactly the same operating point on test. With true positives (TP),
+false positives (FP), true negatives (TN), and false negatives (FN),
+\begin{equation}
+\mathrm{TPR}=\frac{\mathrm{TP}}{\mathrm{TP}+\mathrm{FN}},\qquad
+\mathrm{FPR}=\frac{\mathrm{FP}}{\mathrm{FP}+\mathrm{TN}}.
+\label{eq:tpr-fpr}
+\end{equation}
+ROC--AUC and average precision (AP) summarize ranking, while FPR and TPR describe
+the selected operating point \cite{fawcett2006roc,saito2015precision}.
+
+\subsection{Active-Learning Setting}
+
+Let $\mathcal{L}_r$ and $\mathcal{U}_r$ be the labeled and unlabeled training
+pools at round $r$. The model $f_r$ is fitted only on $\mathcal{L}_r$. An
+acquisition function $Q_r(x)$ ranks $x\in\mathcal{U}_r$, and the top $b$ rows are
+sent to an oracle. In the pilot, the oracle is simulated by revealing an existing
+label only after selection. This permits controlled comparison of query policies;
+it does not measure analyst disagreement, annotation time, or monetary cost.
+
+All strategies within a seed share the same initial labeled set, training pool,
+validation set, test set, and cumulative label budget. The test partition is not
+used for querying, parameter selection, threshold selection, or stopping. The
+primary estimand for RQ1 is the paired test-metric difference between acquisition
+strategies at the same seed and budget. Because the five runs share one test set,
+seed variability describes sensitivity to initialization and queried samples, not
+a population confidence interval over independently drawn test sets.
+
+\subsection{Explanation Object and Intervention}
+
+For a fitted tree model and input $x_i$, let
+$\boldsymbol{\phi}_i=(\phi_{i1},\ldots,\phi_{id})$ be the signed TreeSHAP
+contribution vector, excluding the bias term. Native TreeSHAP operates on the raw
+log-odds scale and must satisfy the additive reconstruction
+\begin{equation}
+f_{\mathrm{raw}}(x_i)=\phi_{i0}+\sum_{j=1}^{d}\phi_{ij}
+\label{eq:additivity}
+\end{equation}
+within numerical tolerance. This identity verifies the computation, not the
+semantic correctness of an explanation.
+
+To test model sensitivity, a mask $M_i^{(k)}$ selects $k$ coordinates for sample
+$i$. The intervention replaces each selected value by the corresponding
+arithmetic mean $\mu_j$ estimated from the training partition:
+\begin{equation}
+\widetilde{x}_{ij}=\begin{cases}
+\mu_j, & j\in M_i^{(k)},\\
+x_{ij}, & \text{otherwise}.
+\end{cases}
+\label{eq:mask}
+\end{equation}
+The top-SHAP mask contains the $k$ largest $|\phi_{ij}|$ values for each sample.
+The control selects $k$ distinct coordinates uniformly at random. This is a
+feature-space deletion test. It does not claim that $\widetilde{x}_i$ is produced
+by a valid PE or a semantics-preserving binary edit.
+
+\subsection{Threat Model and Scope}
+
+The motivating adversary distributes Windows PE malware and may employ packing,
+obfuscation, benign-looking metadata, delayed execution, intermittent activity,
+or environment checks. Such behavior can weaken either evidence source: static
+features may hide functionality, while a sandbox may not observe the payload
+within its window. The current design does not claim robustness to a fully
+adaptive attacker with white-box access to the static model, query function, and
+fusion rule. Adversarial feature manipulation, explanation manipulation, and
+active-learning poisoning remain outside the measured scope.
+
+The defender is assumed to have a static feature extractor, a LightGBM model, an
+optional isolated execution environment, and an oracle capable of assigning
+labels to selected samples. A valid PID evaluation additionally assumes that
+static and dynamic scores are aligned to the same sample and observation session,
+that sequence order is meaningful, and that validation and test sessions do not
+share controller state. These assumptions are enforced structurally by the
+runner but cannot be satisfied by inventing $\pdynamic$ from the class label,
+perturbing $\pstatic$ with random noise, or replaying an untraceable demonstration
+log.
+
+Finally, the empirical scope is narrower than the motivating threat model. The
+audited CSV has binary labels but no verified original file identities, family
+metadata, timestamps, or ransomware-specific label definition. We therefore use
+``positive'' and ``negative'' when discussing measured classes. Ransomware is the
+system motivation and intended deployment domain, not a provenance claim about
+every evaluated row.

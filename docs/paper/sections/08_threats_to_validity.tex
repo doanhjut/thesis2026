@@ -1,0 +1,103 @@
+\section{Threats to Validity}
+\label{sec:threats}
+
+\subsection{Construct Validity}
+
+The largest construct threat is the relationship between the available binary
+label and the stated ransomware domain. The repository does not include original
+file identities or a label-definition document proving that every positive row
+is ransomware. Calling the measured task ransomware detection would therefore
+overstate what the data establish. We describe it as binary classification of a
+local PE-feature table and treat ransomware as the motivating application.
+
+The acquisition signals also require precise interpretation. $H$ is entropy of
+positive versus negative SHAP mass, not predictive class entropy. $V$ is variance
+over signed coordinates for one explanation, not uncertainty across trees or
+models. The labels ``directional conflict'' and ``dispersion'' are used to avoid
+claiming that either quantity is a calibrated epistemic uncertainty measure.
+
+Fidelity is similarly multi-dimensional. A large deletion effect supports the
+relationship between a ranking and fitted-model behavior under a defined
+intervention. It does not prove causality, human usefulness, stability under all
+perturbations, or semantic correctness. EC and CF are implementation-specific
+geometric statistics. We avoid collapsing them into OFS because a composite
+would obscure rather than solve these construct differences.
+
+\subsection{Internal Validity}
+
+The fixed row split prevents direct overlap among train, validation, and test
+indices, and the audit found no exact duplicate feature vectors. It does not rule
+out near-duplicates, related binaries, or shared acquisition sources across
+partitions. Such dependence could inflate performance. Family-, source-, or
+time-aware splitting cannot be performed without metadata.
+
+Active-learning methods share initial sets within seeds, budgets, hyperparameters,
+and test data. This controls important confounders, but fixed acquisition weights
+were not selected in an independent outer loop. The policy comparison may depend
+on those choices. The oracle uses existing labels and has no annotation error;
+real analysts could change both selected-label quality and measured cost.
+
+The fidelity model is trained separately from the active-learning models. This
+is intentional for a fixed-model diagnostic, but it prevents a claim that the AL
+improvement caused the fidelity outcome. Training means are calculated only from
+the training partition, which avoids test leakage. Nonetheless, mean replacement
+can induce out-of-distribution vectors, and top-SHAP versus random masks may have
+different numeric magnitudes despite equal selected-coordinate counts.
+
+No internal-validity claim is made for PID performance. The runner rejects
+missing, simulated, or untraceable dynamic evidence, and the default experiment
+did not execute fusion. This avoids one confound---constructing $\pdynamic$ from
+the target label---but leaves RQ3 empirically unanswered.
+
+\subsection{Statistical Conclusion Validity}
+
+Five active-learning seeds share one test set. Their sample SD quantifies
+sensitivity to initial labels and query sequences, not uncertainty over the
+population of possible malware samples. Paired seed differences are appropriate
+for the controlled comparison, but five pairs provide limited power and do not
+justify strong distributional assumptions. We report all paired signs and avoid
+a fragile significance claim.
+
+FPR comparisons depend on thresholds selected from validation at a target TPR.
+Because achieved test TPR varies, a lower FPR is not automatically a uniformly
+better detector. Both rates are reported. AP is calculated from ranked
+predictions using the standard step-wise definition and is not interchangeable
+with trapezoidal PR area \cite{saito2015precision}.
+
+The fidelity bootstrap resamples test rows while retaining paired original and
+masked scores. Its interval is conditional on one trained model. Twenty random
+masks characterize mask variability for that model and test set, not training or
+dataset variability. EC uses 79,800 pairwise entries, but these entries share 400
+samples, so they cannot be treated as independent observations for a conventional
+Pearson test.
+
+\subsection{External Validity}
+
+The pilot is small relative to contemporary malware corpora and has no verified
+upstream provenance. Results may change across collection periods, organizations,
+malware families, benign software distributions, packers, and feature-extractor
+versions. The study is neither a temporal holdout nor a family holdout, and it
+does not establish zero-day performance. External validation should use a
+manifested dataset with file hashes, collection dates, family/source metadata,
+licensing, and independently documented labels.
+
+The models use EMBER-style static coordinates and LightGBM. The acquisition
+signals can be calculated for other additive explanations, but their behavior and
+cost may differ for raw-byte networks, graph models, or sequence models. Likewise,
+mean masking is not directly transferable to categorical, sparse, or structured
+representations without a domain-specific baseline.
+
+\subsection{Operational and Reproducibility Validity}
+
+Recorded timings were obtained in a small, deterministic two-thread experiment.
+They exclude several deployment costs and cannot establish endpoint throughput or
+SOC response time. No real sandbox trace is included, so the work does not show
+resistance to sleep evasion or environmental checks.
+
+The evidence package provides hashes, versions, configurations, checkpoints,
+queries, predictions, masks, and successful replay counts. This supports
+computational reproducibility for the retained run. The compact review package
+does not commit all large checkpoints and per-sample artifacts; a fresh full run
+is required to regenerate them. Moreover, source and output hashes verify file
+identity rather than the truth of external metadata. Reproducibility and data
+authenticity are related but distinct properties.

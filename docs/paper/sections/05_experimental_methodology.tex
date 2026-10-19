@@ -1,0 +1,172 @@
+\section{Experimental Methodology}
+\label{sec:exp}
+
+\subsection{Evidence Source and Data Audit}
+
+All quantitative results in this paper come from the immutable review package
+\texttt{results/measured\_20261014}. The run records source commit
+\texttt{4bd07c6}, an empty working-tree status, and the input-CSV SHA-256 digest
+\texttt{c733cc0c3e0950fa1d05d57d34c69d0a}\-
+\texttt{034383e0c1a2fde0e6878b9e2e8c3668}. Hashes establish byte identity, not
+factual provenance.
+
+The table contains 2,000 rows, 2,381 feature columns, and one binary label. The
+audit found no exact duplicate vectors. A deterministic stratified row split with
+seed 42 assigned 60\% to the training/pool partition, 20\% to validation, and
+20\% to test. Table~\ref{tab:data} reports the class counts. No original file hash,
+collection time, family, source, or label-definition manifest is available. We
+therefore do not claim that the positive class exclusively represents ransomware
+or that the rows form a verified subset of SOREL-20M or EMBER.
+
+\begin{table}[t]
+\centering
+\caption{Audited pilot partitions.}
+\label{tab:data}
+\small
+\begin{tabular}{lrrr}
+\toprule
+Partition & Negative & Positive & Total \\
+\midrule
+Training/pool & 900 & 300 & 1,200 \\
+Validation & 300 & 100 & 400 \\
+Test & 300 & 100 & 400 \\
+\midrule
+Total & 1,500 & 500 & 2,000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The dimensional layout matches the EMBER v2 extractor reference. The groups in
+Table~\ref{tab:feature-groups} describe an expected schema, not proof that the
+CSV was generated from the documented extractor. Hashed imports, exports, and
+section attributes can contain collisions; an individual coordinate need not map
+to one human-readable API or semantic property.
+
+\begin{table}[t]
+\centering
+\caption{Reference feature-group dimensions for a 2,381-coordinate EMBER v2 representation.}
+\label{tab:feature-groups}
+\small
+\begin{tabular}{lr}
+\toprule
+Feature group & Dimensions \\
+\midrule
+Byte histogram & 256 \\
+Byte-entropy histogram & 256 \\
+String extractor & 104 \\
+General file information & 10 \\
+Header information & 62 \\
+Section information & 255 \\
+Imports & 1,280 \\
+Exports & 128 \\
+Data directories & 30 \\
+\midrule
+Total & 2,381 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Active-Learning Protocol}
+
+We used five seeds: 11, 22, 33, 44, and 55. For each seed, stratified sampling
+selected 200 initially labeled training rows; all five acquisition policies shared
+that exact initial set and remaining pool. Each run completed five acquisition
+rounds of 100 labels, producing budgets of 200, 300, 400, 500, 600, and 700
+training labels. The 400 validation labels are additional and are not counted in
+the training budget.
+
+At every round and for every method, a new LightGBM booster was trained with 60
+trees, learning rate 0.05, 15 leaves, maximum depth 4, and minimum 10 samples per
+leaf. Feature and bagging fractions were one, and deterministic column-wise
+training used two threads. Method-specific random, data, and feature seeds were
+locked to the run seed. The compared strategies were Random, Uncertainty, $U+H$,
+$U+V$, and $\xfull$ with weights specified in Section~\ref{sec:method}.
+
+The threshold was selected from validation predictions to target TPR 0.95. We
+then saved validation and test probabilities, predictions, labels, row IDs,
+thresholds, and round budgets. For queried rows we saved rank, composite score,
+raw $U/H/V$ signals, normalized signals, and revealed label. This enables both
+selection replay and checks that no test or validation index enters training.
+
+The primary ranking metrics were ROC--AUC and AP. Thresholded metrics were FPR
+and TPR. We report mean and sample standard deviation across seeds, paired
+within-seed differences, and normalized area under the learning curve (AULC)
+computed by trapezoidal integration over the training-label budget. We do not use
+five seed values as five independent test datasets. No target validation AUC was
+predeclared, so the run does not estimate labels saved to a target. Query timing
+includes pool prediction, TreeSHAP, additivity checking, and normalization; it
+excludes labeling, training, sorting, and file I/O.
+
+\begin{table}[t]
+\centering
+\caption{Core experimental configurations.}
+\label{tab:configuration}
+\small
+\begin{tabular}{p{2.4cm}p{4.6cm}}
+\toprule
+Component & Configuration \\
+\midrule
+AL budgets & 200 initial; $5\times100$ queried; 700 final \\
+AL seeds & 11, 22, 33, 44, 55 \\
+AL model & 60 trees; depth 4; 15 leaves; $\eta=0.05$ \\
+AL threshold & Validation-selected at target TPR 0.95 \\
+Fidelity model & 100 trees; depth 4; 15 leaves; $\eta=0.1$; seed 42 \\
+Fidelity masks & $k\in\{10,25,50\}$; 20 random controls per $k$ \\
+Fidelity bootstrap & 500 stratified paired test resamples \\
+Execution & Python 3.12.14; LightGBM 4.7.0; two threads \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Fidelity Protocol}
+
+The fidelity experiment trained a separate LightGBM classifier on all 1,200
+training rows with 100 estimators, learning rate 0.1, 15 leaves, maximum depth 4,
+minimum child size 20, random seed 42, and two threads. It evaluated all 400 test
+rows. This model is not an active-learning final-round model; AUC values from the
+two experiments must not be subtracted or interpreted as component-wise gains.
+
+We computed native TreeSHAP contributions and checked raw-score additivity. For
+each test sample and $k\in\{10,25,50\}$, the $k$ highest absolute contributions
+were replaced using the training-column means. Twenty sample-specific uniform
+random masks without replacement formed the control at each $k$. We recorded
+the selected indices, number of coordinates that actually changed, original and
+masked probabilities, AUC, AUC drop, signed and absolute probability changes,
+and $\mathrm{FF}_{\mathrm{raw}}$. Random-control summaries report means and
+sample SD across masks.
+
+For uncertainty in the top-SHAP AUC drop, 500 stratified bootstrap resamples
+preserved the original/masked prediction pair for each sampled test row. These
+intervals are conditional on the one fitted model; they do not include
+between-training variability. EC and CF were calculated once from the fixed test
+explanations according to (\ref{eq:ec}) and (\ref{eq:cf}).
+
+\subsection{PID Evaluation Protocol}
+
+The default run intentionally did not execute fusion. A valid fusion input must
+contain a dynamic score, \texttt{row\_id}, session identifier, sequence order, report
+path, and SHA-256 digest for each observation. Metadata must declare the signal
+as observed, document the score construction and collection policy, and confirm
+that the score did not use the target label. Validation and test sessions must be
+disjoint.
+
+When such evidence becomes available, the runner joins each dynamic observation
+to saved final-round active-learning probabilities. It tunes fixed, P, PI, and
+PID rules only on validation, freezes the selected settings, evaluates on test,
+and saves all fused predictions. Static-only, Dynamic-only, Average, and untuned
+reference PID are included. The runner reports score-replay milliseconds per row
+but labels this value as excluding collection, model inference, and I/O. No
+fusion metric appears in Section~\ref{sec:results} because the required input is
+absent.
+
+\subsection{Independent Replay Verification}
+
+The verification command reloads every active-learning checkpoint and
+recomputes probabilities, metrics, and selected queries from saved row indices.
+For fidelity, it reloads the model, training baseline, mask indices, and SHAP
+inputs, reconstructs each masked matrix, and recomputes predictions and geometry.
+The review package reports successful replay of 150 active-learning checkpoints,
+120,000 active-learning prediction records, 12,500 query records, 63 mask
+batches, and 25,200 masked prediction records. Verification establishes
+computational consistency with the saved artifact; it cannot authenticate the
+external origin of the CSV.

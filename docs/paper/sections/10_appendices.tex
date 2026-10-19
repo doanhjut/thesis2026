@@ -1,0 +1,164 @@
+\section{Acquisition Procedure}
+\label{app:acquisition}
+
+For reproducibility, the active-learning loop can be expressed without relying
+on implementation-specific classes:
+
+\begin{enumerate}
+    \item Split the audited row IDs once into training/pool, validation, and test.
+    For each seed, draw a stratified initial labeled subset from the training
+    indices and give every acquisition policy the same subset.
+    \item At round $r$, fit a new LightGBM booster on $\mathcal{L}_r$. Save the
+    model before using it for acquisition.
+    \item Predict validation data, select a threshold for the target validation
+    TPR, and save validation and test predictions. Do not expose test metrics to
+    the selection procedure.
+    \item If the budget is not exhausted, predict the remaining pool. For
+    explanation-based strategies, compute native TreeSHAP and verify
+    (\ref{eq:additivity}). Compute and pool-normalize $U$, $H$, and $V$.
+    \item Rank the pool by (\ref{eq:query}); break score ties using ascending
+    original row ID. Query exactly 100 distinct rows and reveal their existing
+    labels. Save scores, component signals, ranks, IDs, and labels.
+    \item Move queried rows from $\mathcal{U}_r$ to $\mathcal{L}_{r+1}$ and
+    repeat through round five.
+\end{enumerate}
+
+Every method begins round zero with the same predictions within a seed. The
+verifier checks this equality, ensures queried IDs belong to the current pool,
+and confirms that no validation/test index is added to training.
+
+\section{Fidelity Replay Procedure}
+\label{app:fidelity}
+
+The fidelity replay uses artifacts that are independent of plot-generation code:
+
+\begin{enumerate}
+    \item Reload the saved model and the fixed training/validation/test indices.
+    Recompute the training-column mean and standard deviation and compare them
+    with the retained baseline archive.
+    \item Predict the original test matrix and recompute native TreeSHAP. Check
+    shapes, finite values, and raw-score additivity.
+    \item For every retained mask, copy the original test matrix and replace
+    exactly the saved per-row indices by the matching training means.
+    \item Recompute masked probabilities and verify them against saved
+    predictions. Recompute AUC, probability-change metrics, and actual changed
+    coordinate counts.
+    \item Recompute standardized feature cosine similarities, SHAP cosine
+    similarities, label-conditioned centroids, EC, and CF.
+    \item Confirm that no aggregate OFS appears in the summary.
+\end{enumerate}
+
+This procedure makes the numerical conclusions reproducible from a model, split,
+baseline, and masks. It does not make the masked vector a valid executable and
+does not recover absent upstream sample metadata.
+
+\section{Metric and Evidence Definitions}
+
+\begin{table*}[h]
+\centering
+\caption{Interpretation boundaries for reported quantities.}
+\label{tab:metric-boundaries}
+\small
+\begin{tabular}{p{2cm}p{5.2cm}p{7.6cm}}
+\toprule
+Quantity & What it measures & What it does not establish \\
+\midrule
+ROC--AUC & Pairwise ranking of positive above negative rows & Calibration, selected operating cost, temporal/family generalization \\
+AP & Precision summarized over recall thresholds & Analyst cost or a fixed-alert operating point \\
+FPR/TPR & Test behavior at a validation-selected threshold & Uniform dominance when achieved TPR differs \\
+Seed SD & Sensitivity to initial labels and query sequence & Population confidence interval over independent test corpora \\
+$H$ & Balance of positive/negative signed SHAP mass & Predictive entropy or causal conflict \\
+$V$ & Variance across coordinates of one SHAP vector & Ensemble, posterior, or across-tree uncertainty \\
+Top-k AUC drop & Fixed-model sensitivity to training-mean replacement & A valid PE edit or causal ransomware behavior \\
+FF & Relative probability change under a mask & A bounded percentage or universal fidelity scale \\
+EC & Correlation of input/explanation pairwise geometry & Noise robustness, independence of pairs, human usefulness \\
+CF & Separation of label-conditioned SHAP centroids & Causality or prospective classification performance \\
+Fusion replay time & Arithmetic/controller runtime after scores exist & Sandbox, collection, model, queue, or end-to-end latency \\
+SHA-256 & Identity of an input or artifact & Authenticity of its stated origin or label semantics \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\section{Claim--Evidence Map}
+
+\begin{table*}[h]
+\centering
+\caption{Claim--evidence map for the current manuscript.}
+\label{tab:claim-evidence}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{p{4.9cm}p{4.5cm}p{1.8cm}p{3.0cm}}
+\toprule
+Claim & Primary evidence & Status & Scope \\
+\midrule
+$\xfull$ has higher final AUC than uncertainty sampling & \texttt{al/summary.json}, paired differences, final checkpoints & Verified & Five paired seeds; shared row-disjoint test \\
+$\xfull$ always lowers FPR & Paired FPR differences & Rejected & Lower in only 2/5 seeds \\
+Top-SHAP deletion changes predictions more than random deletion & Fidelity masks, predictions, deletion summary & Verified & One fixed model; training-mean feature-space masks \\
+SHAP values reconstruct raw LightGBM outputs & Saved contribution matrices and verifier & Verified & Numeric additivity, not semantic correctness \\
+EC=0.304373 and CF=0.587352 & Replayed similarity/centroid inputs & Verified & Geometry of one test/model \\
+OFS certifies explanation quality & No validated aggregation rule & Not supported & Components reported separately \\
+PID improves AUC/FPR or sleep-evasion resistance & Dynamic template has no observed scores & Not measured & Method/protocol only \\
+Fusion latency is end-to-end system latency & Replay scope excludes collection/inference/I/O & Not supported & Requires separate measurement \\
+Results demonstrate ransomware family/zero-day detection & Original identities/families/times absent & Not supported & Binary local pilot only \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\section{Reproducibility Checklist}
+
+The current evidence package records the following items:
+
+\begin{itemize}
+    \item exact input CSV SHA-256, row and feature counts, class counts, split
+    indices, and exact-duplicate-vector audit;
+    \item repository commit, clean working-tree status at run time, Python and
+    library versions, model hyperparameters, seeds, thread count, query weights,
+    tie policy, and timing scope;
+    \item 150 active-learning checkpoints, per-round metrics, query IDs/ranks,
+    component scores, validation/test predictions, and paired differences in the
+    complete run;
+    \item fidelity model, training baseline, TreeSHAP vectors, mask indices,
+    pre/post-mask predictions, bootstrap resamples, and geometry inputs in the
+    complete run;
+    \item generated Markdown, CSV, JSON, LaTeX, PDF, and PNG review artifacts,
+    with a package-wide checksum list;
+    \item an independent verification summary confirming replay counts for the
+    selected run.
+\end{itemize}
+
+The compact repository review package omits some large model and prediction files
+described by its reports. Reproduction should create a new output directory,
+verify the input hash, preserve the locked configuration, and run the verifier on
+the fresh output. Results from altered data or configuration should be reported as
+a separate experiment rather than silently replacing the measured package.
+
+\section{Requirements for the Pending Dynamic Study}
+
+Before the PID subsection can be promoted from method to empirical contribution,
+the following conditions must be met:
+
+\begin{enumerate}
+    \item Each validation/test \texttt{row\_id} maps to an authorized original sample and
+    exactly one documented observation report with a verified content hash.
+    \item The mapping from observed events to $\pdynamic$ is frozen before test
+    evaluation and documented as either a calibrated probability or risk score.
+    It must not read the target label or $\pstatic$.
+    \item \texttt{sequence\_id} and order represent a real session. Validation and test
+    sessions are disjoint, and controller state is reset at their boundaries.
+    \item Static-only, Dynamic-only, Average, Fixed, P, PI, PID, and reference PID
+    receive the same paired signals and test rows. All choices occur on
+    validation.
+    \item FPR is reported with achieved TPR; AUC and AP use saved test scores; all
+    per-row fused scores and weights are retained.
+    \item Timing separately records collection, feature extraction, static and
+    dynamic inference, fusion, queueing, and end-to-end response. Workload,
+    hardware, warm/cold state, and observation policy are reported.
+    \item If interaction with active learning is claimed, the full
+    Fixed/PID $\times$ Random/$\xfull$ design is evaluated and the
+    difference-in-differences is reported even when it is zero or unfavorable.
+\end{enumerate}
+
+These requirements are deliberately stricter than accepting a demo trace. They
+ensure that a future improvement can be attributed to the fusion rule rather than
+label leakage, incomparable signals, threshold tuning on test, or an unmeasured
+change in the observation process.

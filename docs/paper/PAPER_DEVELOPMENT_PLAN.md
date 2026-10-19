@@ -1,5 +1,12 @@
 # Kế hoạch phát triển bài báo khoa học hoàn chỉnh
 
+> **Trạng thái 2026-10-19:** Master manuscript Track B đã hoàn thành tại
+> `docs/paper/main.tex`, gồm khoảng 10.400 từ và 22 trang trong bản dựng kiểm tra
+> hai cột. Các mục còn lại trước khi nộp là xác nhận metadata/tư cách tác giả,
+> kiểm tra thư mục tài liệu tham khảo bằng DOI/publisher record, build bằng
+> template chính thức của tạp chí đích, và bổ sung dữ liệu động thật nếu muốn
+> nâng PID từ protocol thành đóng góp thực nghiệm.
+
 ## 1. Mục tiêu và chiến lược xuất bản
 
 Mục tiêu là xây dựng một **master manuscript 20–26 trang** từ luận văn, đủ chi

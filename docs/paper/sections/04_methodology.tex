@@ -1,0 +1,243 @@
+\section{Proposed Methodology}
+\label{sec:method}
+
+\subsection{Multi-Stage Architecture}
+
+Figure~\ref{fig:architecture} separates the online decision path from the
+offline adaptation and verification paths. The static path extracts a fixed PE
+representation and applies LightGBM. A deployment gate may accept an early
+decision or request behavioral observation. Once both scores are available, a
+fusion rule returns a final score. TreeSHAP serves two distinct offline roles:
+it contributes signals to active-learning acquisition, and it supplies
+attributions for a controlled fidelity evaluation. The same explanation method
+is used, but the estimands differ: acquisition asks which sample to label next;
+fidelity asks whether a ranked set of coordinates affects the fitted model.
+
+\begin{figure*}[t]
+\centering
+\fbox{\begin{minipage}{0.96\textwidth}
+\centering
+\textbf{Online evidence path}\par\medskip
+PE sample $\rightarrow$ static feature vector $x$ $\rightarrow$ LightGBM
+$\rightarrow \pstatic$ $\rightarrow$ uncertainty gate
+$\rightarrow$ behavioral observation $z$ $\rightarrow \pdynamic$
+$\rightarrow$ validated fusion rule $\rightarrow \pfused$ and decision
+\par\medskip
+\hrule
+\medskip
+\textbf{Offline adaptation and verification}\par\medskip
+Unlabeled pool $\rightarrow$ TreeSHAP $\rightarrow$ $U,H,V$
+$\rightarrow$ query ranking $\rightarrow$ oracle labels $\rightarrow$ retraining
+\qquad$\mid$\qquad
+Fixed model $\rightarrow$ top-$|\mathrm{SHAP}|$/random masks
+$\rightarrow$ FF, EC, CF and replay verification
+\end{minipage}}
+\caption{Conceptual multi-stage framework. The verified pilot evaluates the
+active-learning and fidelity branches. The gate and PID branch are specified but
+require aligned real dynamic observations for empirical evaluation.}
+\label{fig:architecture}
+\end{figure*}
+
+This separation prevents three timing quantities from being conflated. Static
+inference time is the cost of the initial model; dynamic observation time includes
+sandbox startup and the monitoring window; and fusion time is the arithmetic
+replay after both scores exist. A fast fusion function cannot eliminate the time
+needed to obtain $z$. Similarly, the time required to score an active-learning
+pool does not measure annotation time.
+
+\subsection{Static LightGBM and Native TreeSHAP}
+
+LightGBM learns an additive ensemble of decision trees
+\begin{equation}
+F(x)=\sum_{m=1}^{M}\eta h_m(x),
+\end{equation}
+where $h_m$ is a tree, $M$ is the number of boosting rounds, and $\eta$ is the
+learning rate \cite{ke2017lightgbm}. The binary score is obtained from the raw
+logit through the logistic link. Tree models are appropriate for heterogeneous
+PE feature groups and do not require the coordinates to share a unit or scale.
+
+For a fitted booster, native TreeSHAP returns $d$ contributions and one bias
+value. We verify (\ref{eq:additivity}) for every scored pool or fidelity sample.
+The largest observed error was below $10^{-14}$ in both measured pipelines. All
+rankings use the $d$ signed feature contributions; the bias is excluded. This
+matters because including the bias as a feature would allocate the model's base
+rate to the deletion budget and distort both acquisition and fidelity analyses.
+
+\subsection{Adaptive PID Fusion Specification}
+
+Suppose a session provides aligned pairs $(p_{\mathrm{s},k},p_{\mathrm{d},k})$ in a meaningful
+order $k$. The implementation defines the discrepancy as
+\begin{equation}
+e_k=p_{\mathrm{s},k}-p_{\mathrm{d},k}.
+\label{eq:pid-error}
+\end{equation}
+The state update is discrete by observation step:
+\begin{align}
+I_k &= I_{k-1}+e_k,\label{eq:pid-i}\\
+D_k &= e_k-e_{k-1},\label{eq:pid-d}\\
+u_k &= K_p e_k+K_i I_k+K_d D_k.\label{eq:pid-u}
+\end{align}
+The static weight is a clipped logistic transformation,
+\begin{equation}
+w_{\mathrm{s},k}=\operatorname{clip}
+\left(\frac{1}{1+\exp(-u_k)},0.1,0.9\right),
+\label{eq:pid-weight}
+\end{equation}
+and the fused score is
+\begin{equation}
+p_{\mathrm{f},k}=w_{\mathrm{s},k}p_{\mathrm{s},k}+
+(1-w_{\mathrm{s},k})p_{\mathrm{d},k}.
+\label{eq:fusion}
+\end{equation}
+
+The reference gains are $(K_p,K_i,K_d)=(0.85,0.12,0.35)$, but they are not
+treated as established optima. The validation grid contains proportional gains
+$\{0.425,0.85,1.7\}$, integral gains $\{0,0.06,0.12\}$, and derivative gains
+$\{0,0.175,0.35\}$, together with simpler P and PI subsets. Fixed weights are
+searched over $\{0,0.1,\ldots,1\}$. A candidate is selected by maximum validation
+AUC, then lower validation FPR, then declared grid order. The decision threshold
+is independently selected on validation for the target TPR.
+
+The controller is reset for every independent \texttt{sequence\_id}, data split, seed,
+and active-learning strategy. No state flows from validation into test. The
+implementation contains neither an explicit $\Delta t$ nor integral anti-windup;
+clipping the output weight is not the same as bounding the accumulated state. If
+every sequence contains only one independent observation, the P, I, and D terms
+cannot be interpreted as distinct historical benefits. A credible experiment
+must therefore document why observations form a sequence and what one step
+means.
+
+Equations~(\ref{eq:pid-error})--(\ref{eq:fusion}) are a fusion heuristic, not a
+stability theorem. When $\pstatic>\pdynamic$, the update tends to increase the
+static weight; when $\pdynamic>\pstatic$, it tends to favor the dynamic score.
+This often emphasizes the larger positive-risk estimate, but it does not
+guarantee calibration or lower FPR. The required baselines are Static-only,
+Dynamic-only, a 50/50 average, validation-selected fixed weighting, P, PI, PID,
+and the untuned reference PID. The full design also includes a two-factor
+comparison between Random/$\xfull$ querying and Fixed/PID fusion. A
+difference-in-differences analysis is required before claiming interaction
+between the two components.
+
+\subsection{Explanation-Guided Active Learning}
+
+At round $r$, the fitted model assigns probability $p_i$ to each pool sample.
+Predictive uncertainty is
+\begin{equation}
+U_i=1-2|p_i-0.5|,
+\label{eq:uncertainty}
+\end{equation}
+which equals one at the decision boundary and zero at the extremes. To represent
+the directional structure of a signed SHAP vector, define the total positive and
+negative attribution masses
+\begin{equation}
+A_i^+=\sum_j\max(\phi_{ij},0),\qquad
+A_i^-=-\sum_j\min(\phi_{ij},0).
+\end{equation}
+When $A_i^++A_i^->0$, let
+\begin{equation}
+q_i=\frac{A_i^+}{A_i^++A_i^-}.
+\end{equation}
+Directional entropy is the binary entropy
+\begin{equation}
+H_i=-q_i\log_2 q_i-(1-q_i)\log_2(1-q_i),
+\label{eq:entropy}
+\end{equation}
+with $H_i=0$ for a one-sided or zero attribution vector. $H_i$ is high when
+large positive and negative contributions coexist. It is not the entropy of the
+class probability distribution.
+
+The third signal is signed SHAP variance across coordinates,
+\begin{equation}
+V_i=\frac{1}{d}\sum_{j=1}^{d}(\phi_{ij}-\bar{\phi}_i)^2,
+\qquad
+\bar{\phi}_i=\frac{1}{d}\sum_j\phi_{ij}.
+\label{eq:variance}
+\end{equation}
+This quantity measures concentration/dispersion of one explanation. It is not
+variance across trees, posterior samples, or independently trained models.
+
+Because $U$, $H$, and $V$ occupy different numeric ranges, each signal is
+min--max normalized over the current pool:
+\begin{equation}
+\widetilde{S}_i=\begin{cases}
+\dfrac{S_i-S_{\min}}{S_{\max}-S_{\min}}, & S_{\max}>S_{\min},\\
+0, & \text{otherwise}.
+\end{cases}
+\label{eq:normalize}
+\end{equation}
+The acquisition function is
+\begin{equation}
+Q_i=\alpha\widetilde{U}_i+\beta\widetilde{H}_i+
+\gamma\widetilde{V}_i.
+\label{eq:query}
+\end{equation}
+The complete policy uses $(\alpha,\beta,\gamma)=(0.3,0.4,0.3)$. Partial
+ablations use $U+H=(3/7,4/7,0)$ and $U+V=(0.5,0,0.5)$; the uncertainty baseline
+uses $(1,0,0)$. Random sampling assigns an independent random score. Ties are
+resolved by ascending original CSV row identifier, making selection deterministic
+given the score vector and seed.
+
+One active-learning run follows six steps: (1) fit a fresh LightGBM model on the
+current labeled set; (2) select a validation threshold; (3) evaluate and save
+validation/test predictions; (4) compute $Q$ only for the remaining training
+pool; (5) reveal labels for the top $b$ pool rows; and (6) repeat until the fixed
+budget is exhausted. Test outcomes never affect queries or stopping. SHAP is
+recomputed after each model update, so the acquisition geometry follows the
+current classifier rather than a frozen initial explanation.
+
+\subsection{Controlled Fidelity Measures}
+
+The fidelity experiment fits a separate LightGBM model on the entire training
+partition and computes TreeSHAP on the fixed test partition. For each $k$, it
+compares the sample-specific top-$|\phi|$ mask in (\ref{eq:mask}) with 20 random
+masks of the same selected-coordinate count. The model is not retrained after
+masking; the experiment measures prediction sensitivity of one fitted model.
+
+Let $p_i$ and $p_i^{(M)}$ denote original and masked probabilities. The raw
+faithfulness statistic used by the thesis is
+\begin{equation}
+\mathrm{FF}_{\mathrm{raw}}=\frac{1}{n}\sum_{i=1}^{n}
+\frac{|p_i-p_i^{(M)}|}{p_i+\epsilon},\qquad \epsilon=10^{-12}.
+\label{eq:ff}
+\end{equation}
+It is intentionally unclipped and may exceed one when $p_i$ is small. We
+therefore also report AUC before/after masking, paired AUC drop, and mean absolute
+probability change. These quantities provide more interpretable context than an
+isolated FF value.
+
+Explanation consistency (EC) compares pairwise geometry. Standardize test
+features with training means and standard deviations, compute the cosine
+similarity matrix $C^x$, and compute the cosine similarity matrix $C^\phi$ of
+signed SHAP vectors. EC is the Pearson correlation over the strict upper
+triangles:
+\begin{equation}
+\mathrm{EC}=\operatorname{corr}
+\left(\operatorname{ut}(C^x),\operatorname{ut}(C^\phi)\right).
+\label{eq:ec}
+\end{equation}
+For $n=400$, this produces 79,800 pairs, but the pairs share samples and are not
+independent observations for a naive significance test.
+
+Contrastive fidelity (CF) describes separation of the two label-conditioned SHAP
+centroids. With $\boldsymbol{c}_0$ and $\boldsymbol{c}_1$ denoting mean SHAP
+vectors for the negative and positive test classes,
+\begin{equation}
+\mathrm{CF}=\frac{\|\boldsymbol{c}_1-\boldsymbol{c}_0\|_2}
+{\max_i\|\boldsymbol{\phi}_i\|_2+\epsilon}.
+\label{eq:cf}
+\end{equation}
+CF is a normalized geometric separation statistic. It is neither a causal metric
+nor proof of explanation correctness. FF, EC, and CF use different scales and
+constructs. Consequently, no OFS is reported; choosing normalization and weights
+after observing results would manufacture a composite score without an empirical
+meaning.
+
+\subsection{Computational Considerations}
+
+LightGBM prediction is proportional to the number and depth of traversed trees.
+Native TreeSHAP adds pool-scoring overhead that grows with ensemble and path
+complexity. The acquisition policy computes explanations only for methods that
+use $H$ or $V$; uncertainty and random baselines avoid that cost. The fidelity
+test requires one original prediction, one SHAP computation, three top-k masked
+batches, and $3\times20$ random batches. Timing is reported only for the scope
+actually measured and is not translated into endpoint latency or analyst cost.
