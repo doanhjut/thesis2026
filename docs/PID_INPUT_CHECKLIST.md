@@ -71,6 +71,12 @@ Nó chỉ chấp nhận chính sách này khi tổng số dòng khớp NPZ và n
 2.000 source index; quyết định được lưu trong `sorel_alignment_audit.json` và
 `selected_split_policy` của báo cáo. Không được tự trừ số dòng hoặc bỏ qua lỗi.
 
+Lượt căn chỉnh phát lại đúng projection của builder SOREL:
+`select sha256,is_malware from meta ...`. Do upstream không có `ORDER BY`, thêm
+các cột timestamp/tag có thể làm SQLite chọn index khác và đổi thứ tự toàn bộ
+dòng. Sau khi căn chỉnh đạt, runner mới truy vấn metadata đầy đủ theo 2.000
+SHA-256 ở lượt riêng. Audit lưu cả query plan và định nghĩa index để kiểm tra lại.
+
 ### Phương án B — Tạo paired dataset mới
 
 Cung cấp một manifest:

@@ -21,3 +21,9 @@ Giới hạn còn lại:
 Bước tiếp theo dùng `recover-sorel-metadata` với `meta.db` và
 `shas_missing_ember_features.json` của đúng bản SOREL. Công cụ chỉ xuất SHA/tag
 khi toàn bộ số dòng sau lọc và cả 2.000 nhãn tại source index đều khớp.
+
+`diagnostics/sorel_alignment_audit_full_projection.json` lưu lần thử đầu tiên:
+loại 21 dòng đúng timestamp biên làm số dòng khớp 4.195.042, nhưng truy vấn thêm
+timestamp/tag chỉ khớp 1.163/2.000 nhãn. Kết quả này bị loại. Runner sau đó được
+sửa để phát lại đúng projection `sha256,is_malware` của builder SOREL và lấy tag
+theo SHA-256 ở lượt riêng, vì upstream không quy định `ORDER BY`.

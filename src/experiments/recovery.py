@@ -255,19 +255,27 @@ def recover_sorel_metadata(manifest, source_inspection, meta_db, missing_shas, o
         require(needed.issubset(columns), f'SOREL meta table is missing columns: {sorted(needed - columns)}')
         optional = ['rl_ls_const_positives'] if 'rl_ls_const_positives' in columns else []
         selected_columns = ['sha256', 'is_malware', 'rl_fs_t', *optional, *SOREL_TAGS]
-        query = 'select ' + ','.join(selected_columns) + ' from meta where(rl_fs_t >= ?)'
-        cursor = connection.execute(query, (float(test_split),))
+        boundary_query = 'select sha256 from meta where(rl_fs_t = ?)'
+        boundary_shas = {_text_sha(value[0]) for value in connection.execute(boundary_query, (float(test_split),))}
+        # Reproduce the exact projection used by SOREL's LightGBM array builder.
+        # The upstream SQL has no ORDER BY, so adding timestamp/tag columns can
+        # change SQLite's selected index and therefore the iteration order.
+        query = f'select sha256,is_malware from meta where(rl_fs_t >= {float(test_split)})'
+        query_plan = [list(item) for item in connection.execute('explain query plan ' + query)]
+        index_definitions = [
+            {'name': name, 'sql': sql}
+            for name, sql in connection.execute(
+                "select name,sql from sqlite_master where type='index' and tbl_name='meta' order by name")
+        ]
+        cursor = connection.execute(query)
         targets = set(map(int, rows.source_index))
         inclusive_recovered, exclusive_recovered = {}, {}
         inclusive_index, exclusive_index, database_test_rows = 0, 0, 0
-        boundary_rows_before_filter, boundary_rows_after_filter = 0, 0
-        for values in cursor:
+        boundary_rows_before_filter, boundary_rows_after_filter = len(boundary_shas), 0
+        for sha_value, is_malware in cursor:
             database_test_rows += 1
-            record = dict(zip(selected_columns, values))
-            record['sha256'] = _text_sha(record['sha256'])
-            on_boundary = float(record['rl_fs_t']) == float(test_split)
-            if on_boundary:
-                boundary_rows_before_filter += 1
+            record = {'sha256': _text_sha(sha_value), 'is_malware': is_malware}
+            on_boundary = record['sha256'] in boundary_shas
             if record['sha256'] in missing:
                 continue
             if inclusive_index in targets:
@@ -312,6 +320,9 @@ def recover_sorel_metadata(manifest, source_inspection, meta_db, missing_shas, o
         'boundary_rows_before_missing_filter': int(boundary_rows_before_filter),
         'boundary_rows_after_missing_filter': int(boundary_rows_after_filter),
         'missing_sha_count_all_splits': int(len(missing)),
+        'builder_query': query,
+        'builder_query_plan': query_plan,
+        'meta_index_definitions': index_definitions,
         'candidates': [{key: value for key, value in item.items() if not key.startswith('_')}
                        for item in candidates],
     }
@@ -321,7 +332,26 @@ def recover_sorel_metadata(manifest, source_inspection, meta_db, missing_shas, o
             f'exclusive={exclusive_index}, boundary_after_filter={boundary_rows_after_filter}, '
             f'expected={expected_source_rows}. See sorel_alignment_audit.json.')
     chosen = valid[0]
-    ordered, metadata_labels = chosen['_ordered'], chosen['_labels']
+    ordered_keys, metadata_labels = chosen['_ordered'], chosen['_labels']
+
+    chosen_shas = [item['sha256'] for item in ordered_keys]
+    metadata = {}
+    connection = sqlite3.connect(f'file:{meta_db}?mode=ro', uri=True)
+    try:
+        for start in range(0, len(chosen_shas), 500):
+            chunk = chosen_shas[start:start + 500]
+            placeholders = ','.join('?' for _ in chunk)
+            metadata_query = ('select ' + ','.join(selected_columns) +
+                              f' from meta where sha256 in ({placeholders})')
+            for values in connection.execute(metadata_query, chunk):
+                record = dict(zip(selected_columns, values))
+                record['sha256'] = _text_sha(record['sha256'])
+                metadata[record['sha256']] = record
+    finally:
+        connection.close()
+    require(len(metadata) == len(chosen_shas),
+            f'Only recovered full SOREL metadata for {len(metadata)}/{len(chosen_shas)} selected SHA-256 values.')
+    ordered = [metadata[sha] for sha in chosen_shas]
 
     augmented = rows.copy()
     augmented['sha256'] = [item['sha256'] for item in ordered]
@@ -347,6 +377,7 @@ def recover_sorel_metadata(manifest, source_inspection, meta_db, missing_shas, o
         'official_order_replay': {
             'test_split_timestamp': float(test_split),
             'base_query': query,
+            'query_plan': query_plan,
             'selected_split_operator': chosen['operator'],
             'selected_split_policy': chosen['name'],
             'database_test_rows_before_missing_filter': int(database_test_rows),

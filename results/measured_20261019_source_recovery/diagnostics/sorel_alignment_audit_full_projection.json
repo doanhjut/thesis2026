@@ -1,0 +1,28 @@
+{
+  "status": "not_aligned",
+  "test_split_timestamp": 1547279640.0,
+  "database_rows_at_or_after_boundary_before_missing_filter": 4271456,
+  "boundary_rows_before_missing_filter": 21,
+  "boundary_rows_after_missing_filter": 21,
+  "missing_sha_count_all_splits": 335120,
+  "candidates": [
+    {
+      "name": "inclusive_boundary",
+      "operator": ">=",
+      "filtered_rows": 4195063,
+      "expected_rows": 4195042,
+      "recovered_selected_rows": 2000,
+      "matching_selected_labels": 1163,
+      "valid": false
+    },
+    {
+      "name": "exclusive_boundary",
+      "operator": ">",
+      "filtered_rows": 4195042,
+      "expected_rows": 4195042,
+      "recovered_selected_rows": 2000,
+      "matching_selected_labels": 1163,
+      "valid": false
+    }
+  ]
+}
