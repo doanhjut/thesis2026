@@ -15,6 +15,30 @@ Cung cấp:
 
 Script sampling dùng `random_state=42`, nhưng CSV cuối đã shuffle và không lưu source index. Chỉ archive feature/label chưa chắc đủ để lấy SHA-256; cần metadata cùng thứ tự hoặc mapping tương ứng.
 
+### Lệnh khôi phục trên máy Windows
+
+Sau khi pull nhánh `feat/reproducible-thesis-experiments`, chạy kiểm tra header của nguồn nhiều khả năng đã được chọn. Lệnh này không nạp ma trận feature vào RAM và mặc định chưa hash toàn bộ file 39 GB:
+
+```powershell
+python scripts/run_experiments.py inspect-source `
+  --source "D:\Code\Luanvan\data\archives\test-features.npz" `
+  --output outputs\source_inspection_test
+```
+
+Gửi lại file nhỏ `outputs\source_inspection_test\source_inspection.json`. Nếu shape và class counts phù hợp, khôi phục mapping và thử ghép JSONL:
+
+```powershell
+python scripts/run_experiments.py recover-manifest `
+  --source "D:\Code\Luanvan\data\archives\test-features.npz" `
+  --mini "D:\Code\Luanvan\data\processed\real_mini_dataset.csv" `
+  --metadata-jsonl "D:\Code\Luanvan\data\ember2018\test_features.jsonl" `
+  --output outputs\recovered_manifest_test
+```
+
+Runner tái tạo sampling và shuffle cũ, stream đúng 2.000 source rows, rồi so từng vector/label với CSV hiện tại. JSONL chỉ được ghép khi đủ dòng, SHA-256 hợp lệ và label cùng thứ tự; mismatch sẽ dừng thay vì tạo manifest sai.
+
+Lần đóng băng cuối nên thêm `--hash-source`. Hash file hàng chục GB sẽ mất nhiều thời gian nên chưa cần dùng ở bước inspect đầu tiên.
+
 ### Phương án B — Tạo paired dataset mới
 
 Cung cấp một manifest:

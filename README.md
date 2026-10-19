@@ -59,6 +59,8 @@ python scripts/run_experiments.py audit-pid-inputs \
   --output outputs/pid_input_audit
 ```
 
+Nếu có archive NPZ lớn trên máy khác, `inspect-source` đọc header mà không nạp ma trận feature; `recover-manifest` tái tạo source index từ sampling/shuffle cũ và chỉ ghép JSONL khi row order, label và SHA-256 hợp lệ. Xem `docs/PID_INPUT_CHECKLIST.md` để lấy lệnh PowerShell cụ thể.
+
 Phần static uncertainty gate có thể đo trước khi có sandbox data. Runner tách validation thành hai phần rời nhau: một phần fit Platt calibration, phần còn lại chọn threshold; test chỉ dùng đánh giá:
 
 ```bash

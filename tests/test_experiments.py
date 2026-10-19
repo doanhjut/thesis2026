@@ -11,6 +11,7 @@ from src.experiments.fidelity import mask_metrics
 from src.experiments.fusion import sequence_scores
 from src.experiments.gating import gate_counts, select_gate
 from src.experiments.provenance import audit
+from src.experiments.recovery import recover, sampled_source_indices
 from src.experiments.signals import normalize, shap_signals
 from src.experiments.temporal import validate as validate_temporal
 from src.pid_fusion import PIDController, fuse_scores
@@ -122,6 +123,30 @@ class DatasetGuardTests(unittest.TestCase):
             result = validate_temporal(data, provenance, 'abc')
             self.assertEqual(result['status'], 'valid_schema')
             self.assertEqual(result['scored_rows'], 2)
+
+    def test_source_manifest_recovery_replays_sampling_and_metadata_alignment(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            source, mini, metadata, output = root / 'source.npz', root / 'mini.csv', root / 'metadata.jsonl', root / 'out'
+            labels = np.array([0] * 10 + [1] * 5)
+            features = np.arange(len(labels) * 3, dtype=np.float32).reshape(len(labels), 3) / 10
+            np.savez_compressed(source, features, labels)
+            selected = sampled_source_indices(labels, 4, 2, 42)
+            permutation = pd.DataFrame({'position': np.arange(len(selected))}).sample(frac=1, random_state=42).position.to_numpy()
+            source_ids = selected[permutation]
+            frame = pd.DataFrame(features[source_ids], columns=['0', '1', '2'])
+            frame['label'] = labels[source_ids]
+            frame.to_csv(mini, index=False)
+            with metadata.open('w') as stream:
+                for index, label in enumerate(labels):
+                    stream.write(json.dumps({'sha256': f'{index:064x}', 'appeared': '2026-01',
+                                             'label': int(label), 'avclass': 'test'}) + '\n')
+            result = recover(source, mini, output, [metadata], n_negative=4, n_positive=2, seed=42)
+            self.assertEqual(result['status'], 'recovered')
+            self.assertEqual(result['metadata_status'], 'row_order_and_label_verified')
+            manifest = pd.read_csv(output / 'row_manifest.csv', dtype={'sha256': str})
+            np.testing.assert_array_equal(manifest.source_index, source_ids)
+            self.assertTrue(manifest.sha256.str.len().eq(64).all())
 
 
 if __name__ == '__main__':

@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 import traceback
 
-from . import active_learning, fidelity, fusion, gating, provenance, temporal
+from . import active_learning, fidelity, fusion, gating, provenance, recovery, temporal
 from .common import DEFAULT_DATA, REPO, finish_manifest, load_dataset, require, write_json
 from .verification import verify_al, verify_fidelity, verify_saved_run
 
@@ -68,6 +68,19 @@ def parser():
     temporal_validate.add_argument('--data', type=Path, required=True)
     temporal_validate.add_argument('--provenance', type=Path, required=True)
     temporal_validate.add_argument('--dataset-sha256')
+    inspect_source = sub.add_parser('inspect-source', help='Inspect a large NPZ without loading its feature matrix into memory.')
+    inspect_source.add_argument('--source', type=Path, required=True)
+    inspect_source.add_argument('--output', type=Path)
+    inspect_source.add_argument('--hash-source', action='store_true', help='Hash the entire archive; slow for tens of GB.')
+    recover = sub.add_parser('recover-manifest', help='Recreate mini-dataset source indices and optionally join aligned JSONL metadata.')
+    recover.add_argument('--source', type=Path, required=True)
+    recover.add_argument('--mini', type=Path, default=DEFAULT_DATA)
+    recover.add_argument('--output', type=Path, required=True)
+    recover.add_argument('--metadata-jsonl', nargs='+', type=Path)
+    recover.add_argument('--n-negative', type=int, default=1500)
+    recover.add_argument('--n-positive', type=int, default=500)
+    recover.add_argument('--seed', type=int, default=42)
+    recover.add_argument('--hash-source', action='store_true')
     return p
 
 
@@ -104,6 +117,20 @@ def main(argv=None):
             return 0
         if args.command == 'validate-temporal':
             print(json.dumps(temporal.validate(args.data, args.provenance, args.dataset_sha256), ensure_ascii=False, indent=2))
+            return 0
+        if args.command == 'inspect-source':
+            result = recovery.inspect_npz(args.source, args.hash_source)
+            if args.output:
+                args.output.mkdir(parents=True, exist_ok=False)
+                write_json(args.output / 'source_inspection.json', result)
+                finish_manifest(args.output)
+            print(json.dumps(result, ensure_ascii=False, indent=2))
+            return 0
+        if args.command == 'recover-manifest':
+            result = recovery.recover(args.source, args.mini, args.output, args.metadata_jsonl,
+                                      args.n_negative, args.n_positive, args.seed, args.hash_source)
+            finish_manifest(args.output)
+            print(json.dumps(result, ensure_ascii=False, indent=2))
             return 0
         if args.command == 'prepare-dynamic':
             result = fusion.prepare_dynamic_template(args.al_run, args.output)
