@@ -65,6 +65,12 @@ source index trước khi xuất `sorel_row_manifest.csv`. `tag_ransomware` là 
 multi-label tag của SOREL, không được mô tả như family ground truth. Lần đóng
 băng cuối có thể thêm `--hash-meta-db`.
 
+Nếu metadata dùng điều kiện biên `rl_fs_t >= 1547279640` nhiều hơn NPZ đúng bằng
+số mẫu nằm tại timestamp biên, runner thử chính sách `>` trong cùng một lượt đọc.
+Nó chỉ chấp nhận chính sách này khi tổng số dòng khớp NPZ và nhãn khớp tại cả
+2.000 source index; quyết định được lưu trong `sorel_alignment_audit.json` và
+`selected_split_policy` của báo cáo. Không được tự trừ số dòng hoặc bỏ qua lỗi.
+
 ### Phương án B — Tạo paired dataset mới
 
 Cung cấp một manifest:

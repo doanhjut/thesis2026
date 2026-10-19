@@ -167,6 +167,9 @@ class DatasetGuardTests(unittest.TestCase):
             placeholders = ','.join(['?'] * (4 + len(SOREL_TAGS)))
             connection.execute(f'insert into meta values({placeholders})',
                                [f'{999:064x}', 0, 5.0, 0, *([0] * len(SOREL_TAGS))])
+            for index in range(2):
+                connection.execute(f'insert into meta values({placeholders})',
+                                   [f'{1000 + index:064x}', index % 2, 10.0, 1, *([0] * len(SOREL_TAGS))])
             raw_test = []
             for index in range(15):
                 sha = f'{index:064x}'
@@ -190,6 +193,9 @@ class DatasetGuardTests(unittest.TestCase):
             report = recover_sorel_metadata(manifest, inspection, db, missing, output, test_split=10.0)
             self.assertEqual(report['status'], 'sorel_metadata_recovered')
             self.assertEqual(report['official_order_replay']['test_rows_after_missing_filter'], 14)
+            self.assertEqual(report['official_order_replay']['inclusive_rows_after_missing_filter'], 16)
+            self.assertEqual(report['official_order_replay']['boundary_rows_after_missing_filter'], 2)
+            self.assertEqual(report['official_order_replay']['selected_split_operator'], '>')
             augmented = pd.read_csv(output / 'sorel_row_manifest.csv', dtype={'sha256': str})
             self.assertEqual(augmented.sha256.tolist(), [filtered[i][0] for i in source_indices])
             self.assertEqual(int(augmented.tag_ransomware.sum()), 2)

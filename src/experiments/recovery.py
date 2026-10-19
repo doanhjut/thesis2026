@@ -137,7 +137,10 @@ def _feature_digest(row):
 def recover(source, mini, out, metadata_jsonl=None, n_negative=1500, n_positive=500,
             seed=42, hash_source=False, rtol=1e-6, atol=1e-8):
     source, mini, out = Path(source).resolve(), Path(mini).resolve(), Path(out)
-    out.mkdir(parents=True, exist_ok=False)
+    if out.exists():
+        require(out.is_dir() and not any(out.iterdir()), 'Output directory must be new or empty.')
+    else:
+        out.mkdir(parents=True)
     feature_entry, label_entry, inspection = _array_names(source)
     if hash_source:
         inspection = inspect_npz(source, hash_source=True)
@@ -221,7 +224,10 @@ def recover_sorel_metadata(manifest, source_inspection, meta_db, missing_shas, o
     require(source_inspection.is_file(), 'source_inspection.json does not exist.')
     require(meta_db.is_file(), 'SOREL meta.db does not exist.')
     require(missing_shas.is_file(), 'shas_missing_ember_features.json does not exist.')
-    out.mkdir(parents=True, exist_ok=False)
+    if out.exists():
+        require(out.is_dir() and not any(out.iterdir()), 'Output directory must be new or empty.')
+    else:
+        out.mkdir(parents=True)
 
     rows = pd.read_csv(manifest)
     required_manifest = {'row_id', 'source_index', 'label'}
@@ -252,29 +258,70 @@ def recover_sorel_metadata(manifest, source_inspection, meta_db, missing_shas, o
         query = 'select ' + ','.join(selected_columns) + ' from meta where(rl_fs_t >= ?)'
         cursor = connection.execute(query, (float(test_split),))
         targets = set(map(int, rows.source_index))
-        recovered, filtered_index, database_test_rows = {}, 0, 0
+        inclusive_recovered, exclusive_recovered = {}, {}
+        inclusive_index, exclusive_index, database_test_rows = 0, 0, 0
+        boundary_rows_before_filter, boundary_rows_after_filter = 0, 0
         for values in cursor:
             database_test_rows += 1
             record = dict(zip(selected_columns, values))
             record['sha256'] = _text_sha(record['sha256'])
+            on_boundary = float(record['rl_fs_t']) == float(test_split)
+            if on_boundary:
+                boundary_rows_before_filter += 1
             if record['sha256'] in missing:
                 continue
-            if filtered_index in targets:
-                recovered[filtered_index] = record
-            filtered_index += 1
+            if inclusive_index in targets:
+                inclusive_recovered[inclusive_index] = record
+            inclusive_index += 1
+            if on_boundary:
+                boundary_rows_after_filter += 1
+                continue
+            if exclusive_index in targets:
+                exclusive_recovered[exclusive_index] = record
+            exclusive_index += 1
     finally:
         connection.close()
 
-    require(filtered_index == expected_source_rows,
-            f'Filtered SOREL test rows ({filtered_index}) differ from inspected NPZ rows ({expected_source_rows}); '
-            'the meta.db, split, missing-feature list or NPZ release is not aligned.')
-    require(len(recovered) == len(rows),
-            f'Only recovered metadata for {len(recovered)}/{len(rows)} selected source indices.')
+    expected_labels = rows.label.to_numpy(dtype=int)
 
-    ordered = [recovered[int(index)] for index in rows.source_index]
-    metadata_labels = np.asarray([int(item['is_malware']) for item in ordered])
-    require(np.array_equal(metadata_labels, rows.label.to_numpy(dtype=int)),
-            'SOREL metadata labels do not match the NPZ labels at selected source indices.')
+    def candidate(name, operator, count, recovered):
+        complete = len(recovered) == len(rows)
+        if complete:
+            candidate_ordered = [recovered[int(index)] for index in rows.source_index]
+            candidate_labels = np.asarray([int(item['is_malware']) for item in candidate_ordered])
+            matching_labels = int(np.sum(candidate_labels == expected_labels))
+        else:
+            candidate_ordered, candidate_labels, matching_labels = None, None, 0
+        return {
+            'name': name, 'operator': operator, 'filtered_rows': int(count),
+            'expected_rows': expected_source_rows, 'recovered_selected_rows': int(len(recovered)),
+            'matching_selected_labels': matching_labels,
+            'valid': bool(count == expected_source_rows and complete and matching_labels == len(rows)),
+            '_ordered': candidate_ordered, '_labels': candidate_labels,
+        }
+
+    inclusive = candidate('inclusive_boundary', '>=', inclusive_index, inclusive_recovered)
+    candidates = [inclusive]
+    if not inclusive['valid'] and boundary_rows_after_filter:
+        candidates.append(candidate('exclusive_boundary', '>', exclusive_index, exclusive_recovered))
+    valid = [item for item in candidates if item['valid']]
+    alignment_audit = {
+        'status': 'aligned' if len(valid) == 1 else 'not_aligned',
+        'test_split_timestamp': float(test_split),
+        'database_rows_at_or_after_boundary_before_missing_filter': int(database_test_rows),
+        'boundary_rows_before_missing_filter': int(boundary_rows_before_filter),
+        'boundary_rows_after_missing_filter': int(boundary_rows_after_filter),
+        'missing_sha_count_all_splits': int(len(missing)),
+        'candidates': [{key: value for key, value in item.items() if not key.startswith('_')}
+                       for item in candidates],
+    }
+    write_json(out / 'sorel_alignment_audit.json', alignment_audit)
+    require(len(valid) == 1,
+            f'Could not uniquely align SOREL metadata to NPZ: inclusive={inclusive_index}, '
+            f'exclusive={exclusive_index}, boundary_after_filter={boundary_rows_after_filter}, '
+            f'expected={expected_source_rows}. See sorel_alignment_audit.json.')
+    chosen = valid[0]
+    ordered, metadata_labels = chosen['_ordered'], chosen['_labels']
 
     augmented = rows.copy()
     augmented['sha256'] = [item['sha256'] for item in ordered]
@@ -299,13 +346,19 @@ def recover_sorel_metadata(manifest, source_inspection, meta_db, missing_shas, o
         },
         'official_order_replay': {
             'test_split_timestamp': float(test_split),
-            'query': query,
+            'base_query': query,
+            'selected_split_operator': chosen['operator'],
+            'selected_split_policy': chosen['name'],
             'database_test_rows_before_missing_filter': int(database_test_rows),
+            'boundary_rows_before_missing_filter': int(boundary_rows_before_filter),
+            'boundary_rows_after_missing_filter': int(boundary_rows_after_filter),
             'missing_sha_count_all_splits': int(len(missing)),
-            'test_rows_after_missing_filter': int(filtered_index),
+            'inclusive_rows_after_missing_filter': int(inclusive_index),
+            'exclusive_rows_after_missing_filter': int(exclusive_index),
+            'test_rows_after_missing_filter': int(chosen['filtered_rows']),
             'expected_npz_rows': expected_source_rows,
             'selected_rows': int(len(rows)),
-            'selected_labels_matching': int(np.sum(metadata_labels == rows.label.to_numpy(dtype=int))),
+            'selected_labels_matching': int(np.sum(metadata_labels == expected_labels)),
         },
         'selected_label_counts': {str(k): int(v) for k, v in augmented.label.value_counts().sort_index().items()},
         'selected_tag_counts': tag_counts,
@@ -316,6 +369,7 @@ def recover_sorel_metadata(manifest, source_inspection, meta_db, missing_shas, o
         },
         'limitations': [
             'The official LightGBM NPZ contains no SHA-256 or tags; this mapping replays the official SQLite iteration and missing-feature filter.',
+            'When inclusive and exclusive timestamp boundaries differ, a policy is accepted only if the complete NPZ row count and every selected binary label match; the chosen boundary is recorded in the audit.',
             'All selected binary labels and the complete filtered row count must match, but exact feature-to-SHA confirmation additionally requires the corresponding SOREL ember_features LMDB.',
             'SOREL metadata and EMBER features do not provide executable behavior traces; PID still requires paired binaries or sandbox reports.',
         ],
