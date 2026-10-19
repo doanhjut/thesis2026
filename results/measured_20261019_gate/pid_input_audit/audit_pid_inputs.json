@@ -1,0 +1,30 @@
+{
+  "status": "blocked",
+  "dataset": {
+    "path": "/workspace/thesis2026/data/processed/real_mini_dataset.csv",
+    "sha256": "c733cc0c3e0950fa1d05d57d34c69d0a034383e0c1a2fde0e6878b9e2e8c3668",
+    "rows": 2000,
+    "columns": 2382,
+    "identifier_columns": []
+  },
+  "source_feature_files": [],
+  "pe_binary_count": 0,
+  "dynamic_report_count": 0,
+  "known_demo_artifacts": {
+    "trace": "data/dynamic_logs/raw_pid_trace.csv",
+    "source": "scripts/live_defense_demo.py",
+    "usable_as_pid_evidence": false
+  },
+  "blockers": [
+    "Feature CSV has no sample SHA-256 or other binary identifier.",
+    "No source PE binaries are available under data/.",
+    "Original feature archive/raw EMBER arrays are unavailable, so sampled source indices cannot be reconstructed here.",
+    "No per-sample sandbox reports are present in a supported report directory."
+  ],
+  "required_user_inputs": [
+    "A row-to-binary manifest containing row_id and sample_sha256, or the original archive plus its metadata/index mapping.",
+    "Authorized PE binaries or an existing sandbox corpus linked by sample_sha256.",
+    "Per-execution dynamic reports with timestamps and multiple observation windows.",
+    "A documented label source distinguishing benign, generic malware and ransomware."
+  ]
+}

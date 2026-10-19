@@ -1,0 +1,39 @@
+{
+  "kind": "static_uncertainty_gate",
+  "al_run": "/workspace/thesis2026/outputs/thesis_measured_20261014/al",
+  "al_dataset_sha256": "c733cc0c3e0950fa1d05d57d34c69d0a034383e0c1a2fde0e6878b9e2e8c3668",
+  "al_predictions": "Final-round saved probabilities only.",
+  "calibration": "Platt scaling fit on the calibration subset of the original validation split.",
+  "gate_selection": "Minimize routed fraction subject to early error constraints on the disjoint gate-selection subset.",
+  "partition_seed": 2026,
+  "calibration_fraction": 0.5,
+  "max_early_fnr": 0.02,
+  "max_early_fpr": 0.02,
+  "scope": "Static gate only. Routed rows have no final decision until real dynamic evidence is supplied.",
+  "al_predictions_sha256": "8df713e80edbdad6a1bc9fad322d57b7f6e2de10900b05a636d8862ffe2c9690",
+  "repository_commit": "d831933fe91f8522ed28d1d859ee18b8688369a6",
+  "working_tree_status": "",
+  "source_sha256": {
+    "src/experiments/__init__.py": "63c0b7fd26cc89daa9ca4a0b60ef6af7606cd9d701f6976f6fcaeb62313f1566",
+    "src/experiments/active_learning.py": "cedcac90a5338962734cc31ce10f111502b53e85e1e7a5a385bb95eae9b50c82",
+    "src/experiments/cli.py": "dfea17939d0020c945bdc3233ff5d0522118ab479c298ecaa048687a9e07db17",
+    "src/experiments/common.py": "0960265b102c451f7bf73109a900b63a3e5d881d40592d80e1a9112712d3c0d7",
+    "src/experiments/fidelity.py": "84dbdc49c45f4fca43874f43e04c8ea1d84f6e37993595653aa9ac1d3d820f06",
+    "src/experiments/fusion.py": "1dd57b9856bfea086f4c82aa84206c22409cf4a1ea4ae0399630fc67a9e8ee2e",
+    "src/experiments/gating.py": "19c75cd124e47ff2c6748479fc3d1d752a75716ae50930c9a63fa8778063b7c5",
+    "src/experiments/provenance.py": "5edd61a2332bfeb7d91dc3d99252de32d86883dce533dd7bdebfb79644bc4b1d",
+    "src/experiments/reporting.py": "c33cd15e6bc1fd8e85cfe9e81e96e486dd6693e11666b5124aa8c9bddb0e654d",
+    "src/experiments/signals.py": "8e3a773979b787a1b2fd4c199a70e4b877ee2a70ecfbc97428661a7c775c8638",
+    "src/experiments/temporal.py": "81454f7302b7075c0fd184141b0ab197cbc0ff129dd62ee5098e7926aaca0344",
+    "src/experiments/verification.py": "2d437dad7d2f1c3629414038669737359885cb28744383f572f741821e077e4a",
+    "src/pid_fusion.py": "71043dd632c6b573620b4530e353f65bd0a9424e4bebdc59f5df802df7b1e279",
+    "scripts/run_experiments.py": "6700f7fc2ecabe2bb6a1ff8899d0c3ed6b134bcc333ac1b7dc69e9ac06ee5598"
+  },
+  "versions": {
+    "python": "3.12.14",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "sklearn": "1.9.1",
+    "lightgbm": "4.7.0"
+  }
+}

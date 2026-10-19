@@ -1,0 +1,101 @@
+{
+  "status": "measured_static_gate_only",
+  "methods": [
+    {
+      "method": "Random",
+      "test_routed_fraction": {
+        "mean": 0.2435,
+        "sd": 0.08144399916507047,
+        "n": 5
+      },
+      "test_early_false_negative_rate_all_positives": {
+        "mean": 0.026000000000000002,
+        "sd": 0.020736441353327723,
+        "n": 5
+      },
+      "test_early_false_positive_rate_all_negatives": {
+        "mean": 0.04533333333333334,
+        "sd": 0.016090024514862893,
+        "n": 5
+      }
+    },
+    {
+      "method": "U+H",
+      "test_routed_fraction": {
+        "mean": 0.2465,
+        "sd": 0.11306248272526125,
+        "n": 5
+      },
+      "test_early_false_negative_rate_all_positives": {
+        "mean": 0.036,
+        "sd": 0.026076809620810593,
+        "n": 5
+      },
+      "test_early_false_positive_rate_all_negatives": {
+        "mean": 0.034666666666666665,
+        "sd": 0.005055250296034367,
+        "n": 5
+      }
+    },
+    {
+      "method": "U+V",
+      "test_routed_fraction": {
+        "mean": 0.3225,
+        "sd": 0.1102978920922789,
+        "n": 5
+      },
+      "test_early_false_negative_rate_all_positives": {
+        "mean": 0.02,
+        "sd": 0.029154759474226504,
+        "n": 5
+      },
+      "test_early_false_positive_rate_all_negatives": {
+        "mean": 0.036,
+        "sd": 0.005477225575051662,
+        "n": 5
+      }
+    },
+    {
+      "method": "Uncertainty",
+      "test_routed_fraction": {
+        "mean": 0.24050000000000002,
+        "sd": 0.0928439551074813,
+        "n": 5
+      },
+      "test_early_false_negative_rate_all_positives": {
+        "mean": 0.027999999999999997,
+        "sd": 0.014832396974191326,
+        "n": 5
+      },
+      "test_early_false_positive_rate_all_negatives": {
+        "mean": 0.034666666666666665,
+        "sd": 0.015202339001321839,
+        "n": 5
+      }
+    },
+    {
+      "method": "XAI_full",
+      "test_routed_fraction": {
+        "mean": 0.294,
+        "sd": 0.056419189997730365,
+        "n": 5
+      },
+      "test_early_false_negative_rate_all_positives": {
+        "mean": 0.004,
+        "sd": 0.005477225575051661,
+        "n": 5
+      },
+      "test_early_false_positive_rate_all_negatives": {
+        "mean": 0.032,
+        "sd": 0.00557773351022717,
+        "n": 5
+      }
+    }
+  ],
+  "limitations": [
+    "Static gate only. Routed rows have no final decision until real dynamic evidence is supplied.",
+    "Threshold feasibility is estimated from half of a 400-row validation split and is therefore coarse.",
+    "The same test split is shared across seeds; seed SD is not a population confidence interval.",
+    "Calibration/gating does not establish ransomware-specific validity without source provenance."
+  ]
+}

@@ -107,6 +107,8 @@ Active Learning dùng `U = 1 - 2|p-0.5|`. Từ SHAP có dấu `φ`, đặt tổn
 
 Gói báo cáo gọn của lần chạy mặc định ngày 2026-10-14 nằm tại [`results/measured_20261014`](results/measured_20261014/README.md). Gói này chứa bảng, biểu đồ, config, tóm tắt và kết quả verification. Checkpoint và dự đoán từng mẫu không được commit vì toàn bộ run có kích thước khoảng 28 MB; có thể tái tạo bằng lệnh mặc định ở trên.
 
+Kết quả calibration/static gate và audit đầu vào PID ngày 19/10/2026 nằm tại [`results/measured_20261019_gate`](results/measured_20261019_gate/README.md).
+
 ## Mã legacy và demo
 
 `scripts/live_defense_demo.py`, `scripts/defense_demo.py`, `src/xai_active_learning.py` và `src/fidelity_framework.py` là mã nguyên mẫu cũ. Một số đường chạy trong đó sinh tín hiệu bằng RNG hoặc dùng công thức đánh giá cũ; không dùng các tệp này để tạo số liệu luận văn. Lệnh thực nghiệm chuẩn là `scripts/run_experiments.py`.

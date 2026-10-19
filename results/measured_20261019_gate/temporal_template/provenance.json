@@ -1,0 +1,20 @@
+{
+  "dataset_sha256": "c733cc0c3e0950fa1d05d57d34c69d0a034383e0c1a2fde0e6878b9e2e8c3668",
+  "measurements_sha256": null,
+  "signal_origin": "not_collected",
+  "label_definition": "",
+  "dynamic_feature_definition": "",
+  "dynamic_score_definition": "",
+  "dynamic_model_training_source": "",
+  "calibration_method": "",
+  "sandbox_or_honeypot": "",
+  "collection_period": "",
+  "observation_windows_seconds": [
+    5.0,
+    15.0,
+    30.0,
+    60.0
+  ],
+  "no_target_label_in_score": false,
+  "notes": "Template only. Prefilled execution IDs and windows are planned identifiers, not observations."
+}

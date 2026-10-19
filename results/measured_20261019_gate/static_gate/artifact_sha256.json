@@ -1,0 +1,10 @@
+{
+  "REPORT.md": "2a737e2e737e8c6b34ecdf4f17494be365dac51a61164199de5f5a1402466901",
+  "calibration_metrics.csv": "9dc9ee52dbc4b76097db57001fca57196e467c9335446ad8321ce44b01922e70",
+  "config.json": "d6c328fc389ebf7fcf4fd562bbb125360f24cb3e77dc38fbeb971b4624e57098",
+  "gate_decisions.csv.gz": "78770931c80d06f9e85441686a1100b8244bf26915709ae1f2b1cdce7609bb06",
+  "gate_metrics.csv": "3c6fe1d3a1c5828edeafdf378b4ecc7ab6a573060154e93f2770af1c3fb75e64",
+  "summary.json": "81093e7fbdf31830e7663d371b3ad4a88aab5f71aa321deef2f6605071751718",
+  "validation_partition.json": "d5e75dbdf791540d5d3c2b5eb2c1c3bafb8b1d6a5d7231e880a923d34466ed0c",
+  "verification.json": "8f6fd55cf48b929e3c39be7ae7d7b9c8f8573b2205723c554390345f220e02a7"
+}
