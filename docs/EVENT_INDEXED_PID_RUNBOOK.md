@@ -83,6 +83,18 @@ chưa cache trong mỗi lần gọi. Collector dừng gửi request mới ngay k
 đánh dấu `deferred_rate_limit` để có thể chạy tiếp vào ngày sau. Không dùng
 nhiều key để né quota.
 
+Kiểm tra tiến độ mà không gọi mạng:
+
+```bash
+.venv/bin/python scripts/run_experiments.py audit-vt-collection \
+  --cohort outputs/malbehavd_pid_prepared/cohort_manifest.csv \
+  --collection outputs/malbehavd_pid_vt \
+  --min-coverage 0.90
+```
+
+Exit code `3` nghĩa là collection còn dở hoặc coverage cuối cùng chưa đạt ngưỡng;
+không phải lỗi chương trình.
+
 ## 5. Chạy ablation
 
 ```bash
@@ -92,7 +104,7 @@ nhiều key để né quota.
   --selection outputs/malbehavd_pid_vt/selected_cohort.csv \
   --output outputs/malbehavd_pid_confirmatory \
   --windows 5 10 15 20 \
-  --target-tpr 0.95 --min-coverage 0.80 \
+  --target-tpr 0.95 --min-coverage 0.90 \
   --bootstrap 1000 --seed 2026
 ```
 

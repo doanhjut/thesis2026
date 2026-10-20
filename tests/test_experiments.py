@@ -15,6 +15,7 @@ from src.experiments.fusion import sequence_scores
 from src.experiments.gating import gate_counts, select_gate
 from src.experiments.malbehavd_pid import (_bootstrap_difference, _fold_effects,
                                            _timepoint_metrics, _win_tie_loss,
+                                           audit_collection,
                                            prepare as prepare_malbehavd,
                                            safe_static_features)
 from src.experiments.provenance import audit
@@ -131,6 +132,28 @@ class ExperimentMathTests(unittest.TestCase):
 
 
 class DatasetGuardTests(unittest.TestCase):
+    def test_vt_collection_audit_distinguishes_deferred_from_missing(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            cohort, collection = root / 'cohort.csv', root / 'collection'
+            collection.mkdir()
+            rows = pd.DataFrame({
+                'row_id': np.arange(10), 'sha256': [f'{i:064x}' for i in range(10)],
+                'label': [0, 1] * 5, 'outer_fold': [0, 0, 1, 1, 0, 0, 1, 1, 0, 1],
+            })
+            rows.to_csv(cohort, index=False)
+            features = rows.iloc[:6][['row_id', 'sha256', 'label']].copy()
+            features['s_size'] = np.arange(6)
+            features.to_csv(collection / 'static_features.csv.gz', index=False, compression='gzip')
+            log = rows[['row_id', 'sha256', 'label']].copy()
+            log['status'] = ['cached'] * 6 + ['deferred_quota'] * 4
+            log.to_csv(collection / 'request_log.csv', index=False)
+            result = audit_collection(cohort, collection, min_coverage=.9)
+            self.assertEqual(result['status'], 'collection_incomplete')
+            self.assertEqual(result['deferred_rows'], 4)
+            self.assertEqual(result['additional_usable_rows_needed'], 3)
+            self.assertFalse(result['network_requests_issued'])
+
     def test_event_pid_effect_outputs_replay_fold_and_timepoint_pairs(self):
         rows = []
         labels = [0, 0, 1, 1]

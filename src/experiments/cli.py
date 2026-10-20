@@ -163,6 +163,12 @@ def parser():
     vt.add_argument('--api-key-env', default='VT_API_KEY')
     vt.add_argument('--max-new', type=int,
                     help='Maximum uncached API requests in this invocation; useful for daily quota.')
+    vt_audit = sub.add_parser(
+        'audit-vt-collection',
+        help='Audit coverage/fold balance of an existing VT collection without network access.')
+    vt_audit.add_argument('--cohort', type=Path, required=True)
+    vt_audit.add_argument('--collection', type=Path, required=True)
+    vt_audit.add_argument('--min-coverage', type=float, default=.9)
     event_pid = sub.add_parser(
         'event-pid',
         help='Run Static/Dynamic/Average/Fixed/P/PI/PID on ordered public API-call reports.')
@@ -290,6 +296,11 @@ def main(argv=None):
                               'usable_rows': result['usable_rows'], 'coverage': result['coverage']},
                              ensure_ascii=False, indent=2))
             return 0
+        if args.command == 'audit-vt-collection':
+            result = malbehavd_pid.audit_collection(
+                args.cohort, args.collection, args.min_coverage)
+            print(json.dumps(result, ensure_ascii=False, indent=2))
+            return 0 if result['status'] == 'collection_complete_ready_for_confirmatory' else 3
         if args.command == 'event-pid':
             result = malbehavd_pid.run_event_pid(
                 args.sequences, args.static_features, args.output, tuple(args.windows),

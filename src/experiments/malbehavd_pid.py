@@ -344,6 +344,86 @@ def collect_vt(cohort, out, limit=None, seed=2026, requests_per_minute=4.0,
     return summary
 
 
+def audit_collection(cohort, collection, min_coverage=.9):
+    """Audit a resumable VT collection without issuing any network request."""
+    cohort, collection = Path(cohort).resolve(), Path(collection)
+    require(cohort.is_file(), f'Missing cohort manifest: {cohort}')
+    require(0 < min_coverage <= 1, 'min_coverage must be in (0, 1].')
+    feature_path = collection / 'static_features.csv.gz'
+    log_path = collection / 'request_log.csv'
+    require(feature_path.is_file() and log_path.is_file(),
+            'Collection requires static_features.csv.gz and request_log.csv.')
+    expected = pd.read_csv(cohort, dtype={'sha256': str})
+    features = pd.read_csv(feature_path, dtype={'sha256': str})
+    request_log = pd.read_csv(log_path, dtype={'sha256': str})
+    required = {'row_id', 'sha256', 'label', 'outer_fold'}
+    require(required <= set(expected), 'Cohort manifest lacks identity/fold columns.')
+    require({'row_id', 'sha256', 'label'} <= set(features), 'Invalid static feature table.')
+    require({'row_id', 'sha256', 'label', 'status'} <= set(request_log), 'Invalid request log.')
+    require(expected.row_id.is_unique and expected.sha256.is_unique, 'Cohort identities must be unique.')
+    require(features.row_id.is_unique and features.sha256.is_unique, 'Feature identities must be unique.')
+    require(request_log.row_id.is_unique and request_log.sha256.is_unique,
+            'Request log must contain one final status per cohort identity.')
+    require(len(request_log) == len(expected), 'Request log must cover the complete cohort.')
+    identity = expected[['row_id', 'sha256', 'label']].merge(
+        features[['row_id', 'sha256', 'label']], on=['row_id', 'sha256', 'label'],
+        how='inner', validate='one_to_one')
+    require(len(identity) == len(features), 'Static features include identities outside the cohort.')
+    usable_ids = set(features.row_id)
+    expected = expected.copy()
+    expected['usable'] = expected.row_id.isin(usable_ids)
+    rows = []
+    for (fold, label), group in expected.groupby(['outer_fold', 'label'], sort=True):
+        usable = int(group.usable.sum())
+        rows.append({'outer_fold': int(fold), 'label': int(label),
+                     'cohort_rows': int(len(group)), 'usable_rows': usable,
+                     'remaining_rows': int(len(group) - usable),
+                     'coverage': float(usable / len(group))})
+    coverage_frame = pd.DataFrame(rows)
+    coverage_frame.to_csv(collection / 'coverage_by_fold_label.csv', index=False)
+    status_counts = {str(k): int(v) for k, v in request_log.status.value_counts().items()}
+    deferred = int(request_log.status.astype(str).str.startswith('deferred_').sum())
+    total, usable = int(len(expected)), int(len(features))
+    target_rows = int(np.ceil(min_coverage * total))
+    coverage = usable / total
+    if deferred:
+        status = 'collection_incomplete'
+    elif coverage >= min_coverage:
+        status = 'collection_complete_ready_for_confirmatory'
+    else:
+        status = 'collection_complete_below_coverage_threshold'
+    history_path = collection / 'request_history.csv'
+    history_counts = {}
+    if history_path.is_file():
+        history = pd.read_csv(history_path)
+        history_counts = {str(k): int(v) for k, v in history.status.value_counts().items()}
+    audit = {
+        'status': status, 'network_requests_issued': False,
+        'cohort_rows': total, 'usable_rows': usable, 'coverage': float(coverage),
+        'minimum_coverage': float(min_coverage), 'target_usable_rows': target_rows,
+        'additional_usable_rows_needed': int(max(0, target_rows - usable)),
+        'deferred_rows': deferred, 'request_status_counts': status_counts,
+        'recorded_network_attempt_status_counts': history_counts,
+        'class_coverage': {
+            str(label): {
+                'cohort_rows': int(len(group)), 'usable_rows': int(group.usable.sum()),
+                'coverage': float(group.usable.mean()),
+            } for label, group in expected.groupby('label', sort=True)
+        },
+        'fold_label_coverage_file': 'coverage_by_fold_label.csv',
+        'cohort_manifest_sha256': sha256(cohort),
+        'static_features_sha256': sha256(feature_path),
+        'request_log_sha256': sha256(log_path),
+        'binary_downloaded': False,
+        'decision': ('Do not run confirmatory modeling while collection is incomplete.'
+                     if deferred else
+                     'Run confirmatory modeling.' if coverage >= min_coverage else
+                     'Do not use as primary PID evidence; final coverage is below threshold.'),
+    }
+    write_json(collection / 'coverage_audit.json', audit)
+    return audit
+
+
 def _load_sequences(path):
     frame = pd.read_csv(path, dtype={'sha256': str})
     require({'row_id', 'sha256', 'label', 'outer_fold', 'api_sequence_json'} <= set(frame),
