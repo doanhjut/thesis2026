@@ -138,6 +138,12 @@ tại [`results/measured_20261020_malbehavd_pid_intake`](results/measured_202610
 Coverage pilot là 19/20; đây là bằng chứng intake/schema, chưa phải kết quả hiệu
 quả PID.
 
+Pilot event-indexed 200 mẫu đã đo ngày 20/10/2026 nằm tại
+[`results/measured_20261020_malbehavd_pid_pilot200`](results/measured_20261020_malbehavd_pid_pilot200/README.md).
+Coverage là 199/200 và gói chứa ablation P/PI/PID, bootstrap ghép cặp, bảng
+LaTeX, biểu đồ cùng dự đoán từng mẫu. Đây là bằng chứng feasibility: AUC/AP có
+xu hướng tăng khi dung hợp, nhưng chưa chứng minh PID giảm FPR hoặc D vượt PI.
+
 ## Mã legacy và demo
 
 `scripts/live_defense_demo.py`, `scripts/defense_demo.py`, `src/xai_active_learning.py` và `src/fidelity_framework.py` là mã nguyên mẫu cũ. Một số đường chạy trong đó sinh tín hiệu bằng RNG hoặc dùng công thức đánh giá cũ; không dùng các tệp này để tạo số liệu luận văn. Lệnh thực nghiệm chuẩn là `scripts/run_experiments.py`.

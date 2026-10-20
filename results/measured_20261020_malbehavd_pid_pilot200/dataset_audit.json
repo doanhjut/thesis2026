@@ -1,0 +1,54 @@
+{
+  "status": "prepared_public_report_only_cohort",
+  "source": "/tmp/MalbehavD-V1/MalBehavD-V1-dataset.csv",
+  "source_url": "https://github.com/mpasco/MalbehavD-V1",
+  "source_sha256": "1e39c43a014e9b4ee56766ad6bb367ffe8ec4316eb0be75eb182c3b2d15f6364",
+  "expected_source_sha256": "1e39c43a014e9b4ee56766ad6bb367ffe8ec4316eb0be75eb182c3b2d15f6364",
+  "source_sha256_matches_expected": true,
+  "source_rows": 2570,
+  "source_class_counts": {
+    "0": 1285,
+    "1": 1285
+  },
+  "unique_sha256": 2543,
+  "duplicate_rows_involved": 53,
+  "duplicate_sha256": 26,
+  "conflicting_duplicate_labels": 0,
+  "minimum_api_events": 20,
+  "eligible_rows": 1923,
+  "eligible_class_counts": {
+    "0": 932,
+    "1": 991
+  },
+  "folds": 5,
+  "fold_seed": 2026,
+  "fold_class_counts": {
+    "0": {
+      "0": 187,
+      "1": 198
+    },
+    "1": {
+      "0": 187,
+      "1": 198
+    },
+    "2": {
+      "0": 186,
+      "1": 199
+    },
+    "3": {
+      "0": 186,
+      "1": 198
+    },
+    "4": {
+      "0": 186,
+      "1": 198
+    }
+  },
+  "label_semantics": "0=benign, 1=malware as published by MalBehavD-V1.",
+  "safety": "CSV-only public artifact; no PE executable is downloaded or executed.",
+  "limitations": [
+    "The benchmark is generic Windows malware detection, not ransomware-specific ground truth.",
+    "API calls are ordered but do not include wall-clock timestamps; PID is indexed by event count.",
+    "Benign and malware samples were collected from different upstream sources, so source bias must be discussed."
+  ]
+}

@@ -1,0 +1,4 @@
+label,status,rows
+0,cached,100
+1,cached,99
+1,http_404,1

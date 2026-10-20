@@ -8,4 +8,10 @@
 VirusTotal 20 SHA. Nó xác nhận pipeline không cần executable và coverage schema
 95%, nhưng chưa chứa ablation hoặc kết luận hiệu quả PID.
 
+`measured_20261020_malbehavd_pid_pilot200/` là pilot đo thật trên 200 SHA đã
+chọn trước, trong đó 199 mẫu có đủ hai kênh. Gói có dự đoán từng mẫu, ablation
+Static/Dynamic/Average/Fixed/P/PI/PID, bootstrap ghép cặp, bảng LaTeX và biểu đồ.
+Kết quả hỗ trợ tính khả thi của adaptive fusion, nhưng chưa chứng minh PID giảm
+FPR hoặc thành phần D vượt PI; xem README trong gói trước khi trích dẫn.
+
 Các file nằm trực tiếp tại `results/` được tạo bởi mã nguyên mẫu trước đây, không có cùng split/provenance/checkpoint để kiểm tra lại; không dùng chúng làm bằng chứng cho luận văn.

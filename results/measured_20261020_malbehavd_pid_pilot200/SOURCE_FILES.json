@@ -1,0 +1,16 @@
+{
+  "repository_commit": "a1a8643fefdeda339d01daa03bbdeba3e5db26b9",
+  "source_directories": {
+    "run_output": "/workspace/thesis2026/outputs/malbehavd_pid_20261020_pilot200_run_v3",
+    "collection_output": "/workspace/thesis2026/outputs/malbehavd_pid_20261020_vt_pilot20",
+    "prepared_output": "/workspace/thesis2026/outputs/malbehavd_pid_20261020_prepared"
+  },
+  "inputs": {
+    "api_sequences.csv.gz": "db95299e001634061a0c1181ec064ed16b346e3357089262c7091b5f8d683f45",
+    "cohort_manifest.csv": "9540b88b0da2463f63b4e983f5ecc277e3845b7badebbb79695e35f2c3b1a669",
+    "selected_cohort.csv": "5e82b3fba2b6a5faeff2ebf3fcad2fd394dbd519ab8354e041d09e0392b71978",
+    "static_features.csv.gz": "793b7f34ca110d1e9b9a9839b33dd10bf908035fea09d6f6f4e34bc0fb39a7a0"
+  },
+  "raw_vt_metadata_excluded": true,
+  "reason_raw_excluded": "Contains complete third-party API responses; retained only in ignored local output for audit."
+}

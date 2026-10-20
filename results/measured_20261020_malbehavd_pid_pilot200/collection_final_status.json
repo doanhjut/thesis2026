@@ -1,0 +1,22 @@
+{
+  "status": "pilot_collection_complete",
+  "selected_rows": 200,
+  "selected_class_counts": {
+    "0": 100,
+    "1": 100
+  },
+  "usable_rows": 199,
+  "usable_class_counts": {
+    "0": 100,
+    "1": 99
+  },
+  "coverage": 0.995,
+  "unavailable_rows": 1,
+  "final_request_status_counts": {
+    "cached": 199,
+    "http_404": 1
+  },
+  "binary_downloaded": false,
+  "raw_vt_responses_committed": false,
+  "static_feature_allowlist_enforced": true
+}

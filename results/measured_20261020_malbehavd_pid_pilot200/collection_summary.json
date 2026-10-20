@@ -1,0 +1,39 @@
+{
+  "status": "vt_metadata_collected",
+  "cohort_manifest": "/workspace/thesis2026/outputs/malbehavd_pid_20261020_prepared/cohort_manifest.csv",
+  "cohort_manifest_sha256": "9540b88b0da2463f63b4e983f5ecc277e3845b7badebbb79695e35f2c3b1a669",
+  "requested_rows": 200,
+  "usable_rows": 199,
+  "coverage": 0.995,
+  "usable_class_counts": {
+    "0": 100,
+    "1": 99
+  },
+  "api_endpoint": "GET /api/v3/files/{sha256}",
+  "binary_downloaded": false,
+  "safe_top_level_allowlist": [
+    "pe_info",
+    "sha256",
+    "size",
+    "type_tag"
+  ],
+  "explicitly_excluded_fields": [
+    "last_analysis_results",
+    "last_analysis_stats",
+    "popular_threat_classification",
+    "threat_names",
+    "crowdsourced_yara_results",
+    "sandbox_verdicts",
+    "tags",
+    "names"
+  ],
+  "feature_count": 199,
+  "requests_per_minute": 4.0,
+  "new_requests_this_invocation": 1,
+  "max_new": 1,
+  "limitations": [
+    "VirusTotal metadata availability can create missingness; coverage is reported before modeling.",
+    "Raw API responses may contain AV verdicts for audit, but feature extraction uses an explicit structural allow-list.",
+    "No executable content endpoint is called by this collector."
+  ]
+}

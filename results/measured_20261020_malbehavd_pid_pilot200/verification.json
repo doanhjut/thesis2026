@@ -1,0 +1,7 @@
+{
+  "status": "passed",
+  "metric_rows_replayed": 35,
+  "prediction_rows_checked": 1393,
+  "no_executable_downloaded": true,
+  "static_feature_prefix_enforced": true
+}

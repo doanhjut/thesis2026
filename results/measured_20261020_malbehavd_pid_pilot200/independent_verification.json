@@ -1,0 +1,14 @@
+{
+  "status": "passed",
+  "metric_rows_recomputed": 35,
+  "timepoint_rows_recomputed": 28,
+  "prediction_rows": 5572,
+  "final_predictions": 1393,
+  "selected_rows": 200,
+  "usable_rows": 199,
+  "static_feature_columns": 199,
+  "static_identities_subset_of_selection": true,
+  "only_identity_and_s_prefixed_feature_columns": true,
+  "archived_input_hashes_match_sources": true,
+  "no_executable_present": true
+}

@@ -1,0 +1,330 @@
+{
+  "status": "measured_from_public_ordered_api_reports",
+  "samples": 199,
+  "static_metadata_coverage": 0.995,
+  "selection": {
+    "path": "/workspace/thesis2026/outputs/malbehavd_pid_20261020_vt_pilot20/selected_cohort.csv",
+    "sha256": "5e82b3fba2b6a5faeff2ebf3fcad2fd394dbd519ab8354e041d09e0392b71978",
+    "rows": 200
+  },
+  "class_counts": {
+    "0": 100,
+    "1": 99
+  },
+  "outer_folds": 5,
+  "event_windows": [
+    5,
+    10,
+    15,
+    20
+  ],
+  "time_axis": "ordered_api_event_count",
+  "results": [
+    {
+      "fusion": "Average_50_50",
+      "auc": {
+        "mean": 0.9582142797830595,
+        "sd": 0.03438519212083533,
+        "n": 5
+      },
+      "ap": {
+        "mean": 0.9663182949231676,
+        "sd": 0.024008163591689384,
+        "n": 5
+      },
+      "fpr": {
+        "mean": 0.349684265010352,
+        "sd": 0.2346183886612277,
+        "n": 5
+      },
+      "tpr": {
+        "mean": 0.9628384687208218,
+        "sd": 0.03443752004283608,
+        "n": 5
+      },
+      "brier": {
+        "mean": 0.08103884127133429,
+        "sd": 0.03175260471252518,
+        "n": 5
+      }
+    },
+    {
+      "fusion": "Dynamic_only",
+      "auc": {
+        "mean": 0.9345272598499216,
+        "sd": 0.04278112364382524,
+        "n": 5
+      },
+      "ap": {
+        "mean": 0.9437121523696914,
+        "sd": 0.03748821152706966,
+        "n": 5
+      },
+      "fpr": {
+        "mean": 0.47957556935817813,
+        "sd": 0.16687317459804726,
+        "n": 5
+      },
+      "tpr": {
+        "mean": 0.9694805194805195,
+        "sd": 0.0471394582152767,
+        "n": 5
+      },
+      "brier": {
+        "mean": 0.11018876555173902,
+        "sd": 0.030483179694287352,
+        "n": 5
+      }
+    },
+    {
+      "fusion": "Fixed_weight",
+      "auc": {
+        "mean": 0.9415308475168723,
+        "sd": 0.044934427668731416,
+        "n": 5
+      },
+      "ap": {
+        "mean": 0.9558487550433045,
+        "sd": 0.031394931800996353,
+        "n": 5
+      },
+      "fpr": {
+        "mean": 0.299684265010352,
+        "sd": 0.15413085811830446,
+        "n": 5
+      },
+      "tpr": {
+        "mean": 0.9323189882013413,
+        "sd": 0.02393104119461129,
+        "n": 5
+      },
+      "brier": {
+        "mean": 0.09274533720777164,
+        "sd": 0.03814761951105385,
+        "n": 5
+      }
+    },
+    {
+      "fusion": "P",
+      "auc": {
+        "mean": 0.9591803341890115,
+        "sd": 0.03349085903980879,
+        "n": 5
+      },
+      "ap": {
+        "mean": 0.9673941798225817,
+        "sd": 0.022859172090914034,
+        "n": 5
+      },
+      "fpr": {
+        "mean": 0.349684265010352,
+        "sd": 0.2346183886612277,
+        "n": 5
+      },
+      "tpr": {
+        "mean": 0.9628384687208218,
+        "sd": 0.03443752004283608,
+        "n": 5
+      },
+      "brier": {
+        "mean": 0.08158829657840368,
+        "sd": 0.032622929480793685,
+        "n": 5
+      }
+    },
+    {
+      "fusion": "PI",
+      "auc": {
+        "mean": 0.9582712432799207,
+        "sd": 0.03535449125128783,
+        "n": 5
+      },
+      "ap": {
+        "mean": 0.9659866026303148,
+        "sd": 0.025333463301161645,
+        "n": 5
+      },
+      "fpr": {
+        "mean": 0.349684265010352,
+        "sd": 0.2346183886612277,
+        "n": 5
+      },
+      "tpr": {
+        "mean": 0.9628384687208218,
+        "sd": 0.03443752004283608,
+        "n": 5
+      },
+      "brier": {
+        "mean": 0.08537580773386257,
+        "sd": 0.039097720100109236,
+        "n": 5
+      }
+    },
+    {
+      "fusion": "PID",
+      "auc": {
+        "mean": 0.9582712432799207,
+        "sd": 0.03535449125128783,
+        "n": 5
+      },
+      "ap": {
+        "mean": 0.9659866026303148,
+        "sd": 0.025333463301161645,
+        "n": 5
+      },
+      "fpr": {
+        "mean": 0.349684265010352,
+        "sd": 0.2346183886612277,
+        "n": 5
+      },
+      "tpr": {
+        "mean": 0.9628384687208218,
+        "sd": 0.03443752004283608,
+        "n": 5
+      },
+      "brier": {
+        "mean": 0.08536701591808964,
+        "sd": 0.039071485627718554,
+        "n": 5
+      }
+    },
+    {
+      "fusion": "Static_only",
+      "auc": {
+        "mean": 0.9254459372681879,
+        "sd": 0.06668490884034226,
+        "n": 5
+      },
+      "ap": {
+        "mean": 0.9286331126219759,
+        "sd": 0.047932498963296856,
+        "n": 5
+      },
+      "fpr": {
+        "mean": 0.4707556935817806,
+        "sd": 0.2822578998551048,
+        "n": 5
+      },
+      "tpr": {
+        "mean": 0.9628384687208218,
+        "sd": 0.03443752004283608,
+        "n": 5
+      },
+      "brier": {
+        "mean": 0.09801393845151896,
+        "sd": 0.0653606494942748,
+        "n": 5
+      }
+    }
+  ],
+  "paired_bootstrap_pid_minus_fixed": {
+    "comparison": "PID_minus_Fixed_weight",
+    "interpretation": {
+      "auc": "positive_favors_left",
+      "ap": "positive_favors_left",
+      "brier": "negative_favors_left",
+      "fpr": "negative_favors_left",
+      "tpr": "positive_favors_left"
+    },
+    "samples": 199,
+    "metrics": {
+      "auc": {
+        "mean": 0.012953284663398673,
+        "ci95_low": -0.008598918451770332,
+        "ci95_high": 0.04093895290074789,
+        "iterations": 1000
+      },
+      "ap": {
+        "mean": 0.008039314200827732,
+        "ci95_low": -0.01016588979057656,
+        "ci95_high": 0.027222915001514737,
+        "iterations": 1000
+      },
+      "brier": {
+        "mean": -0.009109362673883306,
+        "ci95_low": -0.029190059487850067,
+        "ci95_high": 0.007974846581685308,
+        "iterations": 1000
+      },
+      "fpr": {
+        "mean": 0.05060718777880136,
+        "ci95_low": 0.0,
+        "ci95_high": 0.1057845744680851,
+        "iterations": 1000
+      },
+      "tpr": {
+        "mean": 0.04099597974672295,
+        "ci95_low": 0.009433962264150941,
+        "ci95_high": 0.08260985031385806,
+        "iterations": 1000
+      }
+    }
+  },
+  "fold_win_tie_loss_pid_vs_fixed": {
+    "ap": {
+      "pid_better_folds": 4,
+      "tied_folds": 1,
+      "pid_worse_folds": 0,
+      "folds": 5
+    },
+    "auc": {
+      "pid_better_folds": 4,
+      "tied_folds": 1,
+      "pid_worse_folds": 0,
+      "folds": 5
+    },
+    "brier": {
+      "pid_better_folds": 3,
+      "tied_folds": 0,
+      "pid_worse_folds": 2,
+      "folds": 5
+    },
+    "fpr": {
+      "pid_better_folds": 0,
+      "tied_folds": 4,
+      "pid_worse_folds": 1,
+      "folds": 5
+    },
+    "tpr": {
+      "pid_better_folds": 2,
+      "tied_folds": 3,
+      "pid_worse_folds": 0,
+      "folds": 5
+    }
+  },
+  "limitations": [
+    "Event count is a discrete observation axis, not wall-clock time or measured sandbox latency.",
+    "MalBehavD-V1 supports generic binary Windows malware detection, not ransomware-specific claims.",
+    "Static fields are allow-listed VirusTotal PE metadata; source-collection bias remains possible."
+  ],
+  "repository_commit": "a1a8643fefdeda339d01daa03bbdeba3e5db26b9",
+  "working_tree_status": "",
+  "source_sha256": {
+    "src/experiments/__init__.py": "63c0b7fd26cc89daa9ca4a0b60ef6af7606cd9d701f6976f6fcaeb62313f1566",
+    "src/experiments/active_learning.py": "6d8645265fbbfae8e1e9ac0180536b63146516935ac0f43eeefa81eeb9e5edfa",
+    "src/experiments/cli.py": "023ea853b421f4703bcc530e4020ba7bfbd606e6ebc7edbf3040d9095abac37b",
+    "src/experiments/common.py": "ede14099db6002a85b2bb6af63aa072ecf87b9caaec4dba5fc25f66c1486a52f",
+    "src/experiments/confirmatory.py": "3c3cdfad845d8bad9a485d26a13901c48322650b8a00959cd24cbeedcdf00a47",
+    "src/experiments/fidelity.py": "9984967241aac72899da01c5cbd7582484fa2e5314f641dea92b036ae090519d",
+    "src/experiments/fusion.py": "1dd57b9856bfea086f4c82aa84206c22409cf4a1ea4ae0399630fc67a9e8ee2e",
+    "src/experiments/gating.py": "19c75cd124e47ff2c6748479fc3d1d752a75716ae50930c9a63fa8778063b7c5",
+    "src/experiments/malbehavd_pid.py": "4c9c13676b85bde7f0c5cdef856dda94ada1e4e4ba82057734fddfa0b1386192",
+    "src/experiments/provenance.py": "5edd61a2332bfeb7d91dc3d99252de32d86883dce533dd7bdebfb79644bc4b1d",
+    "src/experiments/recovery.py": "93c6c8cf344301eb6511ce6803090f1df5fbb88cfa5166e6273b2a6af49a0e3f",
+    "src/experiments/reporting.py": "425d1c908f2cc5a6179f6821072e4046ca81d927ce38ef1b56440de477036fb2",
+    "src/experiments/robust_fidelity.py": "52ce38ae22ee758d289b4142079a05821ce99f1a6ba98726e1e2fa5ee5b47533",
+    "src/experiments/signals.py": "8e3a773979b787a1b2fd4c199a70e4b877ee2a70ecfbc97428661a7c775c8638",
+    "src/experiments/temporal.py": "81454f7302b7075c0fd184141b0ab197cbc0ff129dd62ee5098e7926aaca0344",
+    "src/experiments/temporal_fusion.py": "9f5a63c96a1229a055fca27d0335ea53153c28b6e3605710572d173bc82688bc",
+    "src/experiments/verification.py": "421830b3acea0f308d63137ce967d4e19d49a2cc4f0f3f976d4559be5efb0cb0",
+    "src/pid_fusion.py": "82bd691040bc198749ef4fe2bd58d3c8cb88f14286e7046ffd40d52ce7a48a1f",
+    "scripts/run_experiments.py": "6700f7fc2ecabe2bb6a1ff8899d0c3ed6b134bcc333ac1b7dc69e9ac06ee5598"
+  },
+  "versions": {
+    "python": "3.12.14",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "sklearn": "1.9.1",
+    "lightgbm": "4.7.0"
+  }
+}
