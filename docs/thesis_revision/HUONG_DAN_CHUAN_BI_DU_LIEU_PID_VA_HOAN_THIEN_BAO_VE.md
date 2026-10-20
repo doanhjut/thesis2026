@@ -84,6 +84,17 @@ hoặc archive_listing_7zip.txt
 
 Không cần gửi `train_small.zip` ở bước đầu. Từ danh sách này có thể xác định archive có binary, metadata hay chỉ có feature.
 
+Nếu kết quả cho thấy ZIP chỉ có một CSV, kiểm tra header và 20 dòng đầu trực tiếp trong ZIP bằng script của repository:
+
+```powershell
+python scripts\inspect_zip_csv.py `
+  --archive "D:\Code\Luanvan\data\archives\train_small.zip" `
+  --output "D:\Code\Luanvan\outputs\pid_intake\train_small_schema.json" `
+  --sample-rows 20
+```
+
+Script chỉ giải nén luồng header và 20 dòng đầu; không ghi tệp CSV 14 GB ra đĩa và không thực thi nội dung. Gửi lại `train_small_schema.json` để kiểm tra CSV có cột SHA-256, nhãn, family hoặc metadata thời gian hay không.
+
 ### 2.3. Quyết định sau kiểm kê
 
 | Kết quả kiểm kê | Hành động tiếp theo |
