@@ -4,7 +4,8 @@
 
 - **[PDF luận văn 71 trang](Luan_van_cap_nhat_EMBER_xac_minh_20261020.pdf)**
 - **[ZIP nguồn LaTeX và PDF](Luan_van_cap_nhat_EMBER_xac_minh_20261020.zip?raw=true)**
-- **[Dữ liệu cần chuẩn bị để hoàn thành PID](BUOC_TIEP_THEO_PID.md)**
+- **[Hướng dẫn đầy đủ tác giả cần chuẩn bị để hoàn thành PID và bảo vệ](HUONG_DAN_CHUAN_BI_DU_LIEU_PID_VA_HOAN_THIEN_BAO_VE.md)**
+- [Checklist PID rút gọn](BUOC_TIEP_THEO_PID.md)
 
 Bản này thay số liệu pilot bằng Active Learning 5 outer folds × 5 seed và Fidelity 25 mô hình; provenance tĩnh được xác minh bằng manifest EMBER. PID vẫn cần behavior trace ghép theo SHA-256. PDF đã biên dịch bằng XeLaTeX, không có tham chiếu hoặc trích dẫn chưa giải quyết, và các trang thực nghiệm đã được kiểm tra trực quan.
 
