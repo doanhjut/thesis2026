@@ -1,5 +1,15 @@
 # Luận văn: rà soát và cập nhật thực nghiệm
 
+## Bản xác nhận EMBER ngày 20/10/2026
+
+- **[PDF luận văn 71 trang](Luan_van_cap_nhat_EMBER_xac_minh_20261020.pdf)**
+- **[ZIP nguồn LaTeX và PDF](Luan_van_cap_nhat_EMBER_xac_minh_20261020.zip?raw=true)**
+- **[Dữ liệu cần chuẩn bị để hoàn thành PID](BUOC_TIEP_THEO_PID.md)**
+
+Bản này thay số liệu pilot bằng Active Learning 5 outer folds × 5 seed và Fidelity 25 mô hình; provenance tĩnh được xác minh bằng manifest EMBER. PID vẫn cần behavior trace ghép theo SHA-256. PDF đã biên dịch bằng XeLaTeX, không có tham chiếu hoặc trích dẫn chưa giải quyết, và các trang thực nghiệm đã được kiểm tra trực quan.
+
+## Bản ngày 14/10/2026 — lưu để đối chiếu
+
 Cập nhật 14/10/2026, dựa trên nguồn LaTeX đã gửi và đối chiếu PDF mới `thesis (2).pdf`.
 
 - **[Ghi chú các phần cần cập nhật theo từng mục](NOTE_CAN_UPDATE_LUAN_VAN.md)**
