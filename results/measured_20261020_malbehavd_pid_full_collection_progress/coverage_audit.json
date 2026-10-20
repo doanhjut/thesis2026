@@ -2,36 +2,38 @@
   "status": "collection_incomplete",
   "network_requests_issued": false,
   "cohort_rows": 1923,
-  "usable_rows": 424,
-  "coverage": 0.2204888195527821,
+  "usable_rows": 493,
+  "coverage": 0.25637025481019243,
   "minimum_coverage": 0.9,
   "target_usable_rows": 1731,
-  "additional_usable_rows_needed": 1307,
-  "deferred_rows": 1499,
+  "additional_usable_rows_needed": 1238,
+  "deferred_rows": 1429,
   "request_status_counts": {
-    "deferred_quota": 1499,
-    "cached": 324,
-    "fetched": 100
+    "deferred_rate_limit": 1429,
+    "cached": 424,
+    "fetched": 69,
+    "http_429": 1
   },
   "recorded_network_attempt_status_counts": {
-    "fetched": 200
+    "fetched": 269,
+    "http_429": 1
   },
   "class_coverage": {
     "0": {
       "cohort_rows": 932,
-      "usable_rows": 182,
-      "coverage": 0.19527896995708155
+      "usable_rows": 205,
+      "coverage": 0.21995708154506438
     },
     "1": {
       "cohort_rows": 991,
-      "usable_rows": 242,
-      "coverage": 0.24419778002018164
+      "usable_rows": 288,
+      "coverage": 0.29061553985872857
     }
   },
   "fold_label_coverage_file": "coverage_by_fold_label.csv",
   "cohort_manifest_sha256": "9540b88b0da2463f63b4e983f5ecc277e3845b7badebbb79695e35f2c3b1a669",
-  "static_features_sha256": "6f4a9eddbd803247e6c5c4580c8f385377984b8cbe0935895a5079a79eec7402",
-  "request_log_sha256": "9c364e7eb2909c1e1dc7a2f37372bd8d3945928fb6e42525b43644ec3f601d0c",
+  "static_features_sha256": "38d6874ec8e1fcefde97808337e73612bc18692918f7c49ec30fb715497d357a",
+  "request_log_sha256": "63543d489fa56b999aeac75f7bc92be91960e2d116209842f5d9f9c2401fbee2",
   "binary_downloaded": false,
   "decision": "Do not run confirmatory modeling while collection is incomplete."
 }

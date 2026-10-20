@@ -3,11 +3,11 @@
   "cohort_manifest": "/workspace/thesis2026/outputs/malbehavd_pid_20261020_prepared/cohort_manifest.csv",
   "cohort_manifest_sha256": "9540b88b0da2463f63b4e983f5ecc277e3845b7badebbb79695e35f2c3b1a669",
   "requested_rows": 1923,
-  "usable_rows": 424,
-  "coverage": 0.2204888195527821,
+  "usable_rows": 493,
+  "coverage": 0.25637025481019243,
   "usable_class_counts": {
-    "0": 182,
-    "1": 242
+    "0": 205,
+    "1": 288
   },
   "api_endpoint": "GET /api/v3/files/{sha256}",
   "binary_downloaded": false,
@@ -29,9 +29,9 @@
   ],
   "feature_count": 199,
   "requests_per_minute": 4.0,
-  "new_requests_this_invocation": 100,
-  "successful_fetches_this_invocation": 100,
-  "rate_limit_encountered": false,
+  "new_requests_this_invocation": 70,
+  "successful_fetches_this_invocation": 69,
+  "rate_limit_encountered": true,
   "request_history": "/workspace/thesis2026/outputs/malbehavd_pid_20261020_vt_full/request_history.csv",
   "max_new": 100,
   "limitations": [

@@ -15,8 +15,8 @@ Kết quả hỗ trợ tính khả thi của adaptive fusion, nhưng chưa chứ
 FPR hoặc thành phần D vượt PI; xem README trong gói trước khi trích dẫn.
 
 `measured_20261020_malbehavd_pid_full_collection_progress/` lưu snapshot thu
-metadata cho confirmatory trên toàn cohort 1.923 mẫu. Hiện có 424 mẫu usable
-(22,05%); 1.499 mẫu còn lại là deferred do chia lô quota, nên chưa chạy mô hình
-và chưa phân tích missingness cuối cùng.
+metadata cho confirmatory trên toàn cohort 1.923 mẫu. Hiện có 493 mẫu usable
+(25,64%); 1.429 mẫu còn lại được hoãn sau khi API trả HTTP 429, nên chưa chạy
+mô hình và chưa phân tích missingness cuối cùng.
 
 Các file nằm trực tiếp tại `results/` được tạo bởi mã nguyên mẫu trước đây, không có cùng split/provenance/checkpoint để kiểm tra lại; không dùng chúng làm bằng chứng cho luận văn.

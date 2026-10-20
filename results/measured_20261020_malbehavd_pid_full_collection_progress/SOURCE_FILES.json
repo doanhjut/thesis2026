@@ -2,10 +2,10 @@
   "repository_commit": "a93d4181b6feff9370d3b2420dfdc856e55f7267",
   "collection_directory": "/workspace/thesis2026/outputs/malbehavd_pid_20261020_vt_full",
   "cohort_manifest_sha256": "9540b88b0da2463f63b4e983f5ecc277e3845b7badebbb79695e35f2c3b1a669",
-  "static_features_sha256": "6f4a9eddbd803247e6c5c4580c8f385377984b8cbe0935895a5079a79eec7402",
+  "static_features_sha256": "38d6874ec8e1fcefde97808337e73612bc18692918f7c49ec30fb715497d357a",
   "selected_cohort_sha256": "9540b88b0da2463f63b4e983f5ecc277e3845b7badebbb79695e35f2c3b1a669",
-  "request_log_sha256": "9c364e7eb2909c1e1dc7a2f37372bd8d3945928fb6e42525b43644ec3f601d0c",
-  "request_history_sha256": "e565078acc3e9432559c6ae707cab530be8798ca8a9381368d51cbe8c7f93faf",
+  "request_log_sha256": "63543d489fa56b999aeac75f7bc92be91960e2d116209842f5d9f9c2401fbee2",
+  "request_history_sha256": "235eaa0a5a73173b98d31fe5827320a04d0e22ac20573e9e4957d3b4b63ecd4f",
   "raw_vt_metadata_committed": false,
   "static_features_committed_in_progress_snapshot": false,
   "binary_downloaded": false

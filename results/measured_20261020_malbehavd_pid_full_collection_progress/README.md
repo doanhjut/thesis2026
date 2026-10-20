@@ -6,26 +6,27 @@ bằng chứng tiến độ, chưa phải kết quả mô hình.
 ## Trạng thái hiện tại
 
 - Cohort: 1.923 SHA-256; 932 benign và 991 malware.
-- Metadata tĩnh usable: 424 mẫu; coverage 22,05%.
-- Còn 1.499 mẫu được đánh dấu `deferred_quota`. Đây là mẫu chưa gọi API, không
+- Metadata tĩnh usable: 493 mẫu; coverage 25,64%.
+- Còn 1.429 mẫu được đánh dấu `deferred_rate_limit`. Đây là mẫu chưa gọi API, không
   phải mẫu thiếu trên VirusTotal.
 - Ngưỡng confirmatory đã khóa: coverage tối thiểu 90%, tương ứng 1.731 mẫu
-  usable. Snapshot hiện cần thêm tối thiểu 1.307 mẫu usable.
-- 200 request có audit history của hai lô gần nhất đều `fetched`; không có 404,
-  429 hay lỗi mạng. Ngoài ra có 199 cache usable từ pilot và 25 mẫu của lô kiểm
-  tra trước khi tính năng history được thêm vào.
+  usable. Snapshot hiện cần thêm tối thiểu 1.238 mẫu usable.
+- Audit history ghi 269 request `fetched` thành công. Request tiếp theo nhận
+  HTTP 429 `QuotaExceededError`; collector dừng ngay và không retry. Ngoài ra có
+  199 cache usable từ pilot và 25 mẫu của lô kiểm tra trước khi tính năng history
+  được thêm vào.
 - Không tải hoặc thực thi executable. Raw VirusTotal response chỉ nằm trong
   `outputs/` bị Git bỏ qua.
 
-Coverage hiện tại theo lớp là 19,53% benign và 24,42% malware. Mức chênh này
+Coverage hiện tại theo lớp là 22,00% benign và 29,06% malware. Mức chênh này
 phản ánh snapshot thu dở theo thứ tự manifest; không được dùng để phân tích
 missingness hoặc huấn luyện confirmatory. `coverage_by_fold_label.csv` cho thấy
 cả 10 ô fold×class đã có dữ liệu, nhưng chưa cân bằng đủ để đánh giá cuối.
 
 ## Quyết định thực nghiệm
 
-Không chạy confirmatory trên 424 mẫu. Tiếp tục dùng đúng cohort, cache và outer
-fold hiện tại cho đến khi hết `deferred_quota`. Sau đó:
+Không chạy confirmatory trên 493 mẫu. Tiếp tục dùng đúng cohort, cache và outer
+fold hiện tại cho đến khi hết trạng thái `deferred_rate_limit`. Sau đó:
 
 1. Chạy `audit-vt-collection` với ngưỡng 0,90.
 2. Nếu coverage đạt ít nhất 90%, kiểm tra missingness thực theo nhãn/fold.
@@ -42,8 +43,8 @@ fold hiện tại cho đến khi hết `deferred_quota`. Sau đó:
   --seed 2026 --requests-per-minute 4 --max-new 100
 ```
 
-Collector bỏ qua cache, dừng gửi request mới khi gặp HTTP 429 và ghi từng lần
-gọi mạng vào `request_history.csv`.
+Chỉ chạy lại lệnh sau khi quota được reset. Collector bỏ qua cache, dừng gửi
+request mới khi gặp HTTP 429 và ghi từng lần gọi mạng vào `request_history.csv`.
 
 Kiểm tra không gọi mạng:
 
