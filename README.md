@@ -83,6 +83,11 @@ python scripts/run_experiments.py gate \
 
 Giao thức xác nhận nhiều fold cho AL và Fidelity, cùng hợp đồng dữ liệu PID theo thời gian, được mô tả tại [`docs/CONFIRMATORY_RUNBOOK.md`](docs/CONFIRMATORY_RUNBOOK.md). Các lệnh chính là `confirmatory-al`, `confirmatory-fidelity`, `prepare-temporal`, `validate-temporal` và `temporal-fusion`.
 
+Khi không có hạ tầng giữ/chạy PE, giao thức [`docs/EVENT_INDEXED_PID_RUNBOOK.md`](docs/EVENT_INDEXED_PID_RUNBOOK.md)
+dùng MalBehavD-V1 và metadata PE theo cùng SHA-256. Đường chạy này không tải
+executable; nó đánh giá PID theo số API call đã quan sát và phải được báo là
+generic Windows malware benchmark, không phải latency theo giây hay ransomware-specific.
+
 Để kiểm chứng riêng I và D, tạo mẫu nhiều time step trên mỗi PE:
 
 ```bash
@@ -127,6 +132,11 @@ Gói mới nhất dùng dữ liệu EMBER 2018 có định danh hàng đã kiể
 Gói báo cáo gọn của lần chạy mặc định ngày 2026-10-14 nằm tại [`results/measured_20261014`](results/measured_20261014/README.md). Gói này chứa bảng, biểu đồ, config, tóm tắt và kết quả verification. Checkpoint và dự đoán từng mẫu không được commit vì toàn bộ run có kích thước khoảng 28 MB; có thể tái tạo bằng lệnh mặc định ở trên.
 
 Kết quả calibration/static gate và audit đầu vào PID ngày 19/10/2026 nằm tại [`results/measured_20261019_gate`](results/measured_20261019_gate/README.md).
+
+Audit MalBehavD-V1 và pilot 20 truy vấn metadata PE an toàn ngày 20/10/2026 nằm
+tại [`results/measured_20261020_malbehavd_pid_intake`](results/measured_20261020_malbehavd_pid_intake/README.md).
+Coverage pilot là 19/20; đây là bằng chứng intake/schema, chưa phải kết quả hiệu
+quả PID.
 
 ## Mã legacy và demo
 

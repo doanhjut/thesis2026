@@ -30,10 +30,19 @@ def candidate_grids():
     }
 
 
+def _observation_axis(frame):
+    """Return the declared discrete axis without conflating events with seconds."""
+    if 'event_count' in frame:
+        return 'event_count'
+    require('elapsed_seconds' in frame, 'Temporal fusion requires event_count or elapsed_seconds.')
+    return 'elapsed_seconds'
+
+
 def pid_trajectory(frame, gains, integral_limits=(-5., 5.)):
-    """Replay one independent controller per PE execution using real delta-t."""
-    require({'row_id', 'execution_id', 'elapsed_seconds', 'probability', 'p_dynamic'} <= set(frame),
+    """Replay one independent controller per execution using the observed delta."""
+    require({'row_id', 'execution_id', 'probability', 'p_dynamic'} <= set(frame),
             'Temporal fusion frame is missing required columns.')
+    axis = _observation_axis(frame)
     result = frame.copy()
     columns = ['score', 'w_static', 'pid_error', 'pid_integral', 'pid_derivative', 'pid_control']
     values = {name: np.full(len(result), np.nan) for name in columns}
@@ -41,9 +50,10 @@ def pid_trajectory(frame, gains, integral_limits=(-5., 5.)):
     for _, sequence in result.groupby(['row_id', 'execution_id'], sort=False):
         controller = PIDController(*gains, integral_limits=integral_limits)
         previous_time = 0.
-        for row in sequence.sort_values(['elapsed_seconds', 'time_step']).itertuples():
-            delta_t = float(row.elapsed_seconds) - previous_time
-            require(delta_t > 0, 'Elapsed time must increase within every execution.')
+        for row in sequence.sort_values([axis, 'time_step']).itertuples():
+            observed = float(getattr(row, axis))
+            delta_t = observed - previous_time
+            require(delta_t > 0, 'The observation axis must increase within every execution.')
             error = float(row.probability - row.p_dynamic)
             weight = controller.update(error, delta_t=delta_t)
             position = positions[row.Index]
@@ -51,7 +61,7 @@ def pid_trajectory(frame, gains, integral_limits=(-5., 5.)):
             values['w_static'][position] = weight
             for name, value in controller.last_terms.items():
                 values[f'pid_{name}'][position] = value
-            previous_time = float(row.elapsed_seconds)
+            previous_time = observed
     for name in columns:
         result[name] = values[name]
     require(result[['score', 'w_static', 'pid_error', 'pid_integral',
@@ -78,7 +88,7 @@ def score_trajectory(frame, kind, setting, integral_limits=(-5., 5.)):
 
 
 def _final_rows(trajectory):
-    ordered = trajectory.sort_values(['row_id', 'elapsed_seconds', 'time_step'])
+    ordered = trajectory.sort_values(['row_id', _observation_axis(trajectory), 'time_step'])
     return ordered.groupby('row_id', sort=False).tail(1).sort_values('row_id')
 
 

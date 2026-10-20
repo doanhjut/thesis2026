@@ -6,7 +6,8 @@ from pathlib import Path
 import traceback
 
 from . import (active_learning, confirmatory, fidelity, fusion, gating,
-               provenance, recovery, robust_fidelity, temporal, temporal_fusion)
+               malbehavd_pid, provenance, recovery, robust_fidelity, temporal,
+               temporal_fusion)
 from .common import DEFAULT_DATA, REPO, finish_manifest, load_dataset, require, write_json
 from .verification import verify_al, verify_fidelity, verify_saved_run
 
@@ -143,6 +144,38 @@ def parser():
     ember.add_argument('--seed', type=int, default=42)
     ember.add_argument('--features', type=int, default=2381)
     ember.add_argument('--hash-source-files', action='store_true')
+    malbehavd = sub.add_parser(
+        'prepare-malbehavd',
+        help='Audit and freeze a report-only MalBehavD-V1 cohort for event-indexed PID.')
+    malbehavd.add_argument('--source', type=Path, required=True)
+    malbehavd.add_argument('--output', type=Path, required=True)
+    malbehavd.add_argument('--min-events', type=int, default=20)
+    malbehavd.add_argument('--folds', type=int, default=5)
+    malbehavd.add_argument('--seed', type=int, default=2026)
+    vt = sub.add_parser(
+        'collect-vt-static',
+        help='Fetch intrinsic PE metadata by SHA-256; never downloads executable content.')
+    vt.add_argument('--cohort', type=Path, required=True)
+    vt.add_argument('--output', type=Path, required=True)
+    vt.add_argument('--limit', type=int, help='Balanced pilot size; omit for the entire cohort.')
+    vt.add_argument('--seed', type=int, default=2026)
+    vt.add_argument('--requests-per-minute', type=float, default=4.0)
+    vt.add_argument('--api-key-env', default='VT_API_KEY')
+    vt.add_argument('--max-new', type=int,
+                    help='Maximum uncached API requests in this invocation; useful for daily quota.')
+    event_pid = sub.add_parser(
+        'event-pid',
+        help='Run Static/Dynamic/Average/Fixed/P/PI/PID on ordered public API-call reports.')
+    event_pid.add_argument('--sequences', type=Path, required=True)
+    event_pid.add_argument('--static-features', type=Path, required=True)
+    event_pid.add_argument('--output', type=Path, required=True)
+    event_pid.add_argument('--windows', nargs='+', type=int, default=[5, 10, 15, 20])
+    event_pid.add_argument('--target-tpr', type=float, default=.95)
+    event_pid.add_argument('--min-coverage', type=float, default=.8)
+    event_pid.add_argument('--validation-fraction', type=float, default=.2)
+    event_pid.add_argument('--calibration-fraction', type=float, default=.2)
+    event_pid.add_argument('--bootstrap', type=int, default=1000)
+    event_pid.add_argument('--seed', type=int, default=2026)
     return p
 
 
@@ -238,6 +271,31 @@ def main(argv=None):
                 args.seed, args.features, args.hash_source_files)
             finish_manifest(args.output)
             print(json.dumps(result, ensure_ascii=False, indent=2))
+            return 0
+        if args.command == 'prepare-malbehavd':
+            result = malbehavd_pid.prepare(
+                args.source, args.output, args.min_events, args.folds, args.seed)
+            finish_manifest(args.output)
+            print(json.dumps({'status': result['status'], 'output': str(args.output.resolve()),
+                              'eligible_rows': result['eligible_rows']}, ensure_ascii=False, indent=2))
+            return 0
+        if args.command == 'collect-vt-static':
+            result = malbehavd_pid.collect_vt(
+                args.cohort, args.output, args.limit, args.seed,
+                args.requests_per_minute, args.api_key_env, args.max_new)
+            finish_manifest(args.output)
+            print(json.dumps({'status': result['status'], 'output': str(args.output.resolve()),
+                              'usable_rows': result['usable_rows'], 'coverage': result['coverage']},
+                             ensure_ascii=False, indent=2))
+            return 0
+        if args.command == 'event-pid':
+            result = malbehavd_pid.run_event_pid(
+                args.sequences, args.static_features, args.output, tuple(args.windows),
+                args.target_tpr, args.min_coverage, args.validation_fraction,
+                args.calibration_fraction, args.bootstrap, args.seed)
+            finish_manifest(args.output)
+            print(json.dumps({'status': result['status'], 'output': str(args.output.resolve()),
+                              'samples': result['samples']}, ensure_ascii=False, indent=2))
             return 0
         if args.command == 'prepare-dynamic':
             result = fusion.prepare_dynamic_template(args.al_run, args.output)

@@ -13,6 +13,7 @@ from src.experiments.common import (choose_threshold, choose_threshold_at_max_fp
 from src.experiments.fidelity import mask_metrics
 from src.experiments.fusion import sequence_scores
 from src.experiments.gating import gate_counts, select_gate
+from src.experiments.malbehavd_pid import prepare as prepare_malbehavd, safe_static_features
 from src.experiments.provenance import audit
 from src.experiments.recovery import (SOREL_TAGS, inspect_npz, recover,
                                       recover_ember_dataset, recover_sorel_metadata,
@@ -95,6 +96,17 @@ class ExperimentMathTests(unittest.TestCase):
         later = result.sort_values(['row_id', 'elapsed_seconds']).groupby('row_id').tail(1)
         self.assertNotEqual(later.iloc[0].pid_derivative, later.iloc[1].pid_derivative)
 
+    def test_pid_accepts_explicit_event_axis_without_calling_it_seconds(self):
+        frame = pd.DataFrame({
+            'row_id': [1, 1, 2, 2], 'execution_id': ['a', 'a', 'b', 'b'],
+            'time_step': [0, 1, 0, 1], 'event_count': [5., 10., 5., 20.],
+            'probability': [.8, .8, .8, .8], 'p_dynamic': [.4, .6, .4, .6],
+        })
+        result = pid_trajectory(frame, (.85, .12, .35), integral_limits=(-1., 1.))
+        self.assertTrue(result.score.between(0, 1).all())
+        first = result.sort_values(['row_id', 'event_count']).groupby('row_id').head(1)
+        np.testing.assert_allclose(first.pid_derivative, 0.)
+
     def test_mask_metrics_are_directly_recomputable(self):
         y = np.array([0, 0, 1, 1])
         before = np.array([0.1, 0.3, 0.7, 0.9])
@@ -116,6 +128,43 @@ class ExperimentMathTests(unittest.TestCase):
 
 
 class DatasetGuardTests(unittest.TestCase):
+    def test_malbehavd_prepare_deduplicates_and_freezes_stratified_folds(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            source, output = root / 'source.csv', root / 'prepared'
+            rows = []
+            for index in range(24):
+                rows.append({'sha256': f'{index:064x}', 'labels': index % 2,
+                             **{str(step): f'Api{step % 4}' for step in range(6)}})
+            rows.append({**rows[0], '5': np.nan})  # same label/hash, shorter duplicate
+            pd.DataFrame(rows).to_csv(source, index=False)
+            result = prepare_malbehavd(source, output, min_events=5, folds=3, seed=7)
+            manifest = pd.read_csv(output / 'cohort_manifest.csv', dtype={'sha256': str})
+            self.assertEqual(result['unique_sha256'], 24)
+            self.assertEqual(len(manifest), 24)
+            self.assertEqual(manifest.sha256.nunique(), 24)
+            self.assertEqual(set(manifest.outer_fold), {0, 1, 2})
+            for _, group in manifest.groupby('outer_fold'):
+                self.assertEqual(set(group.label), {0, 1})
+
+    def test_vt_static_extractor_uses_structural_allowlist(self):
+        response = {'data': {'attributes': {
+            'sha256': 'a' * 64, 'size': 1000, 'type_tag': 'peexe',
+            'last_analysis_stats': {'malicious': 99},
+            'popular_threat_classification': {'suggested_threat_label': 'leak'},
+            'pe_info': {
+                'entry_point': 100, 'machine_type': 332,
+                'sections': [{'name': '.text', 'entropy': 5, 'raw_size': 100,
+                              'virtual_size': 120, 'chi2': 30, 'flags': 'rx'}],
+                'import_list': [{'library_name': 'kernel32.dll',
+                                 'imported_functions': ['CreateFileW']}],
+            },
+        }}}
+        features = safe_static_features(response)
+        self.assertGreater(len(features), 100)
+        self.assertTrue(all(name.startswith('s_') for name in features))
+        self.assertNotIn(99, features.values())
+
     def test_temporal_fusion_end_to_end_replays_observed_fixture(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
