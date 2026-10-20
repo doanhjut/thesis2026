@@ -295,6 +295,8 @@ def main(argv=None):
                 args.sequences, args.static_features, args.output, tuple(args.windows),
                 args.target_tpr, args.min_coverage, args.validation_fraction,
                 args.calibration_fraction, args.bootstrap, args.seed, args.selection)
+            from . import reporting
+            reporting.event_pid_report(args.output)
             finish_manifest(args.output)
             print(json.dumps({'status': result['status'], 'output': str(args.output.resolve()),
                               'samples': result['samples']}, ensure_ascii=False, indent=2))

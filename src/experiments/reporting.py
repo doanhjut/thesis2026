@@ -162,3 +162,105 @@ def fusion_report(out):
     (out / 'REPORT.md').write_text('# Fusion ablation\n\nSee fusion_summary.csv, fusion_table.tex and factorial_2x2.csv. '
         'All rows come from supplied paired observations. See config.json for report provenance, reset and selection rules. '
         'Latency measures offline replay only; all input pairs already have both scores.\n', encoding='utf-8')
+
+
+def event_pid_report(out):
+    """Create thesis-ready tables/figures from the saved event-indexed pilot."""
+    setup()
+    metrics = pd.read_csv(out / 'fusion_metrics.csv')
+    timepoints = pd.read_csv(out / 'timepoint_metrics.csv')
+    predictions = pd.read_csv(out / 'event_predictions.csv.gz')
+    summary = json.loads((out / 'summary.json').read_text())
+    bootstrap = json.loads((out / 'paired_bootstrap_pid_minus_fixed.json').read_text())
+    order = ['Static_only', 'Dynamic_only', 'Average_50_50', 'Fixed_weight', 'P', 'PI', 'PID']
+    colors = ['#747474', '#276DA8', '#AD7B23', '#91619F', '#18846C', '#B75D69', '#1B4332']
+
+    aggregates = (metrics.groupby('fusion')[['auc', 'ap', 'fpr', 'tpr', 'brier']]
+                  .agg(['mean', 'std']).reindex(order))
+    aggregates.to_csv(out / 'fusion_summary.csv')
+    fig, axes = plt.subplots(1, 2, figsize=(9, 3.5), layout='constrained')
+    for ax, metric, title in zip(axes, ['auc', 'ap'], ['ROC-AUC theo số API call', 'Average precision theo số API call']):
+        for fusion, color in zip(order, colors):
+            group = timepoints[timepoints.fusion == fusion].groupby('event_count')[metric].agg(['mean', 'std'])
+            x, mean = group.index.to_numpy(), group['mean'].to_numpy()
+            sd = group['std'].fillna(0).to_numpy()
+            ax.plot(x, mean, '.-', label=fusion, color=color, lw=1.3)
+            if fusion in {'Fixed_weight', 'PID'}:
+                ax.fill_between(x, mean - sd, mean + sd, color=color, alpha=.10)
+        ax.set(xlabel='Số API call đã quan sát', ylabel=metric.upper(), xticks=sorted(timepoints.event_count.unique()))
+        ax.grid(alpha=.15)
+    axes[0].legend(fontsize=6.5, ncol=2)
+    fig.suptitle('Pilot event-indexed; đường là trung bình 5 outer fold, vùng là ± SD')
+    save(fig, out, 'event_pid_trajectory')
+
+    fig, axes = plt.subplots(1, 2, figsize=(9, 3.6), layout='constrained')
+    x = np.arange(len(order))
+    for ax, metric, scale, title in zip(
+            axes, ['auc', 'fpr'], [1, 100], ['ROC-AUC cuối chuỗi', 'FPR tại ngưỡng validation (%)']):
+        means = np.array([metrics.loc[metrics.fusion == fusion, metric].mean() for fusion in order]) * scale
+        errors = np.array([metrics.loc[metrics.fusion == fusion, metric].std(ddof=1) for fusion in order]) * scale
+        ax.bar(x, means, yerr=errors, color=colors, capsize=2)
+        ax.set_xticks(x, [name.replace('_', '\n') for name in order], rotation=15, ha='right')
+        ax.set(title=title, ylabel=metric.upper())
+        ax.grid(axis='y', alpha=.15)
+    fig.suptitle('Trung bình ± sample SD qua 5 outer fold')
+    save(fig, out, 'event_pid_final_metrics')
+
+    rows = []
+    for fusion in order:
+        group = metrics[metrics.fusion == fusion]
+        rows.append([tex_escape(fusion), pm(group.auc), pm(group.ap),
+                     pm(group.fpr, 100, 2), pm(group.tpr, 100, 2), pm(group.brier)])
+    (out / 'event_pid_table.tex').write_text(tex_table(
+        ['Phương pháp', 'ROC-AUC', 'AP', r'FPR (\%)', r'TPR (\%)', 'Brier'], rows,
+        'Pilot event-indexed trên các mẫu có metadata tĩnh; trung bình và sample SD qua 5 outer fold.'),
+        encoding='utf-8')
+
+    final = (predictions.sort_values(['row_id', 'event_count'])
+             .groupby(['fusion', 'row_id'], sort=False).tail(1))
+    pid = final[final.fusion == 'PID'].set_index('row_id')
+    pi = final[final.fusion == 'PI'].set_index('row_id').loc[pid.index]
+    mean_pid_pi = float(np.mean(np.abs(pid.score - pi.score)))
+    max_pid_pi = float(np.max(np.abs(pid.score - pi.score)))
+    decision_pid_pi = int(np.sum(pid.predicted_label.to_numpy() != pi.predicted_label.to_numpy()))
+    effect = bootstrap['metrics']
+    win_loss = summary['fold_win_tie_loss_pid_vs_fixed']
+    lines = [
+        '# Pilot PID theo tiến trình sự kiện', '',
+        f"Đã đánh giá {summary['samples']} mẫu có đủ hai kênh; coverage metadata tĩnh "
+        f"{summary['static_metadata_coverage'] * 100:.1f}%. Mỗi mẫu có các mốc 5, 10, 15 và 20 API call.", '',
+        '| Phương pháp | ROC-AUC | AP | FPR (%) | TPR (%) | Brier |',
+        '|---|---:|---:|---:|---:|---:|',
+    ]
+    for fusion in order:
+        group = metrics[metrics.fusion == fusion]
+        lines.append('| ' + ' | '.join([
+            fusion, pm(group.auc).replace('$\\pm$', '±'), pm(group.ap).replace('$\\pm$', '±'),
+            pm(group.fpr, 100, 2).replace('$\\pm$', '±'),
+            pm(group.tpr, 100, 2).replace('$\\pm$', '±'),
+            pm(group.brier).replace('$\\pm$', '±')]) + ' |')
+    lines += [
+        '', '## So sánh ghép cặp PID với Fixed', '',
+        f"Bootstrap dự đoán out-of-fold, PID trừ Fixed: ΔAUC={effect['auc']['mean']:+.4f} "
+        f"(95% CI [{effect['auc']['ci95_low']:+.4f}, {effect['auc']['ci95_high']:+.4f}]); "
+        f"ΔAP={effect['ap']['mean']:+.4f} "
+        f"(95% CI [{effect['ap']['ci95_low']:+.4f}, {effect['ap']['ci95_high']:+.4f}]).",
+        f"ΔFPR={effect['fpr']['mean'] * 100:+.2f} điểm phần trăm "
+        f"(95% CI [{effect['fpr']['ci95_low'] * 100:+.2f}, {effect['fpr']['ci95_high'] * 100:+.2f}]); "
+        f"ΔTPR={effect['tpr']['mean'] * 100:+.2f} điểm phần trăm "
+        f"(95% CI [{effect['tpr']['ci95_low'] * 100:+.2f}, {effect['tpr']['ci95_high'] * 100:+.2f}]).",
+        f"PID có AUC cao hơn ở {win_loss['auc']['pid_better_folds']}/5 fold, "
+        f"hòa {win_loss['auc']['tied_folds']}/5; FPR tốt hơn ở "
+        f"{win_loss['fpr']['pid_better_folds']}/5 fold, hòa {win_loss['fpr']['tied_folds']}/5.",
+        '', '## Kiểm tra đóng góp riêng của D', '',
+        f"Ở mốc cuối, |score PID - score PI| trung bình là {mean_pid_pi:.6f}, tối đa {max_pid_pi:.6f}; "
+        f"số quyết định phân lớp khác nhau là {decision_pid_pi}/{len(pid)}.",
+        'Pilot này chưa tách được lợi ích gia tăng của thành phần D. Không dùng nó để tuyên bố PID hoàn chỉnh vượt PI.',
+        '', '## Phạm vi kết luận', '',
+        'Kết quả hỗ trợ tính khả thi của dung hợp tĩnh–động và cho thấy xu hướng cải thiện ranking của nhóm adaptive fusion. '
+        'Khoảng tin cậy PID–Fixed còn cắt qua 0 và FPR biến thiên lớn, nên chưa đủ bằng chứng xác nhận PID giảm cảnh báo nhầm.',
+        'Đây là generic Windows malware với trục số sự kiện, không phải benchmark ransomware hay thời gian thực theo giây.',
+        '', 'Tệp nguồn: fusion_metrics.csv, event_predictions.csv.gz, timepoint_metrics.csv, '
+        'fold_effects_pid_minus_fixed.csv và paired_bootstrap_pid_minus_fixed.json.',
+    ]
+    (out / 'REPORT.md').write_text('\n'.join(lines) + '\n', encoding='utf-8')
