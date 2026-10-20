@@ -11,8 +11,8 @@ bằng chứng tiến độ, chưa phải kết quả mô hình.
   phải mẫu thiếu trên VirusTotal.
 - Ngưỡng confirmatory đã khóa: coverage tối thiểu 90%, tương ứng 1.731 mẫu
   usable. Snapshot hiện cần thêm tối thiểu 1.238 mẫu usable.
-- Audit history ghi 269 request `fetched` thành công. Request tiếp theo nhận
-  HTTP 429 `QuotaExceededError`; collector dừng ngay và không retry. Ngoài ra có
+- Audit history ghi 269 request `fetched` thành công và hai lần thử đầu phiên
+  nhận HTTP 429 `QuotaExceededError`; collector đều dừng ngay. Ngoài ra có
   199 cache usable từ pilot và 25 mẫu của lô kiểm tra trước khi tính năng history
   được thêm vào.
 - Không tải hoặc thực thi executable. Raw VirusTotal response chỉ nằm trong
@@ -56,4 +56,4 @@ Kiểm tra không gọi mạng:
 ```
 
 Exit code `3` là trạng thái dự kiến khi collection còn dở. Code audit tương ứng
-commit `a93d4181b6feff9370d3b2420dfdc856e55f7267`.
+commit `62e8a657454b5257a9e6a57308e4ed988d8068c3`.

@@ -10,13 +10,12 @@
   "deferred_rows": 1429,
   "request_status_counts": {
     "deferred_rate_limit": 1429,
-    "cached": 424,
-    "fetched": 69,
+    "cached": 493,
     "http_429": 1
   },
   "recorded_network_attempt_status_counts": {
     "fetched": 269,
-    "http_429": 1
+    "http_429": 2
   },
   "class_coverage": {
     "0": {
@@ -32,8 +31,8 @@
   },
   "fold_label_coverage_file": "coverage_by_fold_label.csv",
   "cohort_manifest_sha256": "9540b88b0da2463f63b4e983f5ecc277e3845b7badebbb79695e35f2c3b1a669",
-  "static_features_sha256": "38d6874ec8e1fcefde97808337e73612bc18692918f7c49ec30fb715497d357a",
-  "request_log_sha256": "63543d489fa56b999aeac75f7bc92be91960e2d116209842f5d9f9c2401fbee2",
+  "static_features_sha256": "390a8aa94482a99fc26cad181daf3d5dd8fafb09a004464a07e37ec3f202ca0b",
+  "request_log_sha256": "c0009832c0cdfe49c28999fe31ef34eac105d37b13bdef0d24bad8ce763402f7",
   "binary_downloaded": false,
   "decision": "Do not run confirmatory modeling while collection is incomplete."
 }
