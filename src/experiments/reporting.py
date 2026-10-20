@@ -193,16 +193,20 @@ def event_pid_report(out):
     fig.suptitle('Pilot event-indexed; đường là trung bình 5 outer fold, vùng là ± SD')
     save(fig, out, 'event_pid_trajectory')
 
-    fig, axes = plt.subplots(1, 2, figsize=(9, 3.6), layout='constrained')
+    fig, axes = plt.subplots(1, 2, figsize=(10.5, 3.6), layout='constrained')
     x = np.arange(len(order))
+    display_names = ['Static\nonly', 'Dynamic\nonly', 'Average\n50/50',
+                     'Fixed\nweight', 'P', 'PI', 'PID']
     for ax, metric, scale, title in zip(
             axes, ['auc', 'fpr'], [1, 100], ['ROC-AUC cuối chuỗi', 'FPR tại ngưỡng validation (%)']):
         means = np.array([metrics.loc[metrics.fusion == fusion, metric].mean() for fusion in order]) * scale
         errors = np.array([metrics.loc[metrics.fusion == fusion, metric].std(ddof=1) for fusion in order]) * scale
         ax.bar(x, means, yerr=errors, color=colors, capsize=2)
-        ax.set_xticks(x, [name.replace('_', '\n') for name in order], rotation=15, ha='right')
+        ax.set_xticks(x, display_names, rotation=0)
+        ax.tick_params(axis='x', labelsize=8)
         ax.set(title=title, ylabel=metric.upper())
         ax.grid(axis='y', alpha=.15)
+    axes[0].set_ylim(.82, 1.02)
     fig.suptitle('Trung bình ± sample SD qua 5 outer fold')
     save(fig, out, 'event_pid_final_metrics')
 
