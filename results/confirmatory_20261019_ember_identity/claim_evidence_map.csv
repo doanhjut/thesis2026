@@ -1,0 +1,11 @@
+claim_id,claim,status,scope,evidence_file
+DATA-1,Mỗi hàng static có định danh SHA-256 và feature hash khớp manifest.,supported,"2,000 EMBER rows",static_identity_audit.json
+AL-1,U+H cải thiện ROC/AP-AULC so với Random.,supported,"5 outer folds, 5 nested seeds",al/fold_level_effects.csv
+AL-2,U+H cải thiện so với Uncertainty.,supported_small_mixed_metrics,ROC/AP-AULC 4/5 folds; low-FPR approximately tied,al/fold_level_effects.csv
+AL-3,XAI_full giảm ngân sách nhãn trung bình.,supported_with_high_fold_variation,Target derived on validation; oracle query counts,al/fold_method_target_budget.csv
+XAI-1,Top-SHAP quan trọng hơn random features theo deletion test.,supported,"EMBER feature space, mean/median masking",fidelity/deletion_summary.csv
+XAI-2,Thứ hạng SHAP ổn định trước model seed.,supported_moderate,Within-fold stability exceeds across-fold stability,fidelity/shap_stability_summary.csv
+OFS-1,Một OFS tổng hợp hợp lệ đã được chứng minh.,not_supported,Components use different ranges; no validated aggregation,evidence_assessment.json
+PID-1,PID giảm FPR hoặc tăng AUC.,not_evaluated,No paired dynamic behavior data,run_status.json
+SYS-1,Hệ thống tích hợp PID + XAI-AL có tương tác/cộng hưởng.,not_evaluated,Requires paired 2x2 factorial run,run_status.json
+LABEL-1,Kết quả áp dụng riêng cho ransomware/zero-day.,not_supported,EMBER labels are generic benign/malware,static_identity_audit.json

@@ -1,0 +1,45 @@
+{
+  "status": "completed_verified_static_identity",
+  "date": "2026-10-19",
+  "repository_commit": "fed4322f58f5bb55ec47833e857370d076592a32",
+  "dataset": {
+    "sha256": "69f0ae680846edd95458d1e7aaabe36f8866f4f22a6d11488b126ed026b28963",
+    "manifest_sha256": "a2ca16402653e6cc51fdd7a4857d007faf86807b044d78654f180409c73565bb",
+    "rows": 2000,
+    "features": 2381,
+    "label_counts": {
+      "0": 1500,
+      "1": 500
+    },
+    "provenance_status": "verified_static_identity",
+    "label_semantics": "EMBER benign/malware; not a verified ransomware label"
+  },
+  "experiments": {
+    "active_learning": {
+      "status": "passed",
+      "outer_folds": 5,
+      "seeds_per_fold": 5,
+      "methods": 5,
+      "checkpoints_replayed": 1375,
+      "prediction_records_replayed": 1100000,
+      "query_records_replayed": 125000,
+      "elapsed_seconds": 3387.9247604529955,
+      "raw_output": "outputs/ember_confirmatory_al_20261019"
+    },
+    "fidelity": {
+      "status": "passed",
+      "folds": 5,
+      "model_seeds": 5,
+      "mask_baselines": 2,
+      "runs_replayed": 50,
+      "mask_batches_replayed": 3150,
+      "prediction_records_replayed": 1260000,
+      "elapsed_seconds": 185.45830725799897,
+      "raw_output": "outputs/ember_confirmatory_fidelity_20261019"
+    },
+    "pid_fusion": {
+      "status": "not_run",
+      "reason": "No paired dynamic behavior reports aligned to these EMBER SHA-256 identities."
+    }
+  }
+}

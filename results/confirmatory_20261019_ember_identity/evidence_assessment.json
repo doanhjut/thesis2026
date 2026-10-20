@@ -1,0 +1,44 @@
+{
+  "overall": "verified_static_evidence_generic_malware",
+  "contributions": [
+    {
+      "name": "XAI explanation quality",
+      "status": "supported_in_ember_feature_space",
+      "evidence": [
+        "Top-SHAP deletion exceeds random-mask controls for k=10,25,50 under mean and median baselines.",
+        "Within-fold SHAP rank stability: Spearman=0.614440; Jaccard top-10=0.622065."
+      ],
+      "limits": [
+        "Feature masking may be out-of-distribution.",
+        "No causal or executable-level claim.",
+        "Labels are generic benign/malware, not ransomware-specific."
+      ]
+    },
+    {
+      "name": "XAI-Guided Active Learning",
+      "status": "supported_vs_random_mixed_vs_uncertainty",
+      "evidence": [
+        "U+H beats Random by ROC-AULC 0.004249 and AP-AULC 0.014985, winning 5/5 folds.",
+        "U+H beats Uncertainty by ROC-AULC 0.001754 and AP-AULC 0.001401, winning 4/5 folds.",
+        "XAI_full saves 92 labels versus Random and 28 versus Uncertainty on average, with high fold variation."
+      ],
+      "limits": [
+        "Low-FPR performance is clearly better than Random but approximately tied with Uncertainty.",
+        "Label counts are oracle queries, not analyst time.",
+        "XAI_full is not best on every metric."
+      ]
+    },
+    {
+      "name": "PID temporal fusion",
+      "status": "not_evaluated",
+      "evidence": [],
+      "limits": [
+        "Requires real time-indexed dynamic reports, a frozen dynamic scorer and paired sample identities."
+      ]
+    }
+  ],
+  "ofs": {
+    "value": null,
+    "reason": "No validated common-scale normalization and weighting rule; report components separately."
+  }
+}

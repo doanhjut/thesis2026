@@ -1,0 +1,111 @@
+{
+  "status": "confirmatory_measured",
+  "models_per_baseline": 25,
+  "folds": 5,
+  "model_seeds": 5,
+  "baseline_auc": {
+    "mean": 0.9567200000000001,
+    "sd": 0.012541150783040734,
+    "n": 25
+  },
+  "deletion": [
+    {
+      "mask_baseline": "mean",
+      "k": 10,
+      "models": 25,
+      "top_shap_auc_drop_mean": 0.0478173333,
+      "top_shap_auc_drop_sd": 0.0119613735,
+      "random_auc_drop_mean": 0.0001998667,
+      "random_auc_drop_sd": 0.000183188,
+      "top_minus_random_mean": 0.0476174667,
+      "top_minus_random_sd": 0.0119932066
+    },
+    {
+      "mask_baseline": "mean",
+      "k": 25,
+      "models": 25,
+      "top_shap_auc_drop_mean": 0.1358533333,
+      "top_shap_auc_drop_sd": 0.0357913824,
+      "random_auc_drop_mean": 0.0005298667,
+      "random_auc_drop_sd": 0.0003603718,
+      "top_minus_random_mean": 0.1353234667,
+      "top_minus_random_sd": 0.0358132125
+    },
+    {
+      "mask_baseline": "mean",
+      "k": 50,
+      "models": 25,
+      "top_shap_auc_drop_mean": 0.3067293333,
+      "top_shap_auc_drop_sd": 0.068371283,
+      "random_auc_drop_mean": 0.0009791333,
+      "random_auc_drop_sd": 0.0005432053,
+      "top_minus_random_mean": 0.3057502,
+      "top_minus_random_sd": 0.068163652
+    },
+    {
+      "mask_baseline": "median",
+      "k": 10,
+      "models": 25,
+      "top_shap_auc_drop_mean": 0.0534826667,
+      "top_shap_auc_drop_sd": 0.0121908516,
+      "random_auc_drop_mean": 9.42667e-05,
+      "random_auc_drop_sd": 0.0001648737,
+      "top_minus_random_mean": 0.0533884,
+      "top_minus_random_sd": 0.0122081988
+    },
+    {
+      "mask_baseline": "median",
+      "k": 25,
+      "models": 25,
+      "top_shap_auc_drop_mean": 0.12518,
+      "top_shap_auc_drop_sd": 0.0294016565,
+      "random_auc_drop_mean": 0.0003263333,
+      "random_auc_drop_sd": 0.0003332684,
+      "top_minus_random_mean": 0.1248536667,
+      "top_minus_random_sd": 0.0294065075
+    },
+    {
+      "mask_baseline": "median",
+      "k": 50,
+      "models": 25,
+      "top_shap_auc_drop_mean": 0.3007773333,
+      "top_shap_auc_drop_sd": 0.0682193818,
+      "random_auc_drop_mean": 0.0006582667,
+      "random_auc_drop_sd": 0.0004489276,
+      "top_minus_random_mean": 0.3001190667,
+      "top_minus_random_sd": 0.0682963958
+    }
+  ],
+  "shap_stability": {
+    "pair_count": 300,
+    "spearman": {
+      "mean": 0.5617078278094044,
+      "sd": 0.030108010284018532,
+      "n": 300
+    },
+    "jaccard_top_10": {
+      "mean": 0.47168720168720163,
+      "sd": 0.11093533054485752,
+      "n": 300
+    },
+    "jaccard_top_25": {
+      "mean": 0.34605227555497836,
+      "sd": 0.10742192613829488,
+      "n": 300
+    },
+    "jaccard_top_50": {
+      "mean": 0.3333702294379147,
+      "sd": 0.08286419872895565,
+      "n": 300
+    }
+  },
+  "ofs": null,
+  "ofs_reason": "No validated common-scale aggregation rule; components remain separate.",
+  "elapsed_seconds": 185.45830725799897,
+  "limitations": [
+    "Deletion is performed in EMBER feature space and need not correspond to a valid executable.",
+    "Mean and median replacement can create out-of-distribution feature combinations.",
+    "Rank stability measures reproducibility of the fitted model explanations, not causal correctness.",
+    "Repeated random masks within one fitted model are controls, not independent model replications."
+  ]
+}

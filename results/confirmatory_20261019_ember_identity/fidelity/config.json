@@ -1,0 +1,58 @@
+{
+  "kind": "confirmatory_fidelity",
+  "data_path": "/workspace/thesis2026/outputs/ember_identity_dataset/ember_mini_dataset.csv",
+  "row_manifest": "/workspace/thesis2026/outputs/ember_identity_dataset/ember_row_manifest.csv",
+  "split_dir": "/workspace/thesis2026/outputs/ember_confirmatory_al_20261019/fold_manifests",
+  "folds": 5,
+  "model_seeds": [
+    41,
+    42,
+    43,
+    44,
+    45
+  ],
+  "mask_baselines": [
+    "mean",
+    "median"
+  ],
+  "k_values": [
+    10,
+    25,
+    50
+  ],
+  "random_masks_per_k": 20,
+  "bootstrap_repetitions_per_model": 500,
+  "trees": 100,
+  "feature_fraction": 0.8,
+  "bagging_fraction": 0.8,
+  "model_variation": "LightGBM is deterministic within a seed; feature and row subsampling make fitted models differ reproducibly across seeds.",
+  "repository_commit": "fed4322f58f5bb55ec47833e857370d076592a32",
+  "working_tree_status": "",
+  "source_sha256": {
+    "src/experiments/__init__.py": "63c0b7fd26cc89daa9ca4a0b60ef6af7606cd9d701f6976f6fcaeb62313f1566",
+    "src/experiments/active_learning.py": "6d8645265fbbfae8e1e9ac0180536b63146516935ac0f43eeefa81eeb9e5edfa",
+    "src/experiments/cli.py": "fe456cd628933a2cc2ceb0ab473fcf00f5e4b89cc97c7c20de43b9ddaa428dd8",
+    "src/experiments/common.py": "ede14099db6002a85b2bb6af63aa072ecf87b9caaec4dba5fc25f66c1486a52f",
+    "src/experiments/confirmatory.py": "3c3cdfad845d8bad9a485d26a13901c48322650b8a00959cd24cbeedcdf00a47",
+    "src/experiments/fidelity.py": "9984967241aac72899da01c5cbd7582484fa2e5314f641dea92b036ae090519d",
+    "src/experiments/fusion.py": "1dd57b9856bfea086f4c82aa84206c22409cf4a1ea4ae0399630fc67a9e8ee2e",
+    "src/experiments/gating.py": "19c75cd124e47ff2c6748479fc3d1d752a75716ae50930c9a63fa8778063b7c5",
+    "src/experiments/provenance.py": "5edd61a2332bfeb7d91dc3d99252de32d86883dce533dd7bdebfb79644bc4b1d",
+    "src/experiments/recovery.py": "93c6c8cf344301eb6511ce6803090f1df5fbb88cfa5166e6273b2a6af49a0e3f",
+    "src/experiments/reporting.py": "c33cd15e6bc1fd8e85cfe9e81e96e486dd6693e11666b5124aa8c9bddb0e654d",
+    "src/experiments/robust_fidelity.py": "52ce38ae22ee758d289b4142079a05821ce99f1a6ba98726e1e2fa5ee5b47533",
+    "src/experiments/signals.py": "8e3a773979b787a1b2fd4c199a70e4b877ee2a70ecfbc97428661a7c775c8638",
+    "src/experiments/temporal.py": "81454f7302b7075c0fd184141b0ab197cbc0ff129dd62ee5098e7926aaca0344",
+    "src/experiments/temporal_fusion.py": "8b70dae985f208844398f0a6eddafd4d113e88dd3cf813823aa5f787506c48dc",
+    "src/experiments/verification.py": "421830b3acea0f308d63137ce967d4e19d49a2cc4f0f3f976d4559be5efb0cb0",
+    "src/pid_fusion.py": "82bd691040bc198749ef4fe2bd58d3c8cb88f14286e7046ffd40d52ce7a48a1f",
+    "scripts/run_experiments.py": "6700f7fc2ecabe2bb6a1ff8899d0c3ed6b134bcc333ac1b7dc69e9ac06ee5598"
+  },
+  "versions": {
+    "python": "3.12.14",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "sklearn": "1.9.1",
+    "lightgbm": "4.7.0"
+  }
+}

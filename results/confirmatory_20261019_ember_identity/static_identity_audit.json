@@ -1,0 +1,58 @@
+{
+  "status": "verified_static_identity",
+  "dataset": {
+    "path": "outputs/ember_identity_dataset/ember_mini_dataset.csv",
+    "sha256": "69f0ae680846edd95458d1e7aaabe36f8866f4f22a6d11488b126ed026b28963",
+    "rows": 2000,
+    "features": 2381,
+    "label_counts": {
+      "0": 1500,
+      "1": 500
+    }
+  },
+  "manifest": {
+    "path": "outputs/ember_identity_dataset/ember_row_manifest.csv",
+    "sha256": "a2ca16402653e6cc51fdd7a4857d007faf86807b044d78654f180409c73565bb",
+    "columns": [
+      "row_id",
+      "source_index",
+      "label",
+      "sha256",
+      "appeared",
+      "avclass",
+      "source_feature_float32_sha256"
+    ],
+    "rows": 2000,
+    "unique_row_id": 2000,
+    "unique_source_index": 2000,
+    "unique_sha256": 2000,
+    "sha256_format_valid": true,
+    "appeared_min": "2018-11",
+    "appeared_max": "2018-12",
+    "avclass_nonmissing": 498,
+    "missing_by_column": {
+      "row_id": 0,
+      "source_index": 0,
+      "label": 0,
+      "sha256": 0,
+      "appeared": 0,
+      "avclass": 1502,
+      "source_feature_float32_sha256": 0
+    }
+  },
+  "checks": {
+    "dataset_manifest_labels_match": "passed",
+    "source_feature_float32_sha256_match": "passed",
+    "exact_duplicate_feature_vectors": 0
+  },
+  "label_semantics": {
+    "0": "EMBER benign",
+    "1": "EMBER malware",
+    "avclass": "optional weak family metadata; not a verified ransomware label"
+  },
+  "limitations": [
+    "Static identity is verified against the supplied EMBER manifest.",
+    "Random row folds do not establish family-held-out, temporal, zero-day or cross-dataset generalization.",
+    "No executable behavior trace is present; this dataset cannot validate PID fusion."
+  ]
+}

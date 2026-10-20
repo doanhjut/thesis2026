@@ -1,0 +1,34 @@
+{
+  "files": [
+    {
+      "path": "outputs/ember_identity_dataset/ember_mini_dataset.csv",
+      "sha256": "69f0ae680846edd95458d1e7aaabe36f8866f4f22a6d11488b126ed026b28963",
+      "bytes": 28611620
+    },
+    {
+      "path": "outputs/ember_identity_dataset/ember_row_manifest.csv",
+      "sha256": "a2ca16402653e6cc51fdd7a4857d007faf86807b044d78654f180409c73565bb",
+      "bytes": 308780
+    },
+    {
+      "path": "outputs/ember_confirmatory_al_20261019/config.json",
+      "sha256": "5807c261674824a1add96f90adc3b135e34f78dd0e730ef8064c052dda80c559",
+      "bytes": 36715
+    },
+    {
+      "path": "outputs/ember_confirmatory_al_20261019/verification.json",
+      "sha256": "3bb1a21fbdf472be8b8ccb29fbbedda1fc225eef2a690dd7105ab443e4b758ef",
+      "bytes": 822
+    },
+    {
+      "path": "outputs/ember_confirmatory_fidelity_20261019/config.json",
+      "sha256": "ae95d8fda02f26837384f1180b2d0d13855176bb8ca8d21f510a87703e74f12c",
+      "bytes": 2905
+    },
+    {
+      "path": "outputs/ember_confirmatory_fidelity_20261019/verification.json",
+      "sha256": "271f1c1bb321527b4913e02b23290f1f949c6a5f768875fe333d139786016c7e",
+      "bytes": 8791
+    }
+  ]
+}
