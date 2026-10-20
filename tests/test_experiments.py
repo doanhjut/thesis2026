@@ -15,6 +15,7 @@ from src.experiments.fusion import sequence_scores
 from src.experiments.gating import gate_counts, select_gate
 from src.experiments.malbehavd_pid import (_bootstrap_difference, _fold_effects,
                                            _timepoint_metrics, _win_tie_loss,
+                                           _write_gzip_csv,
                                            audit_collection,
                                            prepare as prepare_malbehavd,
                                            safe_static_features)
@@ -132,6 +133,15 @@ class ExperimentMathTests(unittest.TestCase):
 
 
 class DatasetGuardTests(unittest.TestCase):
+    def test_event_pid_gzip_csv_is_byte_reproducible(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            frame = pd.DataFrame({'row_id': [1, 2], 'score': [.2, .8]})
+            first, second = root / 'first.csv.gz', root / 'second.csv.gz'
+            _write_gzip_csv(frame, first)
+            _write_gzip_csv(frame, second)
+            self.assertEqual(sha256(first), sha256(second))
+
     def test_vt_collection_audit_distinguishes_deferred_from_missing(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)

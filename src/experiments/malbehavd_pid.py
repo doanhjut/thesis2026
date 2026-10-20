@@ -9,6 +9,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 import gzip
 import hashlib
+import io
 import json
 import os
 from pathlib import Path
@@ -39,6 +40,13 @@ EXCLUDED_VT_FIELDS = [
     'last_analysis_results', 'last_analysis_stats', 'popular_threat_classification',
     'threat_names', 'crowdsourced_yara_results', 'sandbox_verdicts', 'tags', 'names',
 ]
+def _write_gzip_csv(frame, path):
+    """Write byte-reproducible gzip CSV (no wall-clock timestamp in the header)."""
+    with Path(path).open('wb') as raw:
+        with gzip.GzipFile(filename='', mode='wb', fileobj=raw,
+                           compresslevel=9, mtime=0) as compressed:
+            with io.TextIOWrapper(compressed, encoding='utf-8', newline='') as text:
+                frame.to_csv(text, index=False)
 
 
 def _counts(values):
@@ -89,7 +97,7 @@ def prepare(source, out, min_events=20, folds=5, seed=2026):
     sequence_table = eligible[manifest_columns].copy()
     sequence_table['api_sequence_json'] = eligible.api_sequence.map(
         lambda value: json.dumps(value, ensure_ascii=False, separators=(',', ':')))
-    sequence_table.to_csv(out / 'api_sequences.csv.gz', index=False, compression='gzip')
+    _write_gzip_csv(sequence_table, out / 'api_sequences.csv.gz')
     dataset_hash = sha256(source)
     audit = {
         'status': 'prepared_public_report_only_cohort',
@@ -312,7 +320,7 @@ def collect_vt(cohort, out, limit=None, seed=2026, requests_per_minute=4.0,
         features.append(row)
     feature_frame = pd.DataFrame(features).sort_values('row_id') if features else pd.DataFrame()
     require(len(feature_frame) > 0, 'No usable VirusTotal metadata was collected.')
-    feature_frame.to_csv(out / 'static_features.csv.gz', index=False, compression='gzip')
+    _write_gzip_csv(feature_frame, out / 'static_features.csv.gz')
     selected_rows = int(len(frame))
     summary = {
         'status': 'vt_metadata_collected', 'cohort_manifest': str(cohort),
@@ -683,7 +691,7 @@ def run_event_pid(sequences, static_features, out, windows=(5, 10, 15, 20),
             require(np.isclose(check[metric], getattr(item, metric)), f'Replay mismatch: fold={item.outer_fold}, {item.fusion}, {metric}')
         replayed += len(selected)
     metric_frame.to_csv(out / 'fusion_metrics.csv', index=False)
-    prediction_frame.to_csv(out / 'event_predictions.csv.gz', index=False, compression='gzip')
+    _write_gzip_csv(prediction_frame, out / 'event_predictions.csv.gz')
     timepoint_frame, pooled_timepoint_frame = _timepoint_metrics(prediction_frame)
     timepoint_frame.to_csv(out / 'timepoint_metrics.csv', index=False)
     pooled_timepoint_frame.to_csv(out / 'timepoint_oof_metrics.csv', index=False)
