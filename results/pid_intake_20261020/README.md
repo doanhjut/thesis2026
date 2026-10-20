@@ -13,9 +13,22 @@
 - Không có PE binary hoặc sandbox report được liệt kê riêng.
 - Kiểm kê chỉ đọc central directory và hash archive; không giải nén member, không chạy PE.
 
+## Kết quả kiểm tra schema
+
+`train_small_schema.json` được tạo bằng cách đọc header và 20 dòng đầu trực tiếp trong ZIP:
+
+- 2.382 cột: `0` đến `2380` và `label`;
+- 2.381 chiều đặc trưng số theo cấu trúc EMBER;
+- không có SHA-256, `row_id`, sample ID, family, timestamp, source hoặc split;
+- 20/20 dòng mẫu có đúng 2.382 trường;
+- nhãn mẫu nhận giá trị 0/1;
+- SHA-256 của báo cáo schema: `9e7ab9c8efb64ba1178d7d56edfd9c688d2c1ef0c8ed8a90aed451fafb74a3e9`.
+
 ## Đánh giá học thuật
 
-Nguồn này chưa đủ cho PID vì không có behavior trace theo thời gian. CSV vẫn có thể hữu ích cho dữ liệu tĩnh hoặc mapping nếu header chứa SHA-256 và metadata. Bước tiếp theo là kiểm tra header và một số dòng đầu bằng `scripts/inspect_zip_csv.py`:
+Nguồn này có thể dùng để huấn luyện mô hình tĩnh quy mô lớn, nhưng không thể dùng để khôi phục mapping tĩnh--động: CSV không chứa định danh mẫu và archive không chứa PE/report. Thứ tự hàng đơn thuần không phải bằng chứng để gán SHA-256 từ một nguồn khác.
+
+Lệnh đã dùng để kiểm tra:
 
 ```powershell
 python scripts\inspect_zip_csv.py `
@@ -24,8 +37,4 @@ python scripts\inspect_zip_csv.py `
   --sample-rows 20
 ```
 
-Script không ghi CSV 14 GB ra đĩa. Sau bước này:
-
-- nếu có SHA-256: tìm binary hoặc report sandbox khớp SHA-256;
-- nếu không có SHA-256: CSV không thể tự cung cấp mapping tĩnh--động đáng tin cậy;
-- dù có SHA-256, vẫn cần binary được phép phân tích hoặc report động đã tồn tại.
+Script không ghi CSV 14 GB ra đĩa. Kết luận cuối cho nguồn này là `static_only_without_identity`. Để chạy PID cần một corpus khác có binary hoặc report động và manifest SHA-256, hoặc metadata gốc chứng minh được mapping tới chính các hàng trong CSV. Không tiếp tục suy đoán mapping từ `train_small.csv`.
