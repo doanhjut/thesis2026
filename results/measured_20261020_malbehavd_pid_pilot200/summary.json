@@ -297,7 +297,7 @@
     "MalBehavD-V1 supports generic binary Windows malware detection, not ransomware-specific claims.",
     "Static fields are allow-listed VirusTotal PE metadata; source-collection bias remains possible."
   ],
-  "repository_commit": "a1a8643fefdeda339d01daa03bbdeba3e5db26b9",
+  "repository_commit": "44812ad0c9997e47b418db55975d80c9814b9b77",
   "working_tree_status": "",
   "source_sha256": {
     "src/experiments/__init__.py": "63c0b7fd26cc89daa9ca4a0b60ef6af7606cd9d701f6976f6fcaeb62313f1566",
@@ -311,7 +311,7 @@
     "src/experiments/malbehavd_pid.py": "4c9c13676b85bde7f0c5cdef856dda94ada1e4e4ba82057734fddfa0b1386192",
     "src/experiments/provenance.py": "5edd61a2332bfeb7d91dc3d99252de32d86883dce533dd7bdebfb79644bc4b1d",
     "src/experiments/recovery.py": "93c6c8cf344301eb6511ce6803090f1df5fbb88cfa5166e6273b2a6af49a0e3f",
-    "src/experiments/reporting.py": "425d1c908f2cc5a6179f6821072e4046ca81d927ce38ef1b56440de477036fb2",
+    "src/experiments/reporting.py": "5cfbf9a017c285bf4f0d850f6f0d31e6be4944c91551210460146d03c83a87bf",
     "src/experiments/robust_fidelity.py": "52ce38ae22ee758d289b4142079a05821ce99f1a6ba98726e1e2fa5ee5b47533",
     "src/experiments/signals.py": "8e3a773979b787a1b2fd4c199a70e4b877ee2a70ecfbc97428661a7c775c8638",
     "src/experiments/temporal.py": "81454f7302b7075c0fd184141b0ab197cbc0ff129dd62ee5098e7926aaca0344",
