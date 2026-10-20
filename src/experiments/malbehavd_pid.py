@@ -236,6 +236,10 @@ def collect_vt(cohort, out, limit=None, seed=2026, requests_per_minute=4.0,
     records = []
     last_request = None
     new_requests = 0
+    fetched_requests = 0
+    rate_limit_encountered = False
+    invocation_started = datetime.now(timezone.utc).isoformat()
+    history_path = out / 'request_history.csv'
     for item in frame.itertuples(index=False):
         target = raw / f'{item.sha256}.json.gz'
         if target.is_file():
@@ -248,6 +252,12 @@ def collect_vt(cohort, out, limit=None, seed=2026, requests_per_minute=4.0,
                 target.unlink(missing_ok=True)
                 status, detail = 'cache_invalid', f'{type(error).__name__}: {error}'
         else:
+            if rate_limit_encountered:
+                records.append({'row_id': int(item.row_id), 'sha256': item.sha256,
+                                'label': int(item.label), 'status': 'deferred_rate_limit',
+                                'retrieved_at_utc': None,
+                                'detail': 'Not requested after VirusTotal returned HTTP 429.'})
+                continue
             if max_new is not None and new_requests >= max_new:
                 records.append({'row_id': int(item.row_id), 'sha256': item.sha256,
                                 'label': int(item.label), 'status': 'deferred_quota',
@@ -269,10 +279,19 @@ def collect_vt(cohort, out, limit=None, seed=2026, requests_per_minute=4.0,
                 with gzip.open(target, 'wt', encoding='utf-8') as stream:
                     json.dump(response, stream, ensure_ascii=False, separators=(',', ':'))
                 status, detail = 'fetched', 'ok'
+                fetched_requests += 1
             except urllib.error.HTTPError as error:
                 status, detail = f'http_{error.code}', error.read(500).decode('utf-8', 'replace')
+                rate_limit_encountered = error.code == 429
             except Exception as error:
                 status, detail = 'error', f'{type(error).__name__}: {error}'
+            attempt = pd.DataFrame([{
+                'invocation_started_at_utc': invocation_started,
+                'attempted_at_utc': datetime.now(timezone.utc).isoformat(),
+                'row_id': int(item.row_id), 'sha256': item.sha256,
+                'label': int(item.label), 'status': status, 'detail': detail,
+            }])
+            attempt.to_csv(history_path, mode='a', header=not history_path.is_file(), index=False)
         retrieved_at = (datetime.fromtimestamp(target.stat().st_mtime, timezone.utc).isoformat()
                         if target.is_file() else None)
         records.append({'row_id': int(item.row_id), 'sha256': item.sha256,
@@ -306,6 +325,9 @@ def collect_vt(cohort, out, limit=None, seed=2026, requests_per_minute=4.0,
         'feature_count': int(len([name for name in feature_frame if name.startswith('s_')])),
         'requests_per_minute': float(requests_per_minute),
         'new_requests_this_invocation': int(new_requests),
+        'successful_fetches_this_invocation': int(fetched_requests),
+        'rate_limit_encountered': bool(rate_limit_encountered),
+        'request_history': str(history_path.resolve()),
         'max_new': None if max_new is None else int(max_new),
         'limitations': [
             'VirusTotal metadata availability can create missingness; coverage is reported before modeling.',

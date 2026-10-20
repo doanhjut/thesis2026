@@ -78,7 +78,10 @@ Không tăng tốc độ cao hơn quota của tài khoản.
 
 Nếu tài khoản có quota 500 request/ngày, chạy lại đúng lệnh này vào ngày tiếp
 theo. Các SHA đã có cache không tiêu tốn request mới; `--max-new` giới hạn phần
-chưa cache trong mỗi lần gọi. Không dùng nhiều key để né quota.
+chưa cache trong mỗi lần gọi. Collector dừng gửi request mới ngay khi gặp HTTP
+429 và lưu từng lần gọi mạng trong `request_history.csv`; các mẫu còn lại được
+đánh dấu `deferred_rate_limit` để có thể chạy tiếp vào ngày sau. Không dùng
+nhiều key để né quota.
 
 ## 5. Chạy ablation
 
