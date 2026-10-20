@@ -231,6 +231,7 @@ def collect_vt(cohort, out, limit=None, seed=2026, requests_per_minute=4.0,
             take = min(len(group), base + (1 if order < remainder else 0))
             pieces.append(group.sample(n=take, random_state=seed + int(label)))
         frame = pd.concat(pieces).sort_values('row_id').reset_index(drop=True)
+    frame.to_csv(out / 'selected_cohort.csv', index=False)
     interval = 60.0 / requests_per_minute
     records = []
     last_request = None
@@ -370,29 +371,106 @@ def _final_rows(frame):
 
 def _bootstrap_difference(final, left='PID', right='Fixed_weight', iterations=1000, seed=2026):
     pivot_score = final.pivot(index='row_id', columns='fusion', values='score')
+    pivot_label = final.pivot(index='row_id', columns='fusion', values='predicted_label')
     labels = final.drop_duplicates('row_id').set_index('row_id').label.loc[pivot_score.index].to_numpy()
     left_scores, right_scores = pivot_score[left].to_numpy(), pivot_score[right].to_numpy()
+    left_predictions = pivot_label.loc[pivot_score.index, left].to_numpy(dtype=int)
+    right_predictions = pivot_label.loc[pivot_score.index, right].to_numpy(dtype=int)
     rng = np.random.default_rng(seed)
-    values = {'auc': [], 'ap': []}
+    values = {'auc': [], 'ap': [], 'brier': [], 'fpr': [], 'tpr': []}
     for _ in range(iterations):
         ids = rng.integers(0, len(labels), len(labels))
         if len(np.unique(labels[ids])) < 2:
             continue
-        values['auc'].append(roc_auc_score(labels[ids], left_scores[ids]) -
-                             roc_auc_score(labels[ids], right_scores[ids]))
-        values['ap'].append(average_precision_score(labels[ids], left_scores[ids]) -
-                            average_precision_score(labels[ids], right_scores[ids]))
-    return {
+        sampled_labels = labels[ids]
+        values['auc'].append(roc_auc_score(sampled_labels, left_scores[ids]) -
+                             roc_auc_score(sampled_labels, right_scores[ids]))
+        values['ap'].append(average_precision_score(sampled_labels, left_scores[ids]) -
+                            average_precision_score(sampled_labels, right_scores[ids]))
+        values['brier'].append(brier_score_loss(sampled_labels, left_scores[ids]) -
+                               brier_score_loss(sampled_labels, right_scores[ids]))
+        negative, positive = sampled_labels == 0, sampled_labels == 1
+        values['fpr'].append(left_predictions[ids][negative].mean() -
+                             right_predictions[ids][negative].mean())
+        values['tpr'].append(left_predictions[ids][positive].mean() -
+                             right_predictions[ids][positive].mean())
+    result = {
         metric: {'mean': float(np.mean(samples)),
                  'ci95_low': float(np.quantile(samples, .025)),
                  'ci95_high': float(np.quantile(samples, .975)), 'iterations': len(samples)}
         for metric, samples in values.items()
     }
+    return {
+        'comparison': f'{left}_minus_{right}',
+        'interpretation': {
+            'auc': 'positive_favors_left', 'ap': 'positive_favors_left',
+            'brier': 'negative_favors_left', 'fpr': 'negative_favors_left',
+            'tpr': 'positive_favors_left',
+        },
+        'samples': int(len(labels)), 'metrics': result,
+    }
+
+
+def _timepoint_metrics(predictions):
+    """Return fold-level and pooled out-of-fold ranking/calibration metrics."""
+    rows = []
+    for (fold, fusion, event_count), group in predictions.groupby(
+            ['outer_fold', 'fusion', 'event_count'], sort=True):
+        rows.append({
+            'outer_fold': int(fold), 'fusion': fusion,
+            'event_count': int(event_count), 'samples': int(len(group)),
+            'auc': float(roc_auc_score(group.label, group.score)),
+            'ap': float(average_precision_score(group.label, group.score)),
+            'brier': float(brier_score_loss(group.label, group.score)),
+        })
+    pooled = []
+    for (fusion, event_count), group in predictions.groupby(['fusion', 'event_count'], sort=True):
+        pooled.append({
+            'fusion': fusion, 'event_count': int(event_count),
+            'samples': int(len(group)),
+            'auc': float(roc_auc_score(group.label, group.score)),
+            'ap': float(average_precision_score(group.label, group.score)),
+            'brier': float(brier_score_loss(group.label, group.score)),
+        })
+    return pd.DataFrame(rows), pd.DataFrame(pooled)
+
+
+def _fold_effects(metrics, left='PID', right='Fixed_weight'):
+    """Compute paired outer-fold effects; positive is a literal left-minus-right delta."""
+    rows = []
+    for fold, group in metrics.groupby('outer_fold', sort=True):
+        indexed = group.set_index('fusion')
+        require({left, right} <= set(indexed.index), f'Missing paired methods in fold {fold}.')
+        for metric in ['auc', 'ap', 'fpr', 'tpr', 'brier']:
+            rows.append({
+                'outer_fold': int(fold), 'metric': metric,
+                'left': left, 'right': right,
+                'left_value': float(indexed.loc[left, metric]),
+                'right_value': float(indexed.loc[right, metric]),
+                'difference_left_minus_right': float(indexed.loc[left, metric] - indexed.loc[right, metric]),
+                'lower_is_better': metric in {'fpr', 'brier'},
+            })
+    return pd.DataFrame(rows)
+
+
+def _win_tie_loss(effects, tolerance=1e-12):
+    result = {}
+    for metric, group in effects.groupby('metric'):
+        difference = group.difference_left_minus_right.to_numpy()
+        favorable = -difference if bool(group.lower_is_better.iloc[0]) else difference
+        result[metric] = {
+            'pid_better_folds': int(np.sum(favorable > tolerance)),
+            'tied_folds': int(np.sum(np.abs(favorable) <= tolerance)),
+            'pid_worse_folds': int(np.sum(favorable < -tolerance)),
+            'folds': int(len(group)),
+        }
+    return result
 
 
 def run_event_pid(sequences, static_features, out, windows=(5, 10, 15, 20),
                   target_tpr=.95, min_coverage=.8, validation_fraction=.2,
-                  calibration_fraction=.2, bootstrap=1000, seed=2026):
+                  calibration_fraction=.2, bootstrap=1000, seed=2026,
+                  selection=None):
     """Run five-fold, leakage-controlled event-indexed PID ablations."""
     sequences, static_features, out = Path(sequences), Path(static_features), Path(out)
     windows = tuple(int(value) for value in windows)
@@ -403,6 +481,21 @@ def run_event_pid(sequences, static_features, out, windows=(5, 10, 15, 20),
             'Invalid development split fractions.')
     out.mkdir(parents=True, exist_ok=False)
     sequence_frame = _load_sequences(sequences)
+    selection_metadata = None
+    if selection is not None:
+        selection = Path(selection).resolve()
+        selected = pd.read_csv(selection, dtype={'sha256': str})
+        require({'row_id', 'sha256', 'label'} <= set(selected),
+                'Selection manifest requires row_id, sha256 and label.')
+        require(selected.row_id.is_unique and selected.sha256.is_unique,
+                'Selection manifest identities must be unique.')
+        expected = selected[['row_id', 'sha256', 'label']]
+        sequence_frame = sequence_frame.merge(expected, on=['row_id', 'sha256', 'label'],
+                                              how='inner', validate='one_to_one')
+        require(len(sequence_frame) == len(selected),
+                'Selection manifest contains identities absent from the sequence table.')
+        selection_metadata = {'path': str(selection), 'sha256': sha256(selection),
+                              'rows': int(len(selected))}
     static = pd.read_csv(static_features, dtype={'sha256': str})
     require({'row_id', 'sha256', 'label'} <= set(static), 'Invalid static feature table.')
     static_columns = [name for name in static if name.startswith('s_')]
@@ -489,12 +582,18 @@ def run_event_pid(sequences, static_features, out, windows=(5, 10, 15, 20),
         replayed += len(selected)
     metric_frame.to_csv(out / 'fusion_metrics.csv', index=False)
     prediction_frame.to_csv(out / 'event_predictions.csv.gz', index=False, compression='gzip')
+    timepoint_frame, pooled_timepoint_frame = _timepoint_metrics(prediction_frame)
+    timepoint_frame.to_csv(out / 'timepoint_metrics.csv', index=False)
+    pooled_timepoint_frame.to_csv(out / 'timepoint_oof_metrics.csv', index=False)
+    fold_effects = _fold_effects(metric_frame)
+    fold_effects.to_csv(out / 'fold_effects_pid_minus_fixed.csv', index=False)
     write_json(out / 'validation_search.json', searches)
     effects = _bootstrap_difference(final, iterations=bootstrap, seed=seed)
     write_json(out / 'paired_bootstrap_pid_minus_fixed.json', effects)
     summary = {
         'status': 'measured_from_public_ordered_api_reports',
         'samples': int(len(joined)), 'static_metadata_coverage': float(coverage),
+        'selection': selection_metadata,
         'class_counts': _counts(joined.label), 'outer_folds': int(len(folds)),
         'event_windows': list(windows), 'time_axis': 'ordered_api_event_count',
         'results': [
@@ -502,6 +601,7 @@ def run_event_pid(sequences, static_features, out, windows=(5, 10, 15, 20),
             for kind, group in metric_frame.groupby('fusion')
         ],
         'paired_bootstrap_pid_minus_fixed': effects,
+        'fold_win_tie_loss_pid_vs_fixed': _win_tie_loss(fold_effects),
         'limitations': [
             'Event count is a discrete observation axis, not wall-clock time or measured sandbox latency.',
             'MalBehavD-V1 supports generic binary Windows malware detection, not ransomware-specific claims.',
@@ -519,5 +619,8 @@ def run_event_pid(sequences, static_features, out, windows=(5, 10, 15, 20),
         '# Event-indexed PID benchmark\n\n'
         'Static, Dynamic, Average, Fixed, P, PI and PID are compared with five frozen outer folds. '
         'Base models, calibration and fusion validation use disjoint development partitions. '
-        'The observation axis is ordered API-event count, not seconds.\n', encoding='utf-8')
+        'The observation axis is ordered API-event count, not seconds. '
+        'See timepoint_metrics.csv for fold-level trajectories, timepoint_oof_metrics.csv for pooled '
+        'out-of-fold trajectories, fold_effects_pid_minus_fixed.csv for paired fold effects, and '
+        'paired_bootstrap_pid_minus_fixed.json for uncertainty intervals.\n', encoding='utf-8')
     return summary

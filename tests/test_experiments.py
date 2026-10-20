@@ -13,7 +13,10 @@ from src.experiments.common import (choose_threshold, choose_threshold_at_max_fp
 from src.experiments.fidelity import mask_metrics
 from src.experiments.fusion import sequence_scores
 from src.experiments.gating import gate_counts, select_gate
-from src.experiments.malbehavd_pid import prepare as prepare_malbehavd, safe_static_features
+from src.experiments.malbehavd_pid import (_bootstrap_difference, _fold_effects,
+                                           _timepoint_metrics, _win_tie_loss,
+                                           prepare as prepare_malbehavd,
+                                           safe_static_features)
 from src.experiments.provenance import audit
 from src.experiments.recovery import (SOREL_TAGS, inspect_npz, recover,
                                       recover_ember_dataset, recover_sorel_metadata,
@@ -128,6 +131,39 @@ class ExperimentMathTests(unittest.TestCase):
 
 
 class DatasetGuardTests(unittest.TestCase):
+    def test_event_pid_effect_outputs_replay_fold_and_timepoint_pairs(self):
+        rows = []
+        labels = [0, 0, 1, 1]
+        for fusion, scores, predicted in [
+                ('Fixed_weight', [.2, .8, .6, .7], [0, 1, 1, 1]),
+                ('PID', [.1, .3, .7, .9], [0, 0, 1, 1])]:
+            for row_id, (label, score, decision) in enumerate(zip(labels, scores, predicted)):
+                for event_count in [5, 10]:
+                    rows.append({'row_id': row_id, 'outer_fold': row_id % 2,
+                                 'fusion': fusion, 'event_count': event_count,
+                                 'label': label, 'score': score,
+                                 'predicted_label': decision})
+        predictions = pd.DataFrame(rows)
+        fold_time, pooled_time = _timepoint_metrics(predictions)
+        self.assertEqual(len(fold_time), 8)
+        self.assertEqual(len(pooled_time), 4)
+        final = predictions[predictions.event_count == 10]
+        bootstrap = _bootstrap_difference(final, iterations=100, seed=4)
+        self.assertEqual(bootstrap['comparison'], 'PID_minus_Fixed_weight')
+        self.assertLess(bootstrap['metrics']['fpr']['mean'], 0)
+        metrics = []
+        for fold in [0, 1]:
+            metrics.extend([
+                {'outer_fold': fold, 'fusion': 'Fixed_weight', 'auc': .7,
+                 'ap': .7, 'fpr': .5, 'tpr': .9, 'brier': .3},
+                {'outer_fold': fold, 'fusion': 'PID', 'auc': .8,
+                 'ap': .8, 'fpr': .25, 'tpr': .9, 'brier': .2},
+            ])
+        effects = _fold_effects(pd.DataFrame(metrics))
+        counts = _win_tie_loss(effects)
+        self.assertEqual(counts['auc']['pid_better_folds'], 2)
+        self.assertEqual(counts['fpr']['pid_better_folds'], 2)
+
     def test_malbehavd_prepare_deduplicates_and_freezes_stratified_folds(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)

@@ -168,6 +168,8 @@ def parser():
         help='Run Static/Dynamic/Average/Fixed/P/PI/PID on ordered public API-call reports.')
     event_pid.add_argument('--sequences', type=Path, required=True)
     event_pid.add_argument('--static-features', type=Path, required=True)
+    event_pid.add_argument('--selection', type=Path,
+                           help='Optional predeclared pilot/full cohort manifest used as coverage denominator.')
     event_pid.add_argument('--output', type=Path, required=True)
     event_pid.add_argument('--windows', nargs='+', type=int, default=[5, 10, 15, 20])
     event_pid.add_argument('--target-tpr', type=float, default=.95)
@@ -292,7 +294,7 @@ def main(argv=None):
             result = malbehavd_pid.run_event_pid(
                 args.sequences, args.static_features, args.output, tuple(args.windows),
                 args.target_tpr, args.min_coverage, args.validation_fraction,
-                args.calibration_fraction, args.bootstrap, args.seed)
+                args.calibration_fraction, args.bootstrap, args.seed, args.selection)
             finish_manifest(args.output)
             print(json.dumps({'status': result['status'], 'output': str(args.output.resolve()),
                               'samples': result['samples']}, ensure_ascii=False, indent=2))

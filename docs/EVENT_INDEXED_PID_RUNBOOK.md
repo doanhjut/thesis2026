@@ -86,6 +86,7 @@ chưa cache trong mỗi lần gọi. Không dùng nhiều key để né quota.
 .venv/bin/python scripts/run_experiments.py event-pid \
   --sequences outputs/malbehavd_pid_prepared/api_sequences.csv.gz \
   --static-features outputs/malbehavd_pid_vt/static_features.csv.gz \
+  --selection outputs/malbehavd_pid_vt/selected_cohort.csv \
   --output outputs/malbehavd_pid_confirmatory \
   --windows 5 10 15 20 \
   --target-tpr 0.95 --min-coverage 0.80 \
@@ -109,5 +110,8 @@ Static, Dynamic, Average 50/50, Fixed, P, PI và PID.
   production readiness.
 
 Các tệp chính gồm `fusion_metrics.csv`, `event_predictions.csv.gz`,
-`validation_search.json`, `paired_bootstrap_pid_minus_fixed.json`,
-`summary.json`, `verification.json` và `artifact_sha256.json`.
+`timepoint_metrics.csv`, `timepoint_oof_metrics.csv`,
+`fold_effects_pid_minus_fixed.csv`, `validation_search.json`,
+`paired_bootstrap_pid_minus_fixed.json`, `summary.json`, `verification.json`
+và `artifact_sha256.json`. Hiệu ứng bootstrap được định nghĩa là PID trừ Fixed;
+AUC/AP/TPR dương có lợi cho PID, còn Brier/FPR âm có lợi cho PID.
