@@ -1,5 +1,18 @@
 # Báo cáo dự án — 9 trang
 
+## Bản báo cáo GVHD trước bảo vệ — 20/10/2026
+
+- **[PowerPoint](Bao_cao_GVHD_truoc_bao_ve_20261020.pptx?raw=true)**
+- **[PDF](Bao_cao_GVHD_truoc_bao_ve_20261020.pdf)**
+- **[ZIP gồm PowerPoint, PDF và kịch bản](Bao_cao_GVHD_truoc_bao_ve_20261020.zip?raw=true)**
+- **[Kịch bản nói 10–12 phút](Kich_ban_bao_cao_GVHD_20261020.md)**
+
+Bản này không có demo. Mọi số liệu đều lấy từ artifact đã đo: PID pilot 199 mẫu,
+confirmatory AL/Fidelity trên EMBER và audit tiến độ cohort PID 1.923 mẫu. Bản
+PowerPoint được sinh lại bằng `build_advisor_checkpoint.py`.
+
+---
+
 Cập nhật 13/10/2026. Slide tập trung vào **nội dung dự án, ba đóng góp, bảng/biểu đồ kết quả và tiếp thu góp ý Seminar**. Ghi chú dữ liệu và các việc cần bổ sung được tách thành tài liệu riêng.
 
 - **[Xem slide PDF](Dong_gop_va_bang_chung_thuc_nghiem_GVHD.pdf)**
