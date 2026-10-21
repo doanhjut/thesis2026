@@ -400,7 +400,7 @@ Deletion diễn ra trong không gian feature. Các khía cạnh được báo c�
       \begin{itemize}
         \setlength{\itemsep}{.12cm}
         \item EMBER: 2.000 mẫu, 2.381 feature; 1.500 benign và 500 malware.
-        \item MalBehavD-V1: 199/200 mẫu usable; 100 benign và 99 malware.
+        \item MalBehavD-V1: cohort 200 mẫu, 199 mẫu usable (coverage 99,5\%); 100 benign và 99 malware.
         \item PID ghép 199 metadata tĩnh với chuỗi API ở 5/10/15/20 sự kiện.
       \end{itemize}
     \end{block}
@@ -472,13 +472,13 @@ Deletion diễn ra trong không gian feature. Các khía cạnh được báo c�
 \end{frame}
 
 % ===== 13/15. Kết quả PID: ablation trên dữ liệu ghép cặp =====
-\begin{frame}{Kết quả PID: Ablation trên 199 mẫu ghép cặp}
+\begin{frame}{Kết quả PID: Cohort 200 mẫu, coverage 99,5\%}
 \begin{columns}[T,onlytextwidth]
   \begin{column}{.52\textwidth}
     \centering
     \begin{tikzpicture}
     \begin{axis}[
-      width=\linewidth,height=4.65cm,
+      width=\linewidth,height=4.40cm,
       ybar,bar width=8pt,
       ymin=.90,ymax=.98,ytick={.90,.92,.94,.96,.98},
       symbolic x coords={Static,Dynamic,Average,Fixed,P,PI,PID},
@@ -495,25 +495,25 @@ Deletion diễn ra trong không gian feature. Các khía cạnh được báo c�
   \end{column}
   \begin{column}{.44\textwidth}
     \begin{block}{Kết quả chính}
-      \small
+      \footnotesize
       \begin{itemize}
         \setlength{\itemsep}{.08cm}
         \item Static: 0,9254; Dynamic: 0,9345.
-        \item Average: 0,9582; Fixed: 0,9415.
-        \item \textbf{P: 0,9592}; PI/PID: 0,9583.
+        \item Các luật dung hợp đạt 0,9415--0,9592.
+        \item \textbf{P cao nhất: 0,9592}, tăng 3,37 pp so với Static.
       \end{itemize}
     \end{block}
     \vspace{.05cm}
-    \begin{block}{PID so với Fixed}
-      \small
-      $\Delta$AUC = +0,0130; CI 95\% $[-0,0086;+0,0409]$.\\[.08cm]
-      $\Delta$TPR = +4,10 pp; $\Delta$FPR = +5,06 pp.\\[.08cm]
-      PI và PID khác 0/199 quyết định.
+    \begin{block}{Kết luận về thành phần D}
+      \footnotesize
+      PID--Fixed: $\Delta$AUC = +0,0130; CI 95\% $[-0,0086;+0,0409]$.\\[.08cm]
+      Trung bình $|PID-PI|=0,000109$; lớn nhất 0,001196.\\[.08cm]
+      D làm thay đổi \textbf{0/199 quyết định}: chưa cần thiết ở chuỗi 5--20 sự kiện.
     \end{block}
   \end{column}
 \end{columns}
-\slidehint{Dung hợp cải thiện ranking, nhưng lợi ích riêng của D và khả năng giảm FPR chưa được chứng minh trên cohort này.}
-\note{Khoảng 80 giây. Trên 199 mẫu và 5 outer folds, hai kênh đơn lẻ đạt AUC 0,9254 và 0,9345. Average, P, PI và PID đạt khoảng 0,958 đến 0,959; P có trung bình cao nhất. So ghép cặp PID với Fixed, chênh AUC là +0,0130 nhưng khoảng tin cậy còn đi qua 0. TPR tăng 4,10 điểm phần trăm, đồng thời FPR tăng 5,06 điểm phần trăm. PI và PID không tạo quyết định khác nhau; vì vậy kết quả hỗ trợ tính khả thi của dung hợp thích nghi nhưng chưa chứng minh thành phần D hoặc giảm cảnh báo nhầm.}
+\slidehint{Dung hợp và thành phần P tạo phần cải thiện chính; D chưa cần thiết ở horizon hiện tại. FPR chưa được cải thiện.}
+\note{Khoảng 80 giây. Cohort được thiết kế gồm 200 mẫu; 199 mẫu ghép cặp usable, tương ứng coverage 99,5 phần trăm. Hai kênh đơn lẻ đạt AUC 0,9254 và 0,9345. P đạt trung bình cao nhất 0,9592, tăng 3,37 điểm phần trăm so với Static. So ghép cặp PID với Fixed, chênh AUC là +0,0130 nhưng khoảng tin cậy còn đi qua 0. Phân tích riêng D cho thấy chênh điểm PID--PI trung bình chỉ 0,000109, lớn nhất 0,001196 và không đổi quyết định nào trong 199 mẫu. Đây là kết quả ablation có giá trị: với chuỗi ngắn 5--20 sự kiện, mô hình nên ưu tiên thành phần P đơn giản hơn; chưa có bằng chứng để giữ D hoặc tuyên bố giảm FPR.}
 % Nguồn: results/measured_20261020_malbehavd_pid_pilot200/fusion_summary.csv; paired_bootstrap_pid_minus_fixed.json.
 \end{frame}
 
@@ -530,7 +530,7 @@ Tách bằng chứng cho từng đóng góp, bổ sung PID ablation, đo hiệu 
 \key{Góp ý} & \key{Nội dung đã bổ sung} & \key{Bằng chứng}\\
 \midrule
 Tách đóng góp từng thành phần & Ablation PID; U/H/V trong AL; top-SHAP so với random & 7 luật fusion; 5 chiến lược AL; 2 masking control\\
-Chứng minh công thức PID & Nêu vai trò P/I/D và chọn gain trong validation & 199 mẫu ghép cặp, 5 folds, bootstrap\\
+Chứng minh công thức PID & Nêu vai trò P/I/D, chọn gain trong validation và ablation riêng D & Cohort 200, coverage 99,5\%; 5 folds; bootstrap\\
 Gán nhãn chưa thuyết phục & Báo AULC, nhãn tới mục tiêu và overhead & 25 cặp fold--seed; giảm 92 nhãn so với Random\\
 Độ đo XAI có phù hợp? & Mean/median masking, random control, stability; không gộp OFS & $k=10/25/50$; Spearman trong/giữa fold\\
 AUC tăng ít có ý nghĩa gì? & Báo CI ghép cặp, AP, TPR/FPR và chi phí nhãn & Không chỉ dựa vào Accuracy hoặc AUC điểm cuối\\
@@ -546,7 +546,7 @@ AUC tăng ít có ý nghĩa gì? & Báo CI ghép cặp, AP, TPR/FPR và chi phí
 \begin{block}{Tóm tắt}
   \begin{itemize}
     \setlength{\itemsep}{.15cm}
-    \item \textbf{PID Fusion:} dung hợp đạt AUC khoảng 0,958--0,959 so với 0,9254 tĩnh và 0,9345 động; lợi ích riêng của D chưa rõ.
+    \item \textbf{PID Fusion:} P đạt AUC cao nhất 0,9592; ablation cho thấy D chưa cần thiết ở chuỗi 5--20 sự kiện và không đổi quyết định.
     \item \textbf{XAI-Guided AL:} XAI\_full đạt target với 492 nhãn, giảm 92 nhãn so với Random và 28 nhãn so với Uncertainty.
     \item \textbf{Fidelity:} che top-50 SHAP làm AUC giảm 0,3067, trong khi random giảm 0,0010; stability được báo riêng.
   \end{itemize}
@@ -557,7 +557,7 @@ AUC tăng ít có ý nghĩa gì? & Báo CI ghép cặp, AP, TPR/FPR và chi phí
 \begin{center}
   {\Large\bfseries\color{UETBlue}Em xin trân trọng cảm ơn Thầy!}
 \end{center}
-\note{Khoảng 45 giây. Em xin chốt lại ba đóng góp đều có bằng chứng thực nghiệm thành phần. PID cho thấy giá trị của dung hợp tĩnh--động và xu hướng cải thiện ranking, nhưng chưa chứng minh lợi ích riêng của D hoặc giảm FPR. Active Learning tạo giá trị rõ hơn ở số nhãn cần thiết. Fidelity cho thấy top-SHAP tác động mạnh hơn random và có độ ổn định trung bình. Với phạm vi kết luận này, em đề xuất luận văn đủ cơ sở để hoàn thiện bản bảo vệ và xin Thầy xác nhận cách chốt nội dung.}
+\note{Khoảng 45 giây. Em xin chốt lại ba đóng góp đều có bằng chứng thực nghiệm thành phần. Với PID, P tạo phần cải thiện chính; D không đổi quyết định trong horizon 5--20 sự kiện. Kết quả âm này giúp chọn cấu hình gọn hơn thay vì giữ một thành phần không tạo thêm giá trị, đồng thời chưa cho phép tuyên bố giảm FPR. Active Learning tạo giá trị rõ hơn ở số nhãn cần thiết. Fidelity cho thấy top-SHAP tác động mạnh hơn random và có độ ổn định trung bình. Với phạm vi kết luận này, em đề xuất luận văn đủ cơ sở để hoàn thiện bản bảo vệ và xin Thầy xác nhận cách chốt nội dung.}
 \end{frame}
 
 \end{document}
