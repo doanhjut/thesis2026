@@ -1,0 +1,851 @@
+\documentclass[aspectratio=169,10pt]{beamer}
+
+% ----- Vietnamese + fonts (PDFLaTeX-compatible) -----
+\usepackage[utf8]{inputenc}
+\usepackage[T5]{fontenc}
+\usepackage[vietnamese]{babel}
+\usepackage{lmodern}
+
+% ----- Packages -----
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{colortbl}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{adjustbox}
+\usepackage{ragged2e}
+\usepackage{listings}
+\usepackage{tikz}
+\usepackage{amsmath}
+\usepackage{pifont}
+\graphicspath{{assets/}}
+
+% ----- UET color palette -----
+\definecolor{UETBlue}{RGB}{17,74,126}
+\definecolor{UETBlueDark}{RGB}{7,34,62}
+\definecolor{UETBlueLight}{RGB}{231,242,250}
+\definecolor{UETCyan}{RGB}{0,163,224}
+\definecolor{UETGray}{RGB}{85,96,110}
+\definecolor{UETOrange}{RGB}{244,128,36}
+
+\usetheme{Madrid}
+\usecolortheme[named=UETBlue]{structure}
+\setbeamercolor{normal text}{fg=UETBlueDark,bg=white}
+\setbeamercolor{frametitle}{fg=UETBlueDark,bg=white}
+\setbeamercolor{title}{fg=white,bg=UETBlue}
+\setbeamercolor{block title}{fg=white,bg=UETBlue}
+\setbeamercolor{block body}{fg=UETBlueDark,bg=UETBlueLight}
+\setbeamercolor{alerted text}{fg=UETOrange}
+\setbeamercolor{section in toc}{fg=UETBlue}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{itemize item}{\color{UETCyan}$\blacktriangleright$}
+\setbeamertemplate{itemize subitem}{\color{UETCyan}$\circ$}
+\setbeamertemplate{enumerate item}{\color{UETCyan}\insertenumlabel.}
+
+% ----- Header / footer -----
+\setbeamertemplate{frametitle}{
+    \vspace{0.2cm}
+    {\large\bfseries\color{UETBlueDark}\insertframetitle}
+    \vspace{0.12cm}
+    {\color{UETBlue}\rule{\linewidth}{0.8pt}}
+}
+\setbeamertemplate{footline}{
+    \leavevmode
+    \vspace{0.05cm}
+    \hbox{
+        \begin{beamercolorbox}[wd=.72\paperwidth, ht=2.2ex, dp=1ex, leftskip=0.3cm]{}
+        \scriptsize\color{UETGray}
+        \end{beamercolorbox}
+
+        \begin{beamercolorbox}[wd=.28\paperwidth, ht=2.2ex, dp=1ex, rightskip=0.3cm]{}
+        \hfill
+        \scriptsize\color{UETGray}
+        \insertframenumber/\inserttotalframenumber
+        \hspace{0.12cm}
+        % Chú ý: Uncomment 2 dòng dưới nếu bạn đã có ảnh logo trong assets/
+        % \includegraphics[height=1.8ex]{fit_logo.png}
+        % \hspace{0.08cm}
+        % \includegraphics[height=1.8ex]{uet_logo.png}
+        \end{beamercolorbox}
+    }
+    \vspace{0.05cm}
+}
+\newcommand{\key}[1]{\textcolor{UETBlue}{\textbf{#1}}}
+\newcommand{\minihead}[1]{\textcolor{UETBlue}{\textbf{#1}}}
+\newcolumntype{Y}{>{\RaggedRight\arraybackslash}X}
+
+\begin{document}
+
+% --- SLIDE 1: BÌA 1 ---
+\begin{frame}[plain]
+\begin{tikzpicture}[remember picture,overlay]
+% \node[anchor=north east] at ([xshift=-0.35cm,yshift=-0.22cm]current page.north east) {\includegraphics[height=1.08cm]{uet_logo.png}};
+% \node[anchor=north east] at ([xshift=-1.55cm,yshift=-0.22cm]current page.north east) {\includegraphics[height=1.08cm]{fit_logo.png}};
+\end{tikzpicture}
+\begin{center}
+\vspace{0.15cm}
+{\bfseries\color{UETBlueDark}\large ĐẠI HỌC QUỐC GIA HÀ NỘI}\\
+\vspace{0.03cm}
+{\bfseries\color{UETBlueDark}\large TRƯỜNG ĐẠI HỌC CÔNG NGHỆ}\\
+\vspace{0.38cm}
+{\bfseries\color{UETBlue}\fontsize{28}{32}\selectfont BẢO VỆ LUẬN VĂN THẠC SĨ}\\
+\vspace{0.28cm}
+{\bfseries\color{UETBlueDark}\normalsize NGÀNH: KỸ THUẬT PHẦN MỀM \hspace{1.2cm} MÃ SỐ: 8480103.01}\\
+\vspace{0.22cm}
+{\bfseries\color{UETBlueDark}\normalsize NGƯỜI THỰC HIỆN: \textcolor{UETBlue}{LƯU VĂN DOANH}}\\
+\vspace{0.48cm}
+{\Large\bfseries\color{UETBlueDark}
+Hệ thống phát hiện Ransomware dựa trên Phân tích đa tầng,\\
+tích hợp Học tích cực \& Kiểm chứng độ trung thực XAI
+}\\
+\vspace{0.28cm}
+{\normalsize\color{UETBlueDark} GVHD: PGS.TS. Trương Ninh Thuận}\\
+\vfill
+{\small\color{UETGray} Hà Nội, 2026}
+\end{center}
+\end{frame}
+
+% --- SLIDE 2: BÌA 2 ---
+\begin{frame}[plain]
+\begin{tikzpicture}[remember picture,overlay]
+\fill[UETBlue] (current page.south west) rectangle (current page.north east);
+% \node[anchor=north east] at ([xshift=-0.35cm,yshift=-0.22cm]current page.north east) {\includegraphics[height=1.08cm]{uet_logo.png}};
+% \node[anchor=north east] at ([xshift=-1.55cm,yshift=-0.22cm]current page.north east) {\includegraphics[height=1.08cm]{fit_logo.png}};
+\end{tikzpicture}
+\begin{center}
+\vspace{0.15cm}
+{\bfseries\color{white}\large ĐẠI HỌC QUỐC GIA HÀ NỘI}\\
+\vspace{0.03cm}
+{\bfseries\color{white}\large TRƯỜNG ĐẠI HỌC CÔNG NGHỆ}\\
+\vspace{0.38cm}
+{\bfseries\color{white}\fontsize{28}{32}\selectfont BẢO VỆ LUẬN VĂN THẠC SĨ}\\
+\vspace{0.28cm}
+{\bfseries\color{white}\normalsize NGÀNH: KỸ THUẬT PHẦN MỀM \hspace{1.2cm} MÃ SỐ: 8480103.01}\\
+\vspace{0.22cm}
+{\bfseries\color{white}\normalsize NGƯỜI THỰC HIỆN: LƯU VĂN DOANH}\\
+\vspace{0.48cm}
+{\Large\bfseries\color{white}
+Hệ thống phát hiện Ransomware dựa trên Phân tích đa tầng,\\
+tích hợp Học tích cực \& Kiểm chứng độ trung thực XAI
+}\\
+\vspace{0.28cm}
+{\normalsize\color{white} GVHD: PGS.TS. Trương Ninh Thuận}\\
+\vfill
+{\small\color{white} Hà Nội, 2026}
+\end{center}
+\end{frame}
+
+\setcounter{framenumber}{0}
+
+% --- SLIDE 3 ---
+\begin{frame}{Tổng quan}
+\small
+\begin{enumerate}
+    \item \key{Đặt vấn đề}: Sự trỗi dậy của Ransomware, giới hạn của hệ thống EDR hiện tại.
+    \item \key{Cơ sở lý thuyết}: Đặc trưng tệp PE, LightGBM, TreeSHAP, Active Learning.
+    \item \key{Kiến trúc đề xuất}: Phân tích tĩnh, Honeypot động và PID Fusion.
+    \item \key{Ba đóng góp cốt lõi}: PID Fusion, XAI-Guided AL, Khung đo lường Fidelity.
+    \item \key{Thực nghiệm}: Đánh giá tách biệt từng đóng góp bằng ablation, nhiều fold và nhiều seed.
+    \item \key{Kết luận}: Tổng hợp bằng chứng, giới hạn suy rộng và ý nghĩa vận hành.
+\end{enumerate}
+\vspace{0.25cm}
+\begin{block}{Mục tiêu của bài trình bày}
+Làm rõ luận văn giải quyết bài toán gì, ba đóng góp khác nghiên cứu hiện có ở đâu và bằng chứng thực nghiệm nào hỗ trợ từng phát biểu.
+\end{block}
+\end{frame}
+
+% --- SLIDE 4 ---
+\begin{frame}{Bối cảnh: Ransomware và yêu cầu phát hiện hiện đại}
+\small
+\begin{columns}[T,onlytextwidth]
+\column{0.56\textwidth}
+\minihead{Ransomware hiện đại}
+\begin{itemize}
+    \item Nhiều biến thể sử dụng packing, obfuscation, process injection, sleep evasion và mã hóa ngắt quãng.
+    \item Mô hình RaaS làm tốc độ thay đổi biến thể nhanh hơn, gây khó cho phát hiện dựa thuần chữ ký.
+    \item Hệ thống phòng thủ cần kết hợp tín hiệu tĩnh, hành vi động và thông tin giải thích cho chuyên gia SOC.
+\end{itemize}
+
+\column{0.40\textwidth}
+\begin{block}{Yêu cầu kỹ thuật EDR}
+\begin{itemize}
+    \item Phát hiện sớm, giảm báo động nhầm.
+    \item Có lý do giải thích minh bạch.
+    \item Cập nhật mô hình với chi phí gán nhãn thấp.
+\end{itemize}
+\end{block}
+\end{columns}
+
+\vspace{0.2cm}
+\begin{alertblock}{Vấn đề nghiên cứu}
+Làm thế nào để cân bằng \key{hiệu năng phát hiện}, \key{độ trễ hệ thống}, \key{khả năng giải thích} và \key{chi phí cập nhật nhãn} trong một hệ thống?
+\end{alertblock}
+\end{frame}
+
+% --- SLIDE 5 ---
+\begin{frame}{Hạn chế của các hướng tiếp cận riêng lẻ}
+\small
+\begin{columns}[T,onlytextwidth]
+\column{0.50\textwidth}
+\begin{block}{Phân tích tĩnh}
+\begin{itemize}
+    \item \textbf{Ưu:} Nhanh, phù hợp quét diện rộng.
+    \item \textbf{Nhược:} Dễ bị vượt mặt bởi packing, obfuscation hoặc import động.
+\end{itemize}
+\end{block}
+
+\begin{block}{Giám sát động}
+\begin{itemize}
+    \item \textbf{Ưu:} Quan sát được hành vi I/O, mã hóa thực tế.
+    \item \textbf{Nhược:} Chi phí thu thập và xử lý cao hơn, không phù hợp quét toàn bộ mẫu theo cùng một mức giám sát.
+\end{itemize}
+\end{block}
+
+\column{0.46\textwidth}
+\begin{block}{AI hộp đen (Black-box ML)}
+\begin{itemize}
+    \item \textbf{Ưu:} Học được quan hệ phi tuyến trong không gian đặc trưng PE nhiều chiều.
+    \item \textbf{Nhược:} Xác suất dự đoán đơn lẻ chưa cung cấp đủ căn cứ điều tra cho chuyên gia SOC.
+\end{itemize}
+\end{block}
+
+\begin{block}{Active Learning truyền thống}
+\begin{itemize}
+    \item Chủ yếu chọn mẫu dựa trên Uncertainty (Độ bất định xác suất).
+    \item Có thể tập trung vào các điểm biên lặp lại mà bỏ qua mẫu có xung đột giải thích đáng chú ý.
+\end{itemize}
+\end{block}
+\end{columns}
+\end{frame}
+
+% --- SLIDE 6 ---
+\begin{frame}{Khoảng trống nghiên cứu}
+\scriptsize
+\begin{tabularx}{\linewidth}{p{0.22\linewidth}Y Y}
+\toprule
+\textbf{Nhóm hướng tiếp cận} & \textbf{Điểm mạnh} & \textbf{Khoảng trống trong phạm vi khảo sát} \\
+\midrule
+Phân tích tĩnh \& động & Bù trừ ưu nhược điểm cho nhau & Nhiều hệ thống dùng luật hoặc trọng số cố định, chưa khai thác trạng thái của chuỗi quan sát khi dung hợp. \\
+ML/XAI cho mã độc & Tăng khả năng diễn giải quyết định & Thường dừng ở trực quan hóa, thiếu đối chứng deletion ngẫu nhiên và đánh giá độ ổn định cho dữ liệu PE dạng bảng. \\
+Active Learning & Giảm chi phí nhãn & Thiếu sự liên kết giữa \textbf{xung đột lời giải thích XAI} và việc chọn mẫu khó. \\
+\bottomrule
+\end{tabularx}
+
+\vspace{0.25cm}
+\begin{alertblock}{Khoảng trống trọng tâm}
+Trong phạm vi khảo sát của luận văn, còn thiếu một quy trình đánh giá thống nhất cho: \key{dung hợp tĩnh--động theo chuỗi}, \key{học tích cực hướng dẫn bởi XAI} và \key{kiểm chứng Fidelity} trên dữ liệu PE dạng bảng.
+\end{alertblock}
+\end{frame}
+
+% --- SLIDE 7 ---
+\begin{frame}{Mục tiêu nghiên cứu và câu hỏi nghiên cứu}
+\small
+\begin{columns}[T,onlytextwidth]
+\column{0.46\textwidth}
+\begin{block}{Mục tiêu tổng quát}
+Xây dựng và đánh giá hệ thống phát hiện mã độc Windows đa tầng, hướng tới ransomware, có cơ chế dung hợp thích nghi, học tích cực và kiểm chứng lời giải thích.
+\end{block}
+
+\begin{block}{Phạm vi}
+AL/Fidelity được đánh giá trên đặc trưng tĩnh EMBER; PID được đánh giá trên MalBehavD-V1 với metadata tĩnh và chuỗi API động ghép cặp. Kết quả chưa được suy rộng riêng cho ransomware.
+\end{block}
+
+\column{0.50\textwidth}
+\begin{block}{Ba câu hỏi nghiên cứu}
+\begin{enumerate}
+    \item Dung hợp tĩnh--động theo chuỗi có cải thiện khả năng xếp hạng so với từng kênh và trọng số cố định không?
+    \item Tín hiệu XAI có giúp đạt mục tiêu với ít nhãn hơn uncertainty hoặc random không?
+    \item Top-$|$SHAP$|$ có tác động lớn hơn masking ngẫu nhiên và thứ hạng có ổn định qua fold/seed không?
+\end{enumerate}
+\end{block}
+\end{columns}
+\end{frame}
+
+% --- SLIDE 8 ---
+\begin{frame}{Ba đóng góp chính của luận văn}
+\small
+\begin{columns}[T,onlytextwidth]
+\column{0.31\textwidth}
+\begin{block}{1. Adaptive PID Fusion}
+Đề xuất luật PID để cập nhật trọng số dung hợp tĩnh--động theo chuỗi sự kiện; đánh giá bằng ablation Static, Dynamic, Average, Fixed, P, PI và PID.
+\end{block}
+
+\column{0.31\textwidth}
+\begin{block}{2. XAI-Guided AL}
+Đưa Directional Entropy và SHAP Variance vào điểm truy vấn; đánh giá bằng AULC, số nhãn tới mục tiêu và overhead trên 5 folds $\times$ 5 seeds.
+\end{block}
+
+\column{0.31\textwidth}
+\begin{block}{3. Fidelity Framework}
+Đề xuất quy trình kiểm chứng TreeSHAP bằng deletion top-$|$SHAP$|$ so với random, hai baseline masking và độ ổn định thứ hạng qua fold/seed.
+\end{block}
+\end{columns}
+\end{frame}
+
+% --- SLIDE 9 ---
+\begin{frame}{Cơ sở dữ liệu PE và đặc trưng tĩnh}
+\small
+\begin{columns}[T,onlytextwidth]
+\column{0.52\textwidth}
+\minihead{Nhóm đặc trưng chính (Không gian 2381 chiều EMBER)}
+\begin{itemize}
+    \item Header: DOS, PE/NT, Optional Header, Section Table.
+    \item Entropy section hỗ trợ nhận diện packing hoặc obfuscation.
+    \item Import/API patterns: tệp, tiến trình, registry, mã hóa.
+    \item Byte n-grams và thống kê hình thái của ảnh PE.
+\end{itemize}
+
+\column{0.44\textwidth}
+\begin{block}{Entropy Shannon}
+\[
+H(X)=-\sum_{i=1}^{256}p(x_i)\log_2p(x_i)
+\]
+Entropy cao là tín hiệu thống kê quan trọng, nhưng mã độc Zero-day thường cố tình làm giả Header để có Entropy thấp như tệp lành.
+\end{block}
+\end{columns}
+
+\vspace{0.2cm}
+\begin{block}{Nguyên tắc sử dụng}
+Đặc trưng PE được dùng làm tín hiệu đầu vào cho mô hình LightGBM; kết luận cuối cần xem xét thêm xác suất dự đoán, giải thích SHAP và hành vi động.
+\end{block}
+\end{frame}
+
+% --- SLIDE 10 ---
+\begin{frame}{LightGBM và TreeSHAP trong phân tích tĩnh}
+\small
+\begin{columns}[T,onlytextwidth]
+\column{0.48\textwidth}
+\begin{block}{LightGBM (Thuật toán lõi)}
+\begin{itemize}
+    \item Tốc độ siêu nhanh, phù hợp dữ liệu bảng (Tabular Data) nhiều chiều từ PE.
+    \item Sinh xác suất $P_{static}$ làm tín hiệu phát hiện ban đầu.
+    \item Phù hợp với thực nghiệm nhiều fold, nhiều seed trên dữ liệu bảng 2.381 chiều.
+\end{itemize}
+\end{block}
+
+\column{0.48\textwidth}
+\begin{block}{TreeSHAP (Bộ giải thích)}
+\begin{itemize}
+    \item Phân rã dự đoán thành đóng góp lực kéo (+/-) của từng đặc trưng.
+    \item Vạch trần các dấu hiệu ẩn: Tại sao Header an toàn nhưng API lại gọi mã hóa?
+    \item Giải mã "Hộp đen", hỗ trợ kỹ sư Forensic.
+\end{itemize}
+\end{block}
+\end{columns}
+\end{frame}
+
+% --- SLIDE 11 ---
+\begin{frame}{Kiến trúc tổng thể hệ thống đề xuất}
+\small
+\begin{center}
+    \includegraphics[width=0.94\linewidth,height=0.62\textheight,keepaspectratio]{architecture.png}
+\end{center}
+\vspace{0.15cm}
+\begin{block}{Ý tưởng cốt lõi}
+Cổng bất định xác định mẫu cần bổ sung tín hiệu động. PID Fusion cập nhật trọng số ở bước cuối; XAI-Guided AL và Fidelity tạo hai vòng kiểm chứng cho cập nhật mô hình và lời giải thích.
+\end{block}
+\end{frame}
+
+% --- SLIDE 12 ---
+\begin{frame}{Luồng xử lý: Từ mẫu PE đến Quyết định cảnh báo}
+\small
+\begin{enumerate}
+    \item \key{Trích xuất}: File PE được parse thành vector 2381 chiều.
+    \item \key{Dự đoán tĩnh}: LightGBM sinh $P_{static}$ và TreeSHAP sinh vector giải thích.
+    \item \key{Cổng bất định}: Nếu mẫu nằm gần ngưỡng [0.4 - 0.6] hoặc có dấu hiệu giải thích xung đột, kích hoạt giám sát động.
+    \item \key{Phân tích động}: Chuỗi API được chuyển thành $P_{dynamic}(t)$ tại các mốc sự kiện.
+    \item \key{Dung hợp PID}: Cập nhật trọng số giữa $P_{static}$ và $P_{dynamic}(t)$ theo lịch sử sai lệch.
+    \item \key{Đầu ra}: Cảnh báo SOC, Báo cáo SHAP Forensic và Hàng đợi Active Learning.
+\end{enumerate}
+\end{frame}
+
+% --- SLIDE 13 ---
+\begin{frame}{Cơ chế dung hợp PID theo chuỗi sự kiện}
+\small
+\begin{columns}[T,onlytextwidth]
+\column{0.52\textwidth}
+\begin{block}{Công thức dung hợp}
+\[
+e_t=P_{dynamic}(t)-P_{static}
+\]
+\[
+u_t=K_p e_t+K_i\sum_{\tau\leq t}e_\tau+K_d(e_t-e_{t-1})
+\]
+\[
+w_{t+1}=\text{clip}(w_t+u_t),\quad
+P_{final}(t)=w_tP_{static}+(1-w_t)P_{dynamic}(t)
+\]
+\end{block}
+
+\column{0.43\textwidth}
+\minihead{Bản chất điều khiển}
+\begin{itemize}
+    \item Khâu \textbf{Tỷ lệ ($P$)}: Phản ứng với bất đồng hiện tại.
+    \item Khâu \textbf{Tích phân ($I$)}: Tích lũy bất đồng có hệ thống.
+    \item Khâu \textbf{Vi phân ($D$)}: Phản ứng với tốc độ thay đổi tín hiệu.
+\end{itemize}
+\end{columns}
+\vspace{0.15cm}
+\begin{alertblock}{Lý do lựa chọn và cách kiểm chứng}
+PID cung cấp ba cơ chế nhớ ngắn gọn cho tín hiệu tuần tự. Hiệu quả không được suy ra từ công thức mà được kiểm tra bằng ablation trên cùng outer folds và bootstrap ghép cặp.
+\end{alertblock}
+\end{frame}
+
+% --- SLIDE 14 ---
+\begin{frame}{Tín hiệu động theo chuỗi API}
+\small
+\begin{columns}[T,onlytextwidth]
+\column{0.52\textwidth}
+\minihead{Biểu diễn được sử dụng trong thực nghiệm PID}
+\begin{itemize}
+    \item Nguồn: báo cáo MalBehavD-V1 đã công bố, không tải hoặc thực thi tệp PE.
+    \item Trình tự lời gọi API được tích lũy tại các mốc 5, 10, 15 và 20 sự kiện.
+    \item Mỗi tiền tố chuỗi tạo $P_{dynamic}(t)$ để đánh giá quá trình hội tụ sớm.
+\end{itemize}
+
+\column{0.44\textwidth}
+\begin{block}{Vai trò}
+\begin{itemize}
+    \item Cung cấp tín hiệu hành vi bổ sung cho metadata tĩnh.
+    \item Cho phép so sánh Static-only, Dynamic-only và các luật dung hợp trên cùng mẫu.
+    \item Trục $t$ là số sự kiện API, không phải số giây thực thi.
+\end{itemize}
+\end{block}
+\end{columns}
+\end{frame}
+
+% --- SLIDE 15 ---
+\begin{frame}{Học tích cực hướng dẫn bởi XAI (XAI-Guided AL)}
+\small
+\begin{columns}[T,onlytextwidth]
+\column{0.50\textwidth}
+\begin{block}{Hàm truy vấn thông minh}
+\[
+Q(x) = 0.3\widehat U(x) + 0.4\widehat H(x) + 0.3\widehat V(x)
+\]
+\begin{itemize}
+    \item $U(x)$: Bất định xác suất.
+    \item $H(x)$: \textbf{Directional Entropy}, đo mức xung đột hướng của đóng góp SHAP.
+    \item $V(x)$: \textbf{SHAP Variance}, đo mức phân tán độ lớn đóng góp.
+\end{itemize}
+\end{block}
+
+\column{0.46\textwidth}
+\begin{block}{Ý nghĩa}
+\begin{itemize}
+    \item Kết hợp bất định đầu ra với cấu trúc của lời giải thích để xếp hạng mẫu cần gán nhãn.
+    \item Thuật toán chỉ chọn mẫu; nhãn vẫn do oracle/chuyên gia cung cấp, không dùng pseudo-label.
+\end{itemize}
+\end{block}
+\end{columns}
+\end{frame}
+
+% --- SLIDE 16 ---
+\begin{frame}{Khung kiểm chứng Fidelity cho TreeSHAP}
+\small
+\begin{columns}[T,onlytextwidth]
+\column{0.31\textwidth}
+\begin{block}{Deletion Top-SHAP}
+Đo độ sụt AUC khi che $k\in\{10,25,50\}$ đặc trưng có $|$SHAP$|$ lớn nhất bằng mean hoặc median huấn luyện.
+\end{block}
+
+\hfill
+\column{0.31\textwidth}
+\begin{block}{Đối chứng ngẫu nhiên}
+Che ngẫu nhiên cùng số đặc trưng và cùng baseline để loại trừ hiệu ứng chỉ do số chiều bị thay đổi.
+\end{block}
+
+\hfill
+\column{0.31\textwidth}
+\begin{block}{Rank Stability}
+Đo Spearman và Jaccard của thứ hạng đặc trưng giữa seed trong cùng fold và giữa các fold.
+\end{block}
+\end{columns}
+
+\vspace{0.25cm}
+\begin{block}{Nguyên tắc báo cáo}
+Các thành phần được báo riêng. Luận văn không gộp thành OFS khi chưa có phép chuẩn hóa và trọng số chung được kiểm định cho miền mã độc PE.
+\end{block}
+\end{frame}
+
+% --- SLIDE 17 ---
+\begin{frame}{Thiết lập thực nghiệm và dữ liệu}
+\small
+\begin{columns}[T,onlytextwidth]
+\column{0.49\textwidth}
+\begin{block}{AL và Fidelity: EMBER 2018}
+\begin{itemize}
+    \item 2.000 mẫu (1.500 benign, 500 malware), 2.381 đặc trưng tĩnh.
+    \item 5 outer folds $\times$ 5 seeds: 25 cặp fold--seed.
+    \item Test không tham gia chọn mẫu, tham số hoặc threshold.
+\end{itemize}
+\end{block}
+
+\begin{block}{PID: MalBehavD-V1}
+\begin{itemize}
+    \item 199/200 mẫu ghép cặp usable: 100 benign, 99 malware.
+    \item 199 metadata tĩnh an toàn và chuỗi API tại 5/10/15/20 sự kiện.
+    \item 5 outer folds; bootstrap ghép cặp 1.000 lần.
+\end{itemize}
+\end{block}
+
+\column{0.47\textwidth}
+\begin{block}{Mục tiêu đo kiểm}
+\begin{itemize}
+    \item PID: AUC, AP, Brier, FPR/TPR và ablation thành phần.
+    \item AL: AULC, số nhãn tới mục tiêu và query overhead.
+    \item Fidelity: deletion top-SHAP/random và độ ổn định thứ hạng.
+\end{itemize}
+\end{block}
+\end{columns}
+\end{frame}
+
+% --- SLIDE 18 ---
+\begin{frame}{\key{Kết quả 1:} Ablation dung hợp tĩnh--động}
+\small
+\begin{columns}[T,onlytextwidth]
+\column{0.48\textwidth}
+Dựa trên \textbf{199 mẫu ghép cặp} và 5 outer folds:
+\begin{itemize}
+    \item Static-only: AUC \textbf{0.9254}; Dynamic-only: \textbf{0.9345}.
+    \item Average: \textbf{0.9582}; Fixed: \textbf{0.9415}.
+    \item P đạt \textbf{0.9592}; PI và PID cùng đạt \textbf{0.9583}.
+    \item PID--Fixed: $\Delta$AUC \textbf{+0.0130}, CI 95\% $[-0.0086;+0.0409]$.
+\end{itemize}
+
+\column{0.48\textwidth}
+\begin{center}
+    \includegraphics[width=\linewidth,height=0.54\textheight,keepaspectratio]{latency_jitter_plot.png}
+\end{center}
+\end{columns}
+\vspace{0.2cm}
+\begin{alertblock}{Kết luận}
+Dung hợp hai nguồn cải thiện khả năng xếp hạng trong cohort này. $P$ tạo phần lớn khác biệt; PI/PID không khác nhau về quyết định. $\Delta$TPR = +4.10 pp nhưng $\Delta$FPR = +5.06 pp, vì vậy chưa kết luận PID làm giảm FPR.
+\end{alertblock}
+\end{frame}
+
+% --- SLIDE 19 ---
+\begin{frame}{\key{Kết quả 2:} Cải thiện thông qua XAI-Guided Active Learning}
+\small
+\begin{columns}[T,onlytextwidth]
+\column{0.48\textwidth}
+Kết quả xác nhận trên 25 cặp fold--seed:
+\begin{itemize}
+    \item XAI-full đạt mục tiêu với \textbf{492 nhãn}; Random cần \textbf{584}, Uncertainty cần \textbf{520}.
+    \item Tiết kiệm \textbf{92 nhãn (15.8\%)} so với Random và \textbf{28 nhãn (5.4\%)} so với Uncertainty.
+    \item U+H so với Random: $\Delta$ROC-AULC \textbf{+0.00425}, $\Delta$AP-AULC \textbf{+0.01498}; thắng 5/5 folds.
+\end{itemize}
+
+\column{0.48\textwidth}
+\begin{center}
+    \includegraphics[width=\linewidth,height=0.54\textheight,keepaspectratio]{al_learning_curve.png}
+\end{center}
+\end{columns}
+\vspace{0.2cm}
+\begin{block}{Ý nghĩa thực tiễn}
+Giá trị chính nằm ở hiệu quả sử dụng ngân sách nhãn và chất lượng toàn bộ đường học; query overhead của XAI-full chiếm khoảng \textbf{5.42\%} thời gian train+query.
+\end{block}
+\end{frame}
+
+% --- SLIDE 20 ---
+\begin{frame}{So sánh chiến lược chọn mẫu Active Learning}
+\scriptsize
+\begin{tabularx}{\linewidth}{p{0.25\linewidth}Y Y}
+\toprule
+\textbf{Chiến lược} & \textbf{ROC-AULC} & \textbf{Số nhãn tới mục tiêu} \\
+\midrule
+Random Sampling & 0.9288 & 584 \\
+Uncertainty Sampling & 0.9313 & 520 \\
+U+H & \textbf{0.9330} & 508 \\
+U+V & 0.9304 & \textbf{488} \\
+\rowcolor{UETBlueLight}
+\textbf{XAI-full} & \textbf{0.9322} & \textbf{492} \\
+\bottomrule
+\end{tabularx}
+
+\vspace{0.2cm}
+\begin{alertblock}{Kết luận}
+Directional Entropy đóng góp rõ nhất vào AULC; XAI-full đạt mục tiêu với ít nhãn hơn hai baseline chính. Không có một chiến lược duy nhất tốt nhất trên mọi tiêu chí.
+\end{alertblock}
+\end{frame}
+
+% --- SLIDE 21 ---
+\begin{frame}{\key{Kết quả 3:} Đo lường Độ trung thực (Fidelity) của XAI}
+\scriptsize
+\begin{columns}[T,onlytextwidth]
+\column{0.54\textwidth}
+\begin{table}
+    \begin{tabularx}{\linewidth}{l Y c}
+    \toprule
+    \textbf{Phép đo} & \textbf{Top-SHAP} & \textbf{Random} \\
+    \midrule
+    AUC drop, $k=10$ & 0.0478 & 0.0002 \\
+    AUC drop, $k=25$ & 0.1359 & 0.0005 \\
+    AUC drop, $k=50$ & \textbf{0.3067} & 0.0010 \\
+    \rowcolor{UETBlueLight}
+    \textbf{Spearman thứ hạng} & \textbf{0.614 trong fold} & \textbf{0.551 giữa fold} \\
+    \bottomrule
+    \end{tabularx}
+\end{table}
+
+\column{0.42\textwidth}
+\centering
+\includegraphics[width=\linewidth,height=0.48\textheight,keepaspectratio]{feature_masking_drop.png}
+
+\vspace{0.08cm}
+{\scriptsize Độ sụt AUC khi che top-$|$SHAP$|$ so với cùng số đặc trưng ngẫu nhiên.}
+\end{columns}
+
+\vspace{0.12cm}
+\begin{block}{Ý nghĩa}
+Deletion tạo khoảng cách lớn so với random ở cả ba mức $k$; stability ở mức trung bình. Kết quả hỗ trợ độ bám mô hình của TreeSHAP nhưng không đồng nghĩa giải thích nhân quả.
+\end{block}
+\end{frame}
+
+% --- SLIDE 22 ---
+\begin{frame}{Case study: Cách đọc giải thích ở mức từng mẫu}
+\small
+\begin{columns}[T,onlytextwidth]
+\column{0.48\textwidth}
+\begin{block}{Quy trình phân tích một mẫu kiểm thử}
+Với mỗi mẫu, TreeSHAP trả về hướng và độ lớn đóng góp. Báo cáo cần trình bày:
+\begin{enumerate}
+    \item Xác suất dự đoán và nhãn tham chiếu.
+    \item Các đặc trưng có $|$SHAP$|$ lớn nhất cùng chiều đóng góp.
+    \item Đối chiếu nhóm đặc trưng với cấu trúc PE và kết quả deletion.
+\end{enumerate}
+\end{block}
+
+\vspace{0.1cm}
+Tên chỉ số đặc trưng cần được ánh xạ về nhóm Header, Section, Import hoặc Byte Histogram; không diễn giải chỉ từ số thứ tự cột.
+
+\column{0.48\textwidth}
+\begin{center}
+    \includegraphics[width=\linewidth,height=0.54\textheight,keepaspectratio]{shap_top_features.png}
+\end{center}
+\end{columns}
+\end{frame}
+
+% --- SLIDE 23 ---
+\begin{frame}{Dashboard XAI và Kịch bản vận hành SOC}
+\small
+\begin{columns}[T,onlytextwidth]
+\column{0.44\textwidth}
+\begin{block}{Luồng vận hành (End-to-End)}
+Phân tích tĩnh $\to$ kích hoạt phân tích động cho mẫu cần thiết $\to$ dung hợp theo chuỗi $\to$ sinh giải thích $\to$ đưa mẫu ưu tiên vào hàng đợi gán nhãn.
+\end{block}
+
+\begin{block}{Dashboard XAI}
+\begin{itemize}
+    \item Hiển thị riêng xác suất tĩnh, động và điểm dung hợp.
+    \item Lưu fold, cấu hình, threshold và vết dự đoán để tái lập.
+    \item Xếp hạng hàng đợi Active Learning; chuyên gia là người quyết định nhãn.
+\end{itemize}
+\end{block}
+
+\column{0.52\textwidth}
+\begin{center}
+    \includegraphics[width=\linewidth,height=0.62\textheight,keepaspectratio]{dashboard_demo.png}
+\end{center}
+\end{columns}
+\end{frame}
+
+% --- SLIDE 24 ---
+\begin{frame}{Hyperparameter tuning và kiểm soát ổn định}
+\small
+\begin{columns}[T,onlytextwidth]
+\column{0.49\textwidth}
+\begin{block}{Tối ưu mô hình}
+\begin{itemize}
+    \item Tinh chỉnh LightGBM và luật dung hợp trên train--validation của từng outer fold.
+    \item Không sử dụng test để chọn gain, trọng số, threshold hoặc chiến lược truy vấn.
+\end{itemize}
+\end{block}
+
+\column{0.47\textwidth}
+\begin{block}{Ổn định PID/AL}
+\begin{itemize}
+    \item Giới hạn trọng số PID bằng $clip(.)$ và đánh giá P/PI/PID riêng.
+    \item Chuẩn hóa $U$, $H$, $V$ trước khi tổ hợp điểm truy vấn AL.
+    \item Lưu split manifest, dự đoán từng mẫu, cấu hình và hash artifact.
+\end{itemize}
+\end{block}
+\end{columns}
+
+\vspace{0.2cm}
+\begin{alertblock}{Ghi chú}
+Mọi tham số được chọn bên trong dữ liệu huấn luyện của fold. Kết quả báo cáo là outer-test; khoảng tin cậy PID được tính bằng bootstrap ghép cặp 1.000 lần.
+\end{alertblock}
+\end{frame}
+
+% --- SLIDE 25 ---
+\begin{frame}{Đánh giá tổng hợp}
+\small
+\begin{columns}[T,onlytextwidth]
+\column{0.50\textwidth}
+\begin{block}{Điểm đạt được}
+\begin{itemize}
+    \item Dung hợp tĩnh--động nâng AUC so với từng kênh; P là thành phần tạo khác biệt rõ nhất trên cohort PID.
+    \item XAI được dùng như tín hiệu chọn mẫu và giảm 15.8\% nhãn so với Random tại mục tiêu đã định.
+    \item Deletion và stability cung cấp bằng chứng định lượng bổ sung cho TreeSHAP.
+\end{itemize}
+\end{block}
+
+\column{0.46\textwidth}
+\begin{alertblock}{Giới hạn}
+\begin{itemize}
+    \item PID mới được đo trên 199 mẫu MalBehavD-V1; CI của $\Delta$AUC còn đi qua 0 và chưa chứng minh giảm FPR.
+    \item EMBER/MalBehavD là malware Windows tổng quát; chưa đủ căn cứ suy rộng riêng cho ransomware hoặc triển khai sản xuất.
+    \item Masking kiểm tra độ bám mô hình, không chứng minh quan hệ nhân quả của đặc trưng.
+\end{itemize}
+\end{alertblock}
+\end{columns}
+\end{frame}
+
+% --- SLIDE 26 ---
+\begin{frame}{Đóng góp khoa học và ý nghĩa ứng dụng}
+\small
+\begin{columns}[T,onlytextwidth]
+\column{0.49\textwidth}
+\begin{block}{Đóng góp khoa học}
+\begin{itemize}
+    \item \textbf{Đóng góp 1:} Luật dung hợp PID theo chuỗi sự kiện và ablation thành phần.
+    \item \textbf{Đóng góp 2:} Điểm truy vấn kết hợp uncertainty, Directional Entropy và SHAP Variance.
+    \item \textbf{Đóng góp 3:} Quy trình deletion có đối chứng và kiểm tra độ ổn định thứ hạng SHAP.
+\end{itemize}
+\end{block}
+
+\column{0.47\textwidth}
+\begin{block}{Ý nghĩa ứng dụng}
+\begin{itemize}
+    \item Cung cấp cấu trúc đánh giá có thể truy nguyên cho quy trình phát hiện đa tầng.
+    \item Giảm số mẫu cần gán nhãn trong thí nghiệm, đồng thời báo rõ overhead và độ bất định.
+\end{itemize}
+\end{block}
+\end{columns}
+\end{frame}
+
+% --- SLIDE 27 ---
+\begin{frame}{Hướng phát triển tương lai}
+\small
+\begin{enumerate}
+    \item \key{Mở rộng PID}: Tăng cohort ghép cặp, bổ sung chuỗi dài hơn và kiểm tra riêng lợi ích của $I/D$.
+    \item \key{Đánh giá ransomware}: Xây dựng tập có nhãn họ ransomware và chia theo thời gian/họ mã độc.
+    \item \key{Fidelity theo nhóm}: Masking có ràng buộc cho Header, Section, Import và Byte Histogram.
+    \item \key{Triển khai thử nghiệm}: Đo latency, tải hệ thống và chi phí phân tích động trong môi trường SOC.
+\end{enumerate}
+
+\vspace{0.2cm}
+\begin{block}{Định hướng dài hạn}
+Chuyển từ bằng chứng trên dữ liệu nghiên cứu sang đánh giá tiền triển khai có kiểm soát, giữ nguyên khả năng truy nguyên từng quyết định.
+\end{block}
+\end{frame}
+
+% --- SLIDE 28 ---
+\begin{frame}{Các câu hỏi phản biện dự kiến}
+\small
+\begin{columns}[T,onlytextwidth]
+\column{0.48\textwidth}
+\begin{block}{Về phương pháp luận}
+\begin{itemize}
+    \item Vì sao cần PID khi P/Average đã đạt AUC tương đương?
+    \item Directional Entropy tạo khác biệt gì ngoài uncertainty?
+\end{itemize}
+\end{block}
+
+\column{0.48\textwidth}
+\begin{block}{Về thực nghiệm}
+\begin{itemize}
+    \item Vì sao CI của $\Delta$AUC PID đi qua 0 và FPR còn tăng?
+    \item Masking từ dữ liệu ảnh có phù hợp với đặc trưng PE dạng bảng không?
+\end{itemize}
+\end{block}
+\end{columns}
+
+\vspace{0.2cm}
+\begin{alertblock}{Lời giải đáp}
+Trả lời bằng ablation và giới hạn: lợi ích chính hiện đến từ dung hợp và thành phần P; AL được đánh giá bằng AULC/ngân sách nhãn; Fidelity dùng baseline huấn luyện và random control, không khẳng định quan hệ nhân quả.
+\end{alertblock}
+\end{frame}
+
+% --- SLIDE 29 ---
+\begin{frame}{Kết luận}
+\large
+\begin{block}{Tóm tắt}
+Luận văn xây dựng và đánh giá ba cơ chế bổ sung cho nhau: dung hợp tĩnh--động, tối ưu ngân sách nhãn và kiểm chứng tương đối lời giải thích.
+\end{block}
+
+\begin{block}{Ba cột mốc đạt được}
+\begin{enumerate}
+    \item \textbf{PID Fusion:} AUC khoảng 0.958--0.959 so với 0.9254 tĩnh và 0.9345 động; lợi ích riêng của $I/D$ chưa rõ.
+    \item \textbf{XAI AL:} XAI-full đạt mục tiêu với 492 nhãn, giảm 92 nhãn so với Random.
+    \item \textbf{Fidelity:} Che top-50 SHAP làm AUC giảm 0.3067, trong khi random giảm 0.0010.
+\end{enumerate}
+\end{block}
+
+\begin{center}
+\Large\bfseries\color{UETBlue}Xin trân trọng cảm ơn Hội đồng đã lắng nghe!
+\end{center}
+\end{frame}
+
+% =================================================================
+% BACKUP SLIDES (DÙNG ĐỂ TRẢ LỜI CÂU HỎI PHẢN BIỆN)
+% =================================================================
+
+\begin{frame}{Backup Slide 1: Tại sao lại là LightGBM mà không phải Deep Learning?}
+\small
+\begin{block}{Bản chất của dữ liệu EMBER}
+Dữ liệu EMBER là dạng \textbf{Tabular Data} (Dữ liệu bảng) với các cột rời rạc (Header, Section, Byte Histogram).
+\end{block}
+
+\begin{itemize}
+    \item \textbf{Phù hợp dữ liệu:} Gradient boosting là baseline mạnh cho dữ liệu bảng nhiều kiểu đặc trưng và kích thước mẫu hiện có.
+    \item \textbf{Chi phí:} Huấn luyện và suy luận thuận tiện cho thiết kế nhiều fold, nhiều seed và nhiều vòng AL.
+    \item \textbf{Khả năng giải thích:} TreeSHAP có thuật toán hiệu quả cho mô hình cây, phù hợp phép deletion và stability của luận văn.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Backup Slide 2: PID khác gì với Gán trọng số tĩnh?}
+\small
+\begin{columns}[T,onlytextwidth]
+\column{0.48\textwidth}
+\minihead{Gán trọng số tĩnh}
+\begin{itemize}
+    \item Không thay đổi theo lịch sử bất đồng giữa hai kênh.
+    \item Không biểu diễn được phản ứng, tích lũy và biến thiên như ba thành phần P/I/D.
+\end{itemize}
+
+\column{0.48\textwidth}
+\minihead{Adaptive PID Fusion}
+\begin{itemize}
+    \item \textbf{Khâu P:} Phản ứng theo bất đồng hiện tại và tạo phần lớn cải thiện trong thực nghiệm.
+    \item \textbf{Khâu I/D:} Có ý nghĩa mô hình hóa chuỗi nhưng chưa tạo khác biệt quyết định trên cohort 199 mẫu.
+\end{itemize}
+\end{columns}
+\vspace{0.2cm}
+\begin{alertblock}{Kết quả đo kiểm}
+P đạt AUC 0.9592; PI/PID đạt 0.9583; PID--Fixed có $\Delta$AUC +0.0130 nhưng CI 95\% còn đi qua 0. Do đó PID là cơ chế có tiềm năng, chưa phải bằng chứng về giảm FPR.
+\end{alertblock}
+\end{frame}
+
+\begin{frame}{Backup Slide 3: Nỗi lo "Tự gán nhãn sai" trong Active Learning?}
+\small
+\begin{block}{Sự nhầm lẫn thường gặp}
+Học tích cực (Active Learning) $\neq$ Học bán giám sát (Pseudo-labeling).
+\end{block}
+
+\begin{itemize}
+    \item \textbf{Pseudo-labeling:} AI tự đoán, tự gán nhãn, tự học lại $\to$ Rủi ro nhiễm độc dữ liệu (Poisoning).
+    \item \textbf{Hệ thống của luận văn (Human-in-the-loop):}
+        \begin{enumerate}
+            \item AI dùng SHAP Variance tìm ra 50 mẫu "Mâu thuẫn nhất / Khó nhất".
+            \item Đưa 50 mẫu này vào Dashboard.
+            \item \textbf{Chuyên gia SOC (Con người) trực tiếp phân tích và gán nhãn thủ công.}
+            \item Mô hình học lại từ nhãn chuẩn của con người.
+        \end{enumerate}
+\end{itemize}
+\textbf{Kết luận:} Thiết kế tránh rủi ro tự gán nhãn sai; chất lượng vẫn phụ thuộc vào oracle/chuyên gia và cần được kiểm soát bằng audit nhãn.
+\end{frame}
+
+\end{document}

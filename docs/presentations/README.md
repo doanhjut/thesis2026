@@ -1,5 +1,14 @@
 # Báo cáo dự án — 9 trang
 
+## Chỉ cập nhật nội dung trên template PDFLaTeX gốc — 21/10/2026
+
+- **[Tải nguồn `.tex` giữ nguyên định dạng](latex_content_only_20261021/Luan_van_Luu_Van_Doanh_UET_format_pdflatex_updated.tex?raw=true)**
+
+File này giữ nguyên preamble, theme, 32 frame, các block/columns và toàn bộ vị trí
+ảnh của nguồn người dùng cung cấp; chỉ cập nhật câu chữ, công thức, bảng và số liệu.
+
+---
+
 ## Bản LaTeX cập nhật cho báo cáo/bảo vệ — 21/10/2026
 
 - **[Xem PDF 15 trang](latex_defense_updated_20261021/Luan_van_Luu_Van_Doanh_UET_updated.pdf)**
