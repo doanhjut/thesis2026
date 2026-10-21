@@ -1,5 +1,17 @@
 # Báo cáo dự án — 9 trang
 
+## Bản LaTeX cập nhật cho báo cáo/bảo vệ — 21/10/2026
+
+- **[Xem PDF 15 trang](latex_defense_updated_20261021/Luan_van_Luu_Van_Doanh_UET_updated.pdf)**
+- **[Sửa nguồn LaTeX](latex_defense_updated_20261021/Luan_van_Luu_Van_Doanh_UET_updated.tex)**
+- **[Tải ZIP gồm PDF, LaTeX và assets](latex_defense_updated_20261021/Luan_van_Luu_Van_Doanh_UET_updated.zip?raw=true)**
+
+Bản này thay các số liệu minh họa cũ bằng artifact đã đo: PID ghép cặp 199 mẫu,
+XAI-Guided AL xác nhận và Fidelity xác nhận. Công thức PID dùng trục sự kiện API
+5/10/15/20; kết quả được trình bày kèm ablation và giới hạn suy rộng.
+
+---
+
 ## Bản báo cáo GVHD trước bảo vệ — 20/10/2026
 
 - **[PowerPoint](Bao_cao_GVHD_truoc_bao_ve_20261020.pptx?raw=true)**
