@@ -3,11 +3,11 @@
   "cohort_manifest": "/workspace/thesis2026/outputs/malbehavd_pid_20261020_prepared/cohort_manifest.csv",
   "cohort_manifest_sha256": "9540b88b0da2463f63b4e983f5ecc277e3845b7badebbb79695e35f2c3b1a669",
   "requested_rows": 1923,
-  "usable_rows": 493,
-  "coverage": 0.25637025481019243,
+  "usable_rows": 993,
+  "coverage": 0.516380655226209,
   "usable_class_counts": {
-    "0": 205,
-    "1": 288
+    "0": 466,
+    "1": 527
   },
   "api_endpoint": "GET /api/v3/files/{sha256}",
   "binary_downloaded": false,

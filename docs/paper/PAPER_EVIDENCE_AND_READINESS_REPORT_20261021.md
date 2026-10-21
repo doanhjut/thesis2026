@@ -20,7 +20,7 @@ Tuy nhiên, bằng chứng hiện tại **chưa đủ để viết một paper k
 
 - EMBER và MalBehavD-V1 đều có nhãn malware tổng quát, không phải ransomware ground truth đã xác minh.
 - AL/Fidelity chạy trên EMBER, PID chạy trên MalBehavD-V1; chưa có một thí nghiệm end-to-end trên cùng cohort.
-- PID mới là pilot 199 mẫu. Cohort xác nhận 1.923 mẫu mới có 493 metadata usable, thấp hơn ngưỡng 90% đã khóa.
+- PID mới là pilot 199 mẫu. Cohort xác nhận 1.923 mẫu hiện có 993 metadata usable, thấp hơn ngưỡng 90% đã khóa.
 - Thành phần D không tạo khác biệt quyết định trong pilot; full PID không vượt P.
 - Chưa có gate + fusion + AL tích hợp, external/temporal validation và đo latency đầu cuối.
 
@@ -42,7 +42,7 @@ Paper này dùng EMBER làm bằng chứng chính. Hai trục phương pháp là
 |---|---|---|
 | **Xác nhận** | AL và Fidelity trên EMBER 2.000 mẫu; verification pass | Có thể dùng làm kết quả chính |
 | **Pilot đo thật** | PID trên 199/200 mẫu MalBehavD-V1 | Dùng làm feasibility/ablation pilot; phải báo CI và giới hạn |
-| **Tiến độ thu thập** | 493/1.923 metadata usable cho confirmatory PID | Chỉ báo tiến độ; không dùng làm kết quả mô hình |
+| **Tiến độ thu thập** | 993/1.923 metadata usable cho confirmatory PID | Chỉ báo tiến độ; không dùng làm kết quả mô hình |
 | **Bằng chứng phụ** | Static gate đã đo trên dữ liệu tĩnh nhưng chưa có quyết định động cuối | Dùng mô tả thiết kế hoặc limitation |
 | **Không dùng** | Artifact legacy nằm trực tiếp trong `results/`, pilot cũ không có identity, số demo/mô phỏng | Không đưa vào bảng, abstract hoặc kết luận |
 
@@ -140,15 +140,15 @@ Pilot có verification pass và đủ dùng để chứng minh pipeline/ablation
 |---|---:|
 | Cohort đã khóa | 1.923 |
 | Manifest SHA-256 | `9540b88b0da2463f63b4e983f5ecc277e3845b7badebbb79695e35f2c3b1a669` |
-| Metadata usable | 493 |
-| Coverage | 25,64% |
-| Benign usable | 205/932 = 22,00% |
-| Malware usable | 288/991 = 29,06% |
+| Metadata usable | 993 |
+| Coverage | 51,64% |
+| Benign usable | 466/932 = 50,00% |
+| Malware usable | 527/991 = 53,18% |
 | Ngưỡng tối thiểu đã khóa | 90% = 1.731 mẫu |
-| Cần thêm tối thiểu | 1.238 mẫu usable |
-| Deferred do rate limit | 1.429 |
+| Cần thêm tối thiểu | 738 mẫu usable |
+| Deferred do rate limit | 929 |
 
-**Quyết định hiện tại:** chưa chạy confirmatory model trên 493 mẫu. Việc chạy lúc collection còn dở sẽ làm thay đổi cohort theo thứ tự thu thập và tạo nguy cơ selection bias.
+**Quyết định hiện tại:** chưa chạy confirmatory model trên 993 mẫu. Phiên ngày 21/10 thu thêm 273 mẫu và dừng đúng tại HTTP 429. Lần thử resume lúc 06:38:43 ngày 22/10 (giờ Việt Nam) vẫn nhận HTTP 429 nên không có mẫu mới. Việc chạy model lúc collection còn dở sẽ làm thay đổi cohort theo thứ tự thu thập và tạo nguy cơ selection bias.
 
 Nguồn tiến độ: `results/measured_20261020_malbehavd_pid_full_collection_progress/`.
 
