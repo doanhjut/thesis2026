@@ -1,0 +1,118 @@
+\section{Discussion}
+\label{sec:discussion}
+
+\subsection{What the Acquisition Result Means}
+
+The clearest result is not that explanation guidance replaces uncertainty. It is
+that directional attribution balance adds a small, repeatable improvement to the
+learning trajectory over random acquisition and a smaller improvement over
+uncertainty in four of five outer folds. $H$ distinguishes cases in which the
+same output margin arises from opposing signed masses. Such cases can expose a
+model boundary supported by competing PE attributes, making them plausible
+queries for label acquisition.
+
+The algebraic identity in (\ref{eq:h-identity}) also limits this interpretation.
+$H$ is determined by the raw-score contribution and the $L_1$ attribution norm.
+Likewise, $V$ is determined by $L_2$ magnitude and the mean signed contribution.
+A direct margin-plus-norm score may recover part of the measured gain. Until
+those controls are run, the result supports the tested summaries but does not
+show that entropy and variance are uniquely necessary.
+
+No policy dominates every objective. $U+H$ leads AULC, $U+V$ reaches the target
+with the fewest labels, $\xfull$ performs between them, and Uncertainty remains
+strong in restricted-FPR metrics. This is scientifically more informative than a
+single winner: acquisition policy should be selected against an explicit
+objective and operating region. A system that values early target attainment may
+prefer $U+V$, whereas one that values average ranking quality throughout model
+development may prefer $U+H$.
+
+The target-based label result must also include its accounting boundary. The
+numbers count labels admitted to model training. Validation labels, the full-pool
+reference, dataset labeling, and analyst adjudication are additional resources.
+A 92-label reduction does not imply a measured reduction in analyst hours.
+
+\subsection{Batch Diversity and Robust Scaling}
+
+The top-100 selection rule can query redundant samples. This risk is material
+because the batch equals half of the 200-sample initial set. Uncertainty plus
+k-center selection would test whether the observed gain comes from SHAP signals
+or whether coverage of the same uncertain region is sufficient. A calibrated
+committee would test whether ensemble disagreement explains the benefit.
+
+Min--max normalization is also pool dependent. One extreme $H$ or $V$ value can
+compress the remaining component scores and change the effective mixture.
+Weight sensitivity, percentile/rank normalization, and robust quantile scaling
+should be frozen and evaluated before final submission. These studies must use
+validation or a nested design; selecting the best transformation from test AULC
+would invalidate the outer comparison.
+
+\subsection{What Controlled Deletion Establishes}
+
+Top-SHAP replacement consistently damages fitted-model ranking more than
+uniform random replacement at the same coordinate count, and the result holds
+for mean and median baselines. This supports a relative model-reliance claim:
+TreeSHAP ranks coordinates that influence these fitted LightGBM models under the
+defined intervention.
+
+Several alternatives remain. Tree ensembles use only a subset of the 2,381
+coordinates; uniform random masks will often select inactive features.
+Top-ranked coordinates can also lie farther from their replacement baselines,
+creating a larger perturbation magnitude and greater distribution shift. A
+stronger suite would select random controls from model-used features, match
+absolute standardized displacement, replace semantically coupled feature
+groups, and compare TreeSHAP with gain/permutation rankings.
+
+An attribution-column permutation is a particularly useful negative control. A
+common permutation preserves attribution sums, cosine similarities, centroid
+distances, and norms, so additivity, EC, and CF can all remain unchanged while
+feature identities are wrong. A valid identity-sensitive pipeline should fail
+that control. Until it is included, EC and CF are geometry descriptions rather
+than explanation certificates.
+
+\subsection{Stability and Model Maintenance}
+
+Moderate within-fold agreement suggests that global attribution summaries are
+not dominated by model randomness. The larger reduction across folds shows that
+the learned explanation depends materially on the sampled data. This matters for
+model maintenance: a global top-feature list should be versioned with the model
+and training cohort instead of presented as a timeless malware signature.
+
+The active-learning use of SHAP is local and round specific, so some adaptation
+of the acquisition ranking is expected. Nevertheless, a deployment study should
+track rank drift, query composition, and class yield across releases. Sharp
+changes can signal data drift, feature-extractor changes, or instability that
+requires investigation before analyst queries are trusted.
+
+\subsection{Relationship to Multi-Stage Fusion}
+
+The broader thesis studies conditional static/dynamic analysis. A separate
+199-sample pilot reported complementary static and API-sequence scores and found
+that proportional fusion had the highest mean AUC/AP among seven configurations.
+The PI and PID variants produced identical final decisions; the derivative term
+added no measurable benefit at 5--20 event prefixes, and the PID-versus-fixed AUC
+interval crossed zero. Those results motivate evidence-driven simplification,
+not a full PID superiority claim.
+
+That pilot uses MalBehavD-V1, logistic scorers, and event-indexed API prefixes;
+the present AL/Fidelity study uses static EMBER vectors and LightGBM. Their
+metrics cannot be combined into an end-to-end system result. Multi-stage
+integration requires one paired cohort, a gate with final decisions for all
+traffic, fixed/learned fusion baselines, and a factorial acquisition--fusion
+study. We therefore keep fusion outside the contributions and abstract of this
+paper.
+
+\subsection{Practical Implications}
+
+The most immediate use is a model-development workflow. Train a static PE model,
+score a candidate pool, apply a policy chosen for the development objective,
+present the selected rows to an authorized analyst, and retain query/model
+lineage. Controlled deletion and stability checks can run as release diagnostics
+for candidate models. They do not authorize automated remediation or substitute
+for malware-analysis containment and labeling governance.
+
+The query-computation overhead is modest in the measured small pool, but scaling
+TreeSHAP to large corpora can become material. A production design may prefilter
+by uncertainty and calculate explanations only for a candidate band, or cache
+tree contributions for repeated policy comparisons. Such engineering changes
+must be re-evaluated because they change the acquisition population.
+

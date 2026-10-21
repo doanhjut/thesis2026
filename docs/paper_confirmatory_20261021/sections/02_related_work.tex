@@ -1,0 +1,99 @@
+\section{Related Work}
+\label{sec:related}
+
+\subsection{Static PE Malware Learning}
+
+Static malware analysis uses evidence available without executing a suspect
+object. Earlier learned detectors combined hand-engineered program attributes
+with neural models \cite{saxe2015deep}, while raw-byte approaches learned
+representations directly from complete executables \cite{raff2018malware}.
+EMBER established a documented PE feature representation and benchmark
+\cite{anderson2018ember}; SOREL-20M increased scale and supplied richer metadata
+\cite{harang2020sorel}. Surveys describe the diversity of representations and
+learners used in malware analysis \cite{ucci2019survey,gibert2020rise}.
+
+Dataset scale alone does not guarantee realistic evaluation. Random splits can
+place related families, acquisition sources, time periods, or near-duplicate
+programs across train and test. Security ML also faces distribution shift and an
+adaptive adversary, making provenance, split semantics, and operating point
+central to a credible result \cite{arp2022dos}. Our study uses a small
+identity-audited EMBER subset and random outer folds. It improves row-level
+traceability but does not substitute for temporal, family-disjoint, or external
+validation.
+
+\subsection{Active Learning and Batch Selection}
+
+Pool-based active learning alternates model fitting, query selection, oracle
+annotation, and retraining. Uncertainty sampling is widely used because it is
+simple and model compatible \cite{cohn1996active,settles2009active}. Its weakness
+in batch settings is redundancy: the highest-scoring samples can occupy the same
+region. Core-set acquisition instead seeks representation coverage
+\cite{sener2018active}; ensemble methods query disagreement
+\cite{beluch2018power}; BatchBALD uses joint mutual information
+\cite{kirsch2019batchbald}; and BADGE clusters uncertain gradient embeddings
+\cite{ash2020deep}.
+
+These baselines are not interchangeable across model classes. BADGE and
+BatchBALD were designed around differentiable or Bayesian deep models, whereas
+the present learner is a boosted-tree ensemble. A strong tree-compatible study
+should nevertheless compare uncertainty plus an explicit diversity constraint
+and a calibrated committee. The current artifact includes random, uncertainty,
+and explanation-signal ablations, but not those two stronger families. We treat
+that omission as an evidence gate before a general superiority claim.
+
+Explanations can support active learning in different ways. Explainable active
+learning has studied the effect of local explanations on the annotator
+experience \cite{ghai2021explainable}. Our use is algorithmic: TreeSHAP summaries
+enter the acquisition score before annotation. This does not imply that an
+attribution with large magnitude or balanced signs yields high expected
+information gain. It defines a falsifiable heuristic whose value must be
+established against matched baselines.
+
+\subsection{Attribution and Fidelity Evaluation}
+
+LIME approximates a local decision surface \cite{ribeiro2016why}; SHAP unifies
+additive attributions through Shapley values \cite{lundberg2017unified}; and
+TreeSHAP specializes the computation to tree ensembles
+\cite{lundberg2020local}. Explanation evaluation is multi-dimensional. Sanity
+checks can expose explanations that do not respond to model parameters
+\cite{adebayo2018sanity}, and adversarial constructions can manipulate
+post-hoc explanations \cite{slack2020fooling}. Security data add constrained and
+attacker-controlled inputs \cite{warnecke2020evaluating}.
+
+Deletion tests measure whether intervening on highly ranked coordinates changes
+model output. Their interpretation depends on the replacement distribution:
+feature removal can create out-of-distribution inputs and confound the ranking
+comparison \cite{hooker2019benchmark,yeh2019infidelity}. Training-derived mean
+and median baselines avoid treating zero as universally absent, but they do not
+preserve PE structure. Equal-count random masks control the nominal intervention
+budget but may frequently choose coordinates unused by a tree model. Stronger
+controls include used-feature random selection, magnitude matching, group-aware
+replacement, and attribution permutation.
+
+\begin{table*}[t]
+\centering
+\caption{Positioning relative to representative acquisition and attribution-evaluation methods. ``Required extension'' denotes a comparison that is not present in the retained confirmatory report.}
+\label{tab:related}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{p{3.0cm}p{3.6cm}p{2.5cm}p{2.6cm}p{3.4cm}}
+\toprule
+Study or family & Principal signal & Explicit batch diversity & Explanation role & Relationship to this work \\
+\midrule
+Cohn \emph{et al.} \cite{cohn1996active} / uncertainty & Model uncertainty or error reduction & Method dependent & None & Measured baseline \\
+Core-set \cite{sener2018active} & Representation coverage & Yes & None & Required extension \\
+Ensemble disagreement \cite{beluch2018power} & Predictive disagreement & Indirect & None & Required extension \\
+BatchBALD \cite{kirsch2019batchbald} & Joint mutual information & Yes & None & Requires tree-compatible adaptation \\
+BADGE \cite{ash2020deep} & Uncertain gradient embeddings & Yes & None & Requires model-compatible adaptation \\
+XAL \cite{ghai2021explainable} & Queried samples plus local explanations & Not central & Annotator-facing & Different explanation role \\
+Security XAI evaluation \cite{warnecke2020evaluating} & Explanation behavior under security constraints & Not applicable & Evaluation & Motivates controlled diagnostics \\
+This work & Margin plus TreeSHAP signed-mass summaries & No & Acquisition and post-hoc diagnostic & Measured vs. random/uncertainty; diversity remains open \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+The contribution is therefore not the broad claim that combining active learning
+and explanations is unprecedented. It is the specific signed-mass acquisition
+construction and its repeated, claim-bounded evaluation together with a
+controlled assessment of the attribution ranking used by the policy.
+

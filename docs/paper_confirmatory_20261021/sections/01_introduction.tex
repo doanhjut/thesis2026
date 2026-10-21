@@ -1,0 +1,105 @@
+\section{Introduction}
+\label{sec:introduction}
+
+Static machine-learning detectors can score Windows portable executable (PE)
+files before execution, making them useful for high-volume screening. Public
+representations such as EMBER summarize byte distributions, strings, headers,
+sections, imports, exports, and data directories in a fixed vector
+\cite{anderson2018ember}. Gradient-boosted trees remain strong learners for these
+heterogeneous attributes and provide efficient, exact attribution mechanisms
+\cite{ke2017lightgbm,lundberg2020local}. Their accuracy nevertheless depends on
+the labeled distribution used for training. New software, collection sources,
+packers, and malware families can alter that distribution, while expert analysis
+of every incoming object is infeasible \cite{ucci2019survey,gibert2020rise,
+arp2022dos}.
+
+Pool-based active learning addresses this label bottleneck by selecting a small
+batch from an unlabeled pool for an oracle. Uncertainty sampling is a natural
+baseline because it selects samples near the current decision boundary
+\cite{cohn1996active,settles2009active}. A probability margin, however, collapses
+the model's evidence into one scalar. Two samples with the same predicted
+probability may differ substantially: one can have uniformly weak contributions,
+whereas another can contain large positive and negative effects that nearly
+cancel. The latter pattern can reveal a region in which the model combines
+conflicting learned associations, but it is invisible to margin-only selection.
+
+We examine whether signed TreeSHAP summaries provide useful acquisition signals.
+The proposed family combines predictive uncertainty $U$ with directional entropy
+$H$, which measures the balance of positive and negative attribution mass, and
+signed-attribution variance $V$, which measures dispersion across feature
+coordinates. Five policies---Random, Uncertainty, $U+H$, $U+V$, and a complete
+$U+H+V$ policy---are compared with matched initial sets, model configurations,
+pools, and label budgets. The evaluation emphasizes the entire learning curve
+and labels required to reach a predeclared validation target. This avoids using
+only the final model, for which every policy eventually receives the same full
+training pool.
+
+Using explanations in acquisition creates a second obligation: the attribution
+ranking should be tested against fitted-model behavior rather than accepted from
+a visualization. We therefore conduct a separate controlled TreeSHAP evaluation
+over 25 fitted models. Sample-specific top-$|\mathrm{SHAP}|$ coordinates are
+replaced by statistics computed only from training data and compared with
+equal-budget random masks. Mean and median baselines test sensitivity to the
+replacement rule, while Spearman and Jaccard agreement measure how feature
+rankings change across model seeds and data folds.
+
+The intervention is intentionally described as a feature-space diagnostic. PE
+attributes are structured and dependent: replacing isolated histogram, import,
+header, or section coordinates need not correspond to a valid executable. A
+large deletion effect therefore supports reliance of the fitted model on the
+ranked coordinates under a specified intervention. It does not prove that the
+features cause malicious behavior, that a binary can be edited accordingly, or
+that the explanation is useful to every analyst. We report heterogeneous
+diagnostics separately and do not construct an Overall Fidelity Score without a
+validated normalization and aggregation rule.
+
+The empirical study uses an identity-audited 2,000-sample subset of EMBER with
+2,381 static features, 1,500 benign labels, and 500 malware labels. Each row has
+a source index and SHA-256 identity in a locked manifest. The study uses five
+outer folds, five active-learning seeds per fold, and five fidelity model seeds
+per fold. These controls improve on a single-split pilot, but the data remain a
+small, short-period subset evaluated with random row folds. Consequently, the
+paper makes no claim about ransomware-specific detection, unseen families,
+temporal generalization, or production false-alarm rates.
+
+We study three research questions:
+
+\begin{itemize}
+    \item \textbf{RQ1:} Under matched training-label budgets, do acquisition
+    policies that combine uncertainty with signed TreeSHAP summaries improve ROC
+    and average-precision learning-curve area over random and uncertainty-only
+    selection?
+    \item \textbf{RQ2:} How do the policies trade learning-curve quality, labels
+    required to reach a predeclared validation target, low-FPR behavior, and
+    query computation?
+    \item \textbf{RQ3:} Under training-mean and training-median replacement, do
+    top-$|\mathrm{SHAP}|$ masks affect fitted-model ranking more than equal-count
+    random masks, and how stable are the rankings across folds and model seeds?
+\end{itemize}
+
+The contributions are:
+
+\begin{itemize}
+    \item An explanation-guided acquisition family that combines prediction
+    margin with directional balance and dispersion of signed TreeSHAP
+    contributions, together with component ablations under matched budgets.
+    \item A multi-fold, multi-seed empirical protocol that reports ROC/AP area
+    under the learning curve (AULC), labels to a validation-defined target,
+    low-FPR summaries, paired fold effects, and computation. The results expose a
+    useful trade-off: $U+H$ has the strongest mean AULC, $U+V$ reaches the target
+    with the fewest labels, and no variant wins every criterion.
+    \item A repeated controlled evaluation of TreeSHAP rankings using two
+    training-derived baselines, equal-budget random controls, three deletion
+    budgets, 25 fitted models, and within-/between-fold stability analysis.
+    \item A claim-bounded reproducibility design that links dataset identity,
+    splits, model seeds, query decisions, predictions, masks, and reported replay
+    checks while separating computational reproducibility from external
+    generalization.
+\end{itemize}
+
+Section~\ref{sec:related} reviews static PE learning, batch active learning, and
+attribution evaluation. Section~\ref{sec:problem} defines the estimands and claim
+boundaries. Sections~\ref{sec:method} and~\ref{sec:protocol} specify the methods
+and protocol. Sections~\ref{sec:results}--\ref{sec:threats} present results,
+interpretation, and validity threats; Section~\ref{sec:conclusion} concludes.
+

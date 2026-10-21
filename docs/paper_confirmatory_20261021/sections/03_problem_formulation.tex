@@ -1,0 +1,85 @@
+\section{Problem Formulation and Claim Boundaries}
+\label{sec:problem}
+
+\subsection{Pool-Based Learning}
+
+Let $x\in\mathbb{R}^{d}$ be a static PE feature vector and
+$y\in\{0,1\}$ its benign/malware label. At acquisition round $r$, the labeled
+and unlabeled portions of the development pool are $\mathcal{L}_r$ and
+$\mathcal{U}_r$. Model $f_r$ is fitted only on $\mathcal{L}_r$ and assigns
+probability-like score $p_i=f_r(x_i)$. Acquisition function $Q_r(x)$ ranks
+$x\in\mathcal{U}_r$; the oracle reveals labels for the highest-ranked batch,
+which is moved to $\mathcal{L}_{r+1}$.
+
+Within each outer fold and seed, all policies share the same initial labeled set,
+remaining pool, validation data, test data, model hyperparameters, and cumulative
+budget. Test outcomes do not influence queries, target definition, threshold
+selection, or stopping. The oracle is simulated by revealing retained labels. A
+training-label budget is thus a count of oracle queries, not measured analyst
+time or total dataset annotation cost.
+
+\subsection{Learning-Curve Estimands}
+
+Every run produces ROC--AUC and average precision (AP) at budgets
+$B\in\{200,300,\ldots,1200\}$. The normalized area under a metric learning curve
+$m(B)$ is
+\begin{equation}
+\mathrm{AULC}(m)=\frac{1}{B_{\max}-B_{\min}}
+\int_{B_{\min}}^{B_{\max}}m(B)\,dB,
+\label{eq:aulc}
+\end{equation}
+computed by trapezoidal integration over measured budgets. AULC summarizes how
+quickly useful ranking is acquired; the endpoint is not discriminative when all
+policies eventually train on the same full pool.
+
+For each outer fold, a full-pool reference model defines a validation target
+\begin{equation}
+t_{\mathrm{fold}}=0.5+0.95\left(
+\mathrm{AUC}^{\mathrm{full}}_{\mathrm{val}}-0.5\right).
+\label{eq:target}
+\end{equation}
+Labels-to-target is the first training budget whose validation AUC reaches this
+level. The full-pool reference and validation labels are additional experimental
+resources and must be reported separately from queried training labels.
+
+Low-FPR summaries include normalized partial AUC up to FPR 5\% and TPR learning
+curve area at FPR caps of 1\% and 5\%. These quantities describe the measured
+outer folds. They do not estimate enterprise false-alarm rates near
+$10^{-3}$--$10^{-4}$, for which substantially more benign test samples are
+required.
+
+\subsection{Explanation Object}
+
+For a fitted tree model and sample $x_i$, let
+$\boldsymbol{\phi}_i=(\phi_{i1},\ldots,\phi_{id})$ be the signed TreeSHAP
+contribution vector and $\phi_{i0}$ the bias. Native TreeSHAP is checked on the
+raw-score scale:
+\begin{equation}
+f_{\mathrm{raw}}(x_i)=\phi_{i0}+\sum_{j=1}^{d}\phi_{ij}.
+\label{eq:additivity}
+\end{equation}
+Numerical reconstruction verifies the implementation but not semantic feature
+identity, causality, or analyst usefulness.
+
+The deletion diagnostic selects sample-specific mask $M_i^{(k)}$ and replaces
+selected coordinates by a training-derived baseline $b_j$:
+\begin{equation}
+\widetilde{x}_{ij}=\begin{cases}
+b_j,&j\in M_i^{(k)},\\
+x_{ij},&\text{otherwise}.
+\end{cases}
+\label{eq:mask}
+\end{equation}
+For top-SHAP deletion, $M_i^{(k)}$ contains the $k$ largest
+$|\phi_{ij}|$. The control contains $k$ uniformly selected coordinates. Baseline
+$b_j$ is either the training mean or median. This intervention measures fitted
+model reliance in feature space; it need not correspond to a valid PE binary.
+
+\subsection{Security Scope}
+
+The measured label is generic Windows PE malware. Original SHA-256 identities
+support traceability, but the study does not establish ransomware labels,
+family-held-out performance, or zero-day detection. The adversarial scope also
+excludes a white-box attacker who optimizes pool membership, labels, or features
+against the acquisition rule. These limits are part of the estimand rather than
+footnotes to a broader deployment claim.

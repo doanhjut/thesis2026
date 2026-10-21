@@ -1,0 +1,116 @@
+\section{Active-Learning Replay Checklist}
+\label{app:al}
+
+For each outer fold and AL seed, a reproducible run should retain:
+
+\begin{enumerate}
+    \item development, validation, and test row identifiers;
+    \item the shared 200-row initial labeled set and ordered remaining pool;
+    \item model configuration, library versions, and all deterministic seeds;
+    \item validation/test probabilities and labels for every round;
+    \item pool probabilities, $U/H/V$ components, normalized values, composite
+    scores, ranks, and queried row identifiers;
+    \item the full-pool validation reference and target calculation;
+    \item per-round ROC--AUC, AP, low-FPR summaries, and scoped timings;
+    \item saved checkpoints or a deterministic reconstruction mechanism;
+    \item verification output confirming query membership, uniqueness, no
+    test/validation leakage, additivity, and metric recomputation.
+\end{enumerate}
+
+Every policy within a fold/seed must begin from the same initial set. The test
+partition must remain unavailable to query selection, target construction,
+weight selection, threshold selection, and stopping.
+
+\section{Fidelity Replay Checklist}
+\label{app:fidelity}
+
+For every outer fold and model seed:
+
+\begin{enumerate}
+    \item retain the fitted model, split IDs, training mean and median, and raw
+    TreeSHAP matrix including the bias separately;
+    \item verify raw-score additivity before ranking features;
+    \item save top-$k$ and random mask indices for every sample, $k$, control
+    draw, and replacement baseline;
+    \item reconstruct masked matrices from the original test vectors and saved
+    indices rather than from plotted summaries;
+    \item retain original/masked probabilities and recompute AUC decreases;
+    \item retain global rankings and model-pair identifiers used for Spearman and
+    Jaccard summaries;
+    \item label EC and CF as geometry diagnostics and confirm that no composite
+    OFS is introduced without a preregistered rule.
+\end{enumerate}
+
+Future controls should include random selection restricted to model-used
+features, matched standardized displacement, attribution-column permutation, and
+schema-aware group replacement.
+
+\section{Interpretation Boundaries}
+
+\begin{table*}[h]
+\centering
+\caption{What the reported quantities establish and do not establish.}
+\label{tab:boundaries}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{p{2.4cm}p{5.8cm}p{6.5cm}}
+\toprule
+Quantity & Supported interpretation & Unsupported interpretation \\
+\midrule
+ROC/AP-AULC & Ranking quality integrated over the measured label budgets & Analyst labor, calibration, or external generalization \\
+Labels to target & Training labels to a fold-specific validation target & Total annotation cost or hours saved \\
+Low-FPR summaries & Relative performance at 1\%/5\% caps in the outer folds & Reliable FPR at $10^{-3}$ or $10^{-4}$ \\
+$H$ & Balance of positive/negative TreeSHAP mass & Predictive entropy or causal conflict \\
+$V$ & Dispersion across signed attribution coordinates & Ensemble or posterior uncertainty \\
+Top-k deletion & Fitted-model sensitivity under training-statistic replacement & Valid PE transformation or causal malware mechanism \\
+Additivity & Numerical reconstruction of the raw tree score & Correct feature identity or human usefulness \\
+EC/CF & Geometry of retained attribution vectors & Explanation correctness certificate \\
+Seed/fold agreement & Sensitivity to fitted model and data split & Stability across organizations and time \\
+Replay verification & Consistency with retained code/data/artifacts & Independent external replication or data authenticity \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\section{Claim--Evidence Map}
+
+\begin{table*}[h]
+\centering
+\caption{Central claims and submission status.}
+\label{tab:claims}
+\scriptsize
+\begin{tabular}{p{5.2cm}p{3.0cm}p{6.9cm}}
+\toprule
+Claim & Status & Scope or required wording \\
+\midrule
+$U+H$ exceeds Random in ROC/AP-AULC & Reported supported & Five outer folds; report paired effect and direction \\
+$U+H$ universally exceeds Uncertainty & Not supported & Small effects; favorable in 4/5 folds \\
+\xfull saves 92 training labels vs. Random & Reported supported & Validation labels/reference cost are additional \\
+\xfull is the best policy & Not supported & $U+H$ leads AULC; $U+V$ uses the fewest labels \\
+Top-SHAP deletion exceeds random deletion & Reported supported & Feature space; 25 models; mean/median; absolute effects \\
+TreeSHAP identifies causal malware features & Not supported & No executable-valid or causal intervention \\
+Rankings are invariant & Not supported & Moderate agreement; lower across folds \\
+The study detects ransomware/zero-day families & Not supported & Generic PE malware labels only \\
+The cloud revision independently replayed results & Pending & Synchronize named source/artifacts and rerun verification \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\section{Pre-Submission Evidence Gates}
+
+The following items should be completed before journal submission:
+
+\begin{enumerate}
+    \item synchronize commit
+    \texttt{fed4322f58f5bb55ec47833e857370d076592a32} and the complete confirmatory
+    result directory; verify the locked dataset and manifest hashes;
+    \item rerun the verification entry point in a clean environment and generate
+    every table/figure directly from retained fold-level data;
+    \item add uncertainty-plus-diversity and a calibrated committee baseline;
+    \item add weight/normalization sensitivity and batch-redundancy analysis;
+    \item add identity-sensitive and magnitude-matched fidelity controls;
+    \item obtain external, temporal, or source-disjoint evidence if the target
+    venue expects broad generalization;
+    \item verify bibliography metadata against publisher records and confirm
+    authorship, ORCID, corresponding author, data rights, and the current journal
+    template.
+\end{enumerate}

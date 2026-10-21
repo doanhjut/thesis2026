@@ -1,0 +1,109 @@
+\section{Experimental Protocol}
+\label{sec:protocol}
+
+\subsection{Data Identity and Provenance}
+
+The retained study report identifies an EMBER-derived table with 2,000 rows,
+2,381 static features, 1,500 benign labels, and 500 malware labels. All
+\texttt{row\_id}, source indices, and sample SHA-256 values are unique, and the
+audit found no exact duplicate feature vectors. Samples appeared during
+November--December 2018; AVClass metadata exists for 498 malware rows but is not
+treated as ransomware ground truth.
+
+The locked dataset SHA-256 is
+\texttt{69f0ae680846edd95458d1e7aaabe36f8}\-
+\texttt{866f4f22a6d11488b126ed026b28963}; the manifest SHA-256 is
+\texttt{a2ca16402653e6cc51fdd7a4857d007f}\-
+\texttt{af86807b044d78654f180409c73565bb}. The subset was recovered from available
+EMBER test material rather than sampled according to the complete official
+train/test protocol. We therefore call it an identity-audited internal subset,
+not a new official EMBER benchmark.
+
+\begin{table}[t]
+\centering
+\caption{Dataset and evaluation units.}
+\label{tab:data}
+\small
+\begin{tabular}{lr}
+\toprule
+Item & Value \\
+\midrule
+Samples & 2,000 \\
+Static features & 2,381 \\
+Benign / malware & 1,500 / 500 \\
+Outer folds & 5 \\
+AL seeds per fold & 5 \\
+Fidelity model seeds per fold & 5 \\
+Initial AL labels & 200 \\
+Query rounds / batch & 10 / 100 \\
+Maximum training labels & 1,200 \\
+Fidelity deletion budgets & 10, 25, 50 \\
+Random masks per model/budget & 20 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Outer-Fold Separation}
+
+Five outer folds define disjoint test partitions. Within each outer development
+partition, retained labels are separated into the active-learning pool and
+validation resources. The report records that test rows never enter query
+selection, target construction, threshold selection, or model selection. All
+policies within a fold and AL seed receive the same initial labeled rows and
+remaining pool. The unit for paired policy comparison is the outer fold after
+averaging its five seed trajectories; 25 fold--seed runs are not treated as 25
+independent test datasets.
+
+Random row folds do not prevent related families, acquisition sources, or time
+periods from crossing partitions. SHA uniqueness and absence of exact feature
+duplicates address only exact identity leakage.
+
+\subsection{Active-Learning Configuration}
+
+The AL seeds are 11, 22, 33, 44, and 55. Each run begins with 200 stratified
+training labels and performs ten rounds of 100 queries, giving budgets from 200
+through 1,200. LightGBM uses 60 trees, learning rate 0.05, 15 leaves, maximum
+depth 4, and deterministic seed-specific training. At each round, the runner
+saves model configuration, pool membership, query components, selected row IDs,
+validation/test scores, and metrics.
+
+The full-pool reference in each fold sets the target in
+(\ref{eq:target}). This makes target attainment comparable within that fold but
+introduces additional validation and reference-model cost. The study reports
+training labels to target and does not translate them into analyst hours.
+
+Query timing covers pool prediction, TreeSHAP computation where applicable,
+additivity checking, score normalization, and query construction as recorded by
+the runner. It does not include human annotation, data acquisition, endpoint
+feature extraction, or production inference.
+
+\subsection{Fidelity and Stability Configuration}
+
+For each outer fold, five LightGBM models use seeds 41--45, 100 trees, learning
+rate 0.1, feature fraction 0.8, bagging fraction 0.8, 15 leaves, and maximum
+depth 4. Controlled subsampling creates variation across fitted models. Each of
+the 25 models is evaluated under both mean and median replacement. Three top-k
+and $3\times20$ random-mask batches are generated for each replacement baseline,
+yielding 50 model--baseline combinations.
+
+The retained report records replay of 3,150 mask batches and 1,260,000 prediction
+records, with 50/50 model--baseline verification cases passing. Active-learning
+artifacts record 1,375 checkpoints, 1,100,000 prediction records, and 125,000
+query records, with all five folds passing the reported verification. These are
+reported properties of the retained artifact. The experiment commits are not
+present in the cloud checkout used to assemble this manuscript revision, so a
+fresh hash check and replay remain mandatory before submission.
+
+\subsection{Metrics and Statistical Reporting}
+
+ROC--AUC and AP measure ranking \cite{fawcett2006roc,saito2015precision}. AULC,
+labels-to-target, normalized low-FPR summaries, and computation describe the AL
+trajectory. Paired effects are calculated within outer fold. Direction counts
+such as 5/5 or 4/5 folds are reported without treating five folds as sufficient
+for a strong asymptotic significance claim.
+
+Fidelity results aggregate across fitted models and distinguish seed variation
+within a fold from variation across folds. Random masks estimate control-mask
+variation conditional on the retained fitted models. Neither the mask repetitions
+nor pairwise stability comparisons are independent draws from a deployment
+population.

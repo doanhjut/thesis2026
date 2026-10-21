@@ -1,0 +1,71 @@
+\documentclass[journal]{IEEEtran}
+
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{cite}
+\usepackage{url}
+\usepackage[hidelinks]{hyperref}
+
+\graphicspath{{figures/}}
+\newcommand{\xfull}{\textsc{XAI-Full}}
+
+\title{Explanation-Guided Active Learning with Controlled TreeSHAP Validation
+for Static Windows Malware Detection}
+
+\author{Luu Van Doanh and Truong Ninh Thuan%
+\thanks{The authors are with the VNU University of Engineering and Technology,
+Vietnam National University, Hanoi, Vietnam.}%
+}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Static malware detectors require periodic adaptation, but expert labels are
+costly and probability-margin acquisition ignores how a model assembles its
+evidence. We evaluate an active-learning family that augments predictive
+uncertainty with two summaries of signed TreeSHAP contributions: directional
+entropy of positive versus negative attribution mass and variance across feature
+coordinates. The evaluation uses an identity-audited subset of EMBER containing
+2,000 Windows PE samples and 2,381 features, with five outer folds and five
+active-learning seeds per fold. At equal budgets, uncertainty plus directional
+entropy achieved the highest mean ROC and average-precision areas under the
+learning curve (0.933026 and 0.883336), improving on random acquisition by
+0.004249 and 0.014985, respectively, in the same direction in all five folds.
+The complete three-signal policy required 492 training labels on average to reach
+a predeclared validation target, 92 fewer than random acquisition, although it
+did not consistently outperform uncertainty across ranking and low-false-positive
+criteria. We separately evaluate TreeSHAP as a fitted-model diagnostic across 25
+models. Replacing the 50 largest absolute contributions by training means reduced
+ROC--AUC by 0.306729, versus 0.000979 for equal-budget random replacement; the
+corresponding median-replacement difference was 0.300119. Rank agreement was
+moderate and decreased across folds. These results support explanation-guided
+sample prioritization and relative model reliance under the tested interventions,
+not causal, executable-level, ransomware-specific, or deployment-level claims.
+\end{abstract}
+
+\begin{IEEEkeywords}
+active learning, explainable artificial intelligence, LightGBM, malware
+detection, model reliance, portable executable, SHAP, TreeSHAP
+\end{IEEEkeywords}
+
+\input{sections/01_introduction}
+\input{sections/02_related_work}
+\input{sections/03_problem_formulation}
+\input{sections/04_methodology}
+\input{sections/05_experimental_protocol}
+\input{sections/06_results}
+\input{sections/07_discussion}
+\input{sections/08_threats}
+\input{sections/09_conclusion}
+
+\appendices
+\input{sections/10_appendices}
+\clearpage
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+\end{document}

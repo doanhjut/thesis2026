@@ -1,0 +1,36 @@
+\section{Conclusion}
+\label{sec:conclusion}
+
+This paper evaluated explanation-guided active learning and controlled TreeSHAP
+diagnostics for static Windows PE malware classification. The acquisition family
+combines predictive uncertainty with directional entropy and signed-attribution
+variance. On an identity-audited 2,000-sample EMBER subset, evaluated with five
+outer folds and five seeds per fold, $U+H$ achieved the highest ROC/AP learning-
+curve area. Its improvements over Random were positive in every outer fold;
+improvements over Uncertainty were smaller and occurred in four of five folds.
+$U+V$ reached the predeclared validation target with the fewest mean training
+labels, while $\xfull$ reduced the mean budget by 92 labels relative to Random.
+No configuration was best across learning quality, target attainment, restricted-
+FPR behavior, and computation.
+
+The TreeSHAP study extended the evaluation to 25 fitted models. Top-ranked
+coordinates produced substantially larger AUC decreases than equal-count random
+coordinates under both training-mean and training-median replacement. Global and
+top-k rankings showed moderate agreement and were less stable across data folds
+than across seeds within one fold. These findings support relative reliance of
+the fitted models on the ranked coordinates under the specified interventions.
+They do not establish causal malware features or valid executable edits.
+
+The results motivate a focused next experiment rather than a broader deployment
+claim. Uncertainty plus diversity, calibrated committee acquisition, weight and
+normalization sensitivity, stronger deletion controls, and external/temporal
+evaluation are the primary evidence gates. Completing them would determine
+whether the measured gains reflect uniquely useful explanation signals and
+whether they transfer beyond the audited subset.
+
+The study also illustrates a general reporting principle for security ML: label
+efficiency, operating-point quality, attribution behavior, and reproducibility
+answer different questions. Reporting their trade-offs and limitations provides
+a stronger basis for model maintenance than selecting a single favorable AUC or
+explanation image.
+

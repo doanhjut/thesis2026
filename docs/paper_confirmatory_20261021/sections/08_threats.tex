@@ -1,0 +1,82 @@
+\section{Threats to Validity}
+\label{sec:threats}
+
+\subsection{Construct Validity}
+
+The label denotes generic benign/malware status, not ransomware. SHA-256 identity
+and source-index linkage improve traceability but cannot create absent family or
+behavior semantics. We therefore avoid ransomware, zero-day, and behavioral
+claims.
+
+$H$ is entropy of signed attribution mass, and $V$ is variance across one
+attribution vector. Neither is calibrated model uncertainty. The term
+``explanation-guided'' refers to how the signals are computed, not proof that they
+encode human-understandable malware mechanisms.
+
+Deletion measures model behavior under feature replacement. It does not establish
+valid PE edits, causality, robustness to every perturbation, or human usefulness.
+EC, CF, and additivity examine different constructs and are not combined into an
+OFS.
+
+\subsection{Internal Validity}
+
+Outer test partitions are excluded from query and target selection according to
+the retained protocol. Policies share initial sets within fold/seed, limiting
+confounding by starting labels. The fixed policy weights and min--max
+normalization, however, were not evaluated through an independent outer
+sensitivity study. The measured comparison may depend on those design choices.
+
+The oracle reveals existing labels without error. Real analysts can abstain,
+disagree, or use different evidence, changing both label quality and cost. Batch
+selection has no diversity constraint and may contain redundant samples.
+
+Mean/median baselines are calculated from training data, avoiding direct test
+leakage. Yet top-SHAP and random masks are not matched by displacement magnitude,
+used-feature status, or manifold distance. These confounders can contribute to
+the deletion gap.
+
+\subsection{Statistical Conclusion Validity}
+
+Five seed trajectories are averaged within each of five outer folds. The paired
+outer fold is the comparison unit; fold--seed combinations are not 25 independent
+test datasets. Five folds support effect-size and direction reporting but limited
+formal inference. The readiness snapshot does not provide fold-level vectors in
+this checkout, so figures assembled here omit uncertainty bars. The submission
+artifact must regenerate them directly from retained fold-level files.
+
+Twenty random masks per $k$ characterize mask variability conditional on each
+fitted model. The 25 fidelity models share data and folds, so model-level records
+are also dependent. Pairwise rank comparisons share models and cannot be counted
+as independent observations in a naive significance test.
+
+Restricted-FPR estimates use small outer test folds. With roughly 300 benign
+rows, one false positive changes FPR by about 0.33 percentage points. Results at
+1\% and 5\% caps do not validate operation at $10^{-3}$ or $10^{-4}$.
+
+\subsection{External Validity}
+
+The 2,000 rows form a short-period subset recovered from EMBER material and do
+not reproduce the full official benchmark protocol. Random row folds do not
+enforce temporal, family, source, or campaign separation. Results may change
+under newer software, another organization, a different benign distribution,
+another feature extractor, or adversarial manipulation. External and temporal
+validation are required for a broad journal claim.
+
+LightGBM and TreeSHAP are central to the experiment. The acquisition statistics
+can be defined for other additive attributions, but their numeric behavior,
+cost, and stability may differ for raw-byte networks, graph models, or sequence
+models.
+
+\subsection{Reproducibility Validity}
+
+The readiness report names source commit
+\texttt{fed4322f58f5bb55ec47833e857370d076592a32}, locked dataset/manifest hashes,
+and replay counts. That commit and the confirmatory result directory are not
+available in the cloud checkout used for this manuscript revision. We therefore
+attribute numerical values to the retained readiness report and do not describe
+this writing pass as an independent rerun. Before submission, the exact source
+and artifacts must be synchronized, hashes verified, replay executed in a clean
+environment, and all tables/figures regenerated from source records.
+
+Computational replay establishes consistency with stored data and code. It does
+not prove external label correctness, data-sharing rights, or generalization.

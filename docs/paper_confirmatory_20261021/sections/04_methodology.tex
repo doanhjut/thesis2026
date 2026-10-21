@@ -1,0 +1,188 @@
+\section{Methodology}
+\label{sec:method}
+
+\subsection{Static Learner and Study Workflow}
+
+LightGBM represents the raw score as an additive ensemble
+\begin{equation}
+F(x)=\sum_{m=1}^{M}\eta h_m(x),
+\end{equation}
+where $h_m$ is a decision tree, $M$ is the number of boosting rounds, and $\eta$
+is the learning rate \cite{ke2017lightgbm}. Its histogram-based learner handles
+heterogeneous PE attributes efficiently. Native TreeSHAP supplies signed
+per-coordinate contributions without fitting a separate local surrogate
+\cite{lundberg2020local}.
+
+Figure~\ref{fig:workflow} separates three data flows. The active-learning loop
+trains on the current labeled set, scores only the remaining development pool,
+queries a batch, and retrains. Validation defines the target and any operating
+threshold. The fixed outer test set is used only for reporting. A separate
+fidelity path trains controlled models on the outer-fold development data and
+intervenes on test vectors. Fidelity results are not treated as a causal
+explanation for active-learning gains.
+
+\begin{figure*}[t]
+\centering
+\fbox{\begin{minipage}{0.95\textwidth}
+\centering
+\textbf{Outer-fold data split}\quad Development $\mid$ Validation $\mid$ Test
+\par\medskip
+\textbf{Active-learning loop:}\quad
+$\mathcal{L}_r\rightarrow$ LightGBM $\rightarrow$
+pool scores/TreeSHAP $\rightarrow Q_r\rightarrow$ oracle batch
+$\rightarrow\mathcal{L}_{r+1}$
+\par\smallskip
+Validation $\dashrightarrow$ target and threshold
+\qquad Test $\dashrightarrow$ reporting only
+\par\medskip\hrule\medskip
+\textbf{Controlled diagnostic:}\quad
+fixed model $\rightarrow$ TreeSHAP ranking $\rightarrow$
+top-$k$/random masks $\rightarrow$ prediction and ranking changes
+\end{minipage}}
+\caption{Study workflow. Solid arrows form the acquisition loop. Dashed arrows
+denote evaluation inputs that never enter query selection. The controlled
+TreeSHAP diagnostic is fitted and interpreted separately.}
+\label{fig:workflow}
+\end{figure*}
+
+\subsection{Predictive Uncertainty}
+
+For predicted probability $p_i$, uncertainty is
+\begin{equation}
+U_i=1-2|p_i-0.5|.
+\label{eq:uncertainty}
+\end{equation}
+It equals one at the decision boundary and zero at either probability extreme.
+This score is computationally inexpensive and supplies the strongest measured
+baseline beyond random selection.
+
+\subsection{Directional Entropy}
+
+For signed attribution vector $\boldsymbol{\phi}_i$, define positive and
+negative masses
+\begin{equation}
+A_i^+=\sum_j\max(\phi_{ij},0),\qquad
+A_i^-=-\sum_j\min(\phi_{ij},0).
+\end{equation}
+If $A_i^++A_i^->0$, the positive-mass share is
+\begin{equation}
+q_i=\frac{A_i^+}{A_i^++A_i^-}.
+\end{equation}
+Directional entropy is
+\begin{equation}
+H_i=-q_i\log_2q_i-(1-q_i)\log_2(1-q_i),
+\label{eq:entropy}
+\end{equation}
+with $H_i=0$ for an all-zero or one-sided vector. $H_i$ is high when substantial
+positive and negative attribution masses coexist. It is not entropy of the
+predicted class distribution and not calibrated epistemic uncertainty.
+
+Let $S_i=\sum_j\phi_{ij}$ and $L_i=\|\boldsymbol{\phi}_i\|_1$. Because
+$A_i^+-A_i^-=S_i$ and $A_i^++A_i^-=L_i$,
+\begin{equation}
+q_i=\frac{1}{2}+\frac{S_i}{2L_i},\qquad L_i>0.
+\label{eq:h-identity}
+\end{equation}
+Thus, $H_i$ is a signed-mass balance statistic determined by the raw-score
+contribution and $L_1$ attribution magnitude. The identity motivates direct
+attribution-norm baselines in future confirmatory extensions.
+
+\subsection{Signed-Attribution Variance}
+
+The dispersion signal is
+\begin{equation}
+V_i=\frac{1}{d}\sum_{j=1}^{d}(\phi_{ij}-\bar{\phi}_i)^2,
+\qquad
+\bar{\phi}_i=\frac{1}{d}\sum_j\phi_{ij}.
+\label{eq:variance}
+\end{equation}
+Expanding the centered square gives
+\begin{equation}
+V_i=\frac{\|\boldsymbol{\phi}_i\|_2^2}{d}-\frac{S_i^2}{d^2}.
+\label{eq:v-identity}
+\end{equation}
+It therefore summarizes coordinate dispersion of one explanation; it is not
+variance across trees, posterior samples, or independently fitted models.
+
+\subsection{Composite Acquisition Policies}
+
+Because $U,H,V$ have different numeric ranges, each signal $S$ is min--max
+normalized over the current pool:
+\begin{equation}
+\widetilde{S}_i=\begin{cases}
+\dfrac{S_i-S_{\min}}{S_{\max}-S_{\min}},&S_{\max}>S_{\min},\\
+0,&\text{otherwise}.
+\end{cases}
+\label{eq:normalization}
+\end{equation}
+The general score is
+\begin{equation}
+Q_i=\alpha\widetilde{U}_i+
+\beta\widetilde{H}_i+
+\gamma\widetilde{V}_i.
+\label{eq:query}
+\end{equation}
+Table~\ref{tab:policies} defines the measured policies. Random assigns an
+independent random score; ties in deterministic policies are resolved using the
+retained row identifier.
+
+\begin{table}[t]
+\centering
+\caption{Measured acquisition policies.}
+\label{tab:policies}
+\small
+\begin{tabular}{lc}
+\toprule
+Policy & $(\alpha,\beta,\gamma)$ \\
+\midrule
+Random & not applicable \\
+Uncertainty & $(1,0,0)$ \\
+$U+H$ & $(3/7,4/7,0)$ \\
+$U+V$ & $(0.5,0,0.5)$ \\
+\xfull & $(0.3,0.4,0.3)$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Min--max scaling is sensitive to pool extremes, and the weights were not selected
+through an independent outer optimization study. The top-100 rule also lacks an
+explicit diversity constraint. These are tested configurations, not established
+optima. Sensitivity, uncertainty-plus-diversity, and calibrated committee
+comparisons remain required before claiming dominance over strong acquisition
+families.
+
+\subsection{Controlled TreeSHAP Diagnostics}
+
+For $k\in\{10,25,50\}$, each test sample receives a top-$|\mathrm{SHAP}|$ mask
+and 20 uniform random masks of equal size. The intervention in
+(\ref{eq:mask}) is repeated with the training-column mean and median. Primary
+outputs are the post-mask ROC--AUC and decrease relative to the unmasked model.
+The comparison of interest is
+\begin{equation}
+\Delta_k^{\mathrm{rel}}=
+\Delta\mathrm{AUC}_{k}^{\mathrm{top}}-
+\Delta\mathrm{AUC}_{k}^{\mathrm{random}}.
+\label{eq:relative-deletion}
+\end{equation}
+Absolute differences are preferred to ratios because random-mask decreases are
+near zero.
+
+Global ranking stability is measured using Spearman correlation. Set agreement
+for the highest-ranked $k$ coordinates uses
+\begin{equation}
+J_k(A,B)=\frac{|T_k(A)\cap T_k(B)|}{|T_k(A)\cup T_k(B)|},
+\label{eq:jaccard}
+\end{equation}
+where $T_k(A)$ and $T_k(B)$ are top-$k$ feature sets of two fitted models.
+Comparisons are separated into different seeds within the same fold and models
+from different folds.
+
+Explanation consistency (EC) and contrastive geometry (CF) are retained only as
+descriptive diagnostics. EC correlates pairwise cosine geometry in standardized
+feature and signed-attribution spaces. CF normalizes the distance between
+label-conditioned SHAP centroids by the largest sample attribution norm. A common
+permutation of attribution columns preserves additivity, pairwise cosines,
+centroid distance, and norms while assigning effects to incorrect feature names.
+Consequently, additivity, EC, and CF cannot certify semantic correctness, and no
+aggregate OFS is constructed.
+
