@@ -83,6 +83,24 @@ chưa cache trong mỗi lần gọi. Collector dừng gửi request mới ngay k
 đánh dấu `deferred_rate_limit` để có thể chạy tiếp vào ngày sau. Không dùng
 nhiều key để né quota.
 
+Có thể dùng worker nền để tự chờ quota và chạy tiếp đúng cache, không đổi API
+key hoặc cohort:
+
+```bash
+.venv/bin/python scripts/auto_resume_vt_collection.py \
+  --cohort outputs/malbehavd_pid_prepared/cohort_manifest.csv \
+  --output outputs/malbehavd_pid_vt \
+  --seed 2026 --requests-per-minute 4 --max-new 100
+```
+
+Worker dùng khóa tệp để ngăn hai collector chạy đồng thời. Sau 429 đầu tiên của
+chu kỳ, worker chờ 24 giờ và thêm 5 phút; nếu quota vẫn chưa mở, worker thử lại
+sau mỗi 6 giờ. Mỗi lần chỉ chạy một lô tuần tự. Tạo tệp
+`outputs/malbehavd_pid_vt/STOP_AUTO_COLLECTION` để yêu cầu worker dừng an toàn.
+Trạng thái và log lần lượt nằm ở `auto_collection_state.json` và
+`auto_collection.log`. Worker chỉ thu metadata và audit; không tự chạy mô hình
+confirmatory.
+
 Kiểm tra tiến độ mà không gọi mạng:
 
 ```bash
