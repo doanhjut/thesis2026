@@ -1,6 +1,6 @@
 # Báo cáo trạng thái bằng chứng và mức sẵn sàng viết bài báo
 
-**Ngày chốt:** 21/10/2026  
+**Ngày cập nhật:** 23/10/2026
 **Nhánh mã nguồn:** `feat/reproducible-thesis-experiments`  
 **Mục đích:** tổng hợp dữ liệu, thực nghiệm, nội dung đã khắc phục, nội dung chưa đáp ứng và phạm vi phát biểu phù hợp để chuyển sang viết paper.
 
@@ -13,15 +13,15 @@ Tới thời điểm hiện tại, nghiên cứu đã tiến xa hơn đáng kể
 1. **Dữ liệu tĩnh EMBER đã được khôi phục định danh và kiểm tra provenance ở mức hàng.** Bộ dùng cho Active Learning và Fidelity có 2.000 mẫu, 2.381 đặc trưng, SHA-256 và manifest khóa bằng hash.
 2. **XAI-Guided Active Learning đã có thực nghiệm xác nhận** trên 5 outer folds × 5 seeds, có Random và Uncertainty làm baseline, có ablation `U+H`, `U+V`, `XAI_full`, có AULC, ngân sách nhãn, low-FPR metrics và overhead.
 3. **Fidelity đã được nâng từ một điểm OFS khó bảo vệ thành một giao thức có đối chứng:** deletion top-SHAP so với random cùng số chiều, hai baseline mean/median, nhiều fold/seed và kiểm tra độ ổn định thứ hạng.
-4. **PID đã chuyển từ mô phỏng sang pilot đo thật** trên MalBehavD-V1: 200 mẫu chọn trước, 199 mẫu có đủ metadata tĩnh và chuỗi API động; có bảy cấu hình Static, Dynamic, Average, Fixed, P, PI và PID; có bootstrap ghép cặp và phân tích riêng thành phần D.
+4. **PID đã có run xác nhận trên MalBehavD-V1:** 1.922/1.923 mẫu có đủ metadata tĩnh và chuỗi API động; có bảy cấu hình Static, Dynamic, Average, Fixed, P, PI và PID, 5 outer folds, bootstrap ghép cặp và phép tắt riêng thành phần D.
 5. **Pipeline và artifact đã có khả năng replay/verification.** Các bảng chính có thể truy ngược về cấu hình, prediction và hash.
 
 Tuy nhiên, bằng chứng hiện tại **chưa đủ để viết một paper khẳng định hoàn chỉnh “multi-stage ransomware detection with PID”** vì:
 
 - EMBER và MalBehavD-V1 đều có nhãn malware tổng quát, không phải ransomware ground truth đã xác minh.
 - AL/Fidelity chạy trên EMBER, PID chạy trên MalBehavD-V1; chưa có một thí nghiệm end-to-end trên cùng cohort.
-- PID mới là pilot 199 mẫu. Cohort xác nhận 1.923 mẫu hiện có 993 metadata usable, thấp hơn ngưỡng 90% đã khóa.
-- Thành phần D không tạo khác biệt quyết định trong pilot; full PID không vượt P.
+- Run xác nhận cho thấy Average đạt AUC/AP/Brier tốt nhất, Fixed đạt FPR thấp nhất; full PID không phải cấu hình tốt nhất.
+- Thành phần D không làm thay đổi quyết định cuối trên 1.922 mẫu và không tạo hiệu ứng AUC/AP có khoảng tin cậy loại trừ 0.
 - Chưa có gate + fusion + AL tích hợp, external/temporal validation và đo latency đầu cuối.
 
 ### Khuyến nghị phạm vi paper
@@ -32,7 +32,7 @@ Tuy nhiên, bằng chứng hiện tại **chưa đủ để viết một paper k
 
 Paper này dùng EMBER làm bằng chứng chính. Hai trục phương pháp là XAI-guided acquisition và đánh giá Fidelity/stability. PID chỉ xuất hiện ở phần thảo luận hoặc pilot bổ sung, không phải claim trung tâm.
 
-**Phương án giữ đủ ba đóng góp và kiến trúc multi-stage:** chỉ chốt manuscript sau khi hoàn thành confirmatory PID, baseline fusion mạnh, gate end-to-end và thí nghiệm tích hợp. Nếu D tiếp tục không có tác dụng, nên đổi đóng góp từ “PID Fusion” thành **event-indexed adaptive static–dynamic fusion with component ablation**, trong đó kết quả khoa học là P đủ trong horizon hiện tại.
+**Phương án giữ đủ ba đóng góp và kiến trúc multi-stage:** run confirmatory PID đã hoàn tất, nhưng vẫn cần baseline learned-fusion, gate end-to-end và thí nghiệm tích hợp trước khi chốt manuscript mạnh. Vì D không tạo lợi ích đo được, nên đổi đóng góp từ “PID Fusion vượt trội” thành **event-indexed static–dynamic fusion with component ablation**, trong đó kết quả khoa học là luật đơn giản hơn đủ trong horizon hiện tại.
 
 ---
 
@@ -41,8 +41,8 @@ Paper này dùng EMBER làm bằng chứng chính. Hai trục phương pháp là
 | Mức | Nội dung | Cách dùng trong paper |
 |---|---|---|
 | **Xác nhận** | AL và Fidelity trên EMBER 2.000 mẫu; verification pass | Có thể dùng làm kết quả chính |
-| **Pilot đo thật** | PID trên 199/200 mẫu MalBehavD-V1 | Dùng làm feasibility/ablation pilot; phải báo CI và giới hạn |
-| **Tiến độ thu thập** | 993/1.923 metadata usable cho confirmatory PID | Chỉ báo tiến độ; không dùng làm kết quả mô hình |
+| **Xác nhận** | PID/fusion trên 1.922/1.923 mẫu MalBehavD-V1; verification pass | Dùng làm kết quả ablation chính, báo CI và giới hạn |
+| **Pilot đo thật** | PID trên 199/200 mẫu MalBehavD-V1 | Chỉ dùng đối chiếu feasibility; đã được thay bởi run xác nhận |
 | **Bằng chứng phụ** | Static gate đã đo trên dữ liệu tĩnh nhưng chưa có quyết định động cuối | Dùng mô tả thiết kế hoặc limitation |
 | **Không dùng** | Artifact legacy nằm trực tiếp trong `results/`, pilot cũ không có identity, số demo/mô phỏng | Không đưa vào bảng, abstract hoặc kết luận |
 
@@ -134,23 +134,23 @@ Nguồn chuẩn: `results/confirmatory_20261019_ember_identity/`.
 
 Pilot có verification pass và đủ dùng để chứng minh pipeline/ablation hoạt động. Quy mô này chưa đủ để xác nhận full PID hoặc ước lượng low-FPR đáng tin cậy.
 
-### 3.4. Cohort confirmatory PID 1.923 mẫu — trạng thái hiện tại
+### 3.4. Cohort confirmatory PID 1.923 mẫu — đã hoàn tất
 
 | Thuộc tính | Giá trị |
 |---|---:|
 | Cohort đã khóa | 1.923 |
 | Manifest SHA-256 | `9540b88b0da2463f63b4e983f5ecc277e3845b7badebbb79695e35f2c3b1a669` |
-| Metadata usable | 993 |
-| Coverage | 51,64% |
-| Benign usable | 466/932 = 50,00% |
-| Malware usable | 527/991 = 53,18% |
+| Metadata usable | 1.922 |
+| Coverage | 99,95% |
+| Benign usable | 932/932 = 100% |
+| Malware usable | 990/991 = 99,90% |
 | Ngưỡng tối thiểu đã khóa | 90% = 1.731 mẫu |
-| Cần thêm tối thiểu | 738 mẫu usable |
-| Deferred do rate limit | 929 |
+| Mẫu thiếu thực | 1 malware, HTTP 404 |
+| Deferred do rate limit | 0 |
 
-**Quyết định hiện tại:** chưa chạy confirmatory model trên 993 mẫu. Phiên ngày 21/10 thu thêm 273 mẫu và dừng đúng tại HTTP 429. Lần thử resume lúc 06:38:43 ngày 22/10 (giờ Việt Nam) vẫn nhận HTTP 429 nên không có mẫu mới. Việc chạy model lúc collection còn dở sẽ làm thay đổi cohort theo thứ tự thu thập và tạo nguy cơ selection bias.
+**Quyết định hiện tại:** run confirmatory đã chạy trên 1.922 mẫu usable sau khi collection kết thúc. Mẫu HTTP 404 được giữ là missing thật, không thay thế hoặc tạo metadata. Verification replay pass.
 
-Nguồn tiến độ: `results/measured_20261020_malbehavd_pid_full_collection_progress/`.
+Nguồn xác nhận: `results/measured_20261023_malbehavd_pid_confirmatory_1922/`.
 
 ---
 
@@ -195,48 +195,49 @@ Trạng thái được reset theo execution; (D_0=0); integral có giới hạn 
 - Có trajectory theo 5/10/15/20 sự kiện.
 - Có kiểm tra riêng `PID − PI` để xác định đóng góp D.
 
-### 4.3. Kết quả pilot cuối chuỗi
+### 4.3. Kết quả confirmatory cuối chuỗi
 
 Các ô là mean ± sample SD qua 5 outer folds.
 
 | Phương pháp | ROC-AUC | AP | FPR (%) | TPR (%) | Brier |
 |---|---:|---:|---:|---:|---:|
-| Static | 0,9254 ± 0,0667 | 0,9286 ± 0,0479 | 47,08 ± 28,23 | 96,28 ± 3,44 | 0,0980 ± 0,0654 |
-| Dynamic | 0,9345 ± 0,0428 | 0,9437 ± 0,0375 | 47,96 ± 16,69 | 96,95 ± 4,71 | 0,1102 ± 0,0305 |
-| Average 50/50 | 0,9582 ± 0,0344 | 0,9663 ± 0,0240 | 34,97 ± 23,46 | 96,28 ± 3,44 | **0,0810 ± 0,0318** |
-| Fixed weight | 0,9415 ± 0,0449 | 0,9558 ± 0,0314 | **29,97 ± 15,41** | 93,23 ± 2,39 | 0,0927 ± 0,0381 |
-| **P** | **0,9592 ± 0,0335** | **0,9674 ± 0,0229** | 34,97 ± 23,46 | 96,28 ± 3,44 | 0,0816 ± 0,0326 |
-| PI | 0,9583 ± 0,0354 | 0,9660 ± 0,0253 | 34,97 ± 23,46 | 96,28 ± 3,44 | 0,0854 ± 0,0391 |
-| PID | 0,9583 ± 0,0354 | 0,9660 ± 0,0253 | 34,97 ± 23,46 | 96,28 ± 3,44 | 0,0854 ± 0,0391 |
+| Static | 0,9702 ± 0,0140 | 0,9700 ± 0,0130 | 23,58 ± 11,74 | 96,56 ± 2,01 | 0,0567 ± 0,0146 |
+| Dynamic | 0,9733 ± 0,0076 | 0,9802 ± 0,0055 | 16,40 ± 5,57 | 95,46 ± 2,11 | 0,0584 ± 0,0106 |
+| **Average 50/50** | **0,9844 ± 0,0088** | **0,9883 ± 0,0059** | 13,40 ± 6,49 | 96,57 ± 0,66 | **0,0455 ± 0,0100** |
+| Fixed weight | 0,9832 ± 0,0086 | 0,9872 ± 0,0060 | **11,69 ± 3,58** | 96,06 ± 0,84 | 0,0481 ± 0,0108 |
+| P | 0,9838 ± 0,0088 | 0,9878 ± 0,0058 | 13,29 ± 6,07 | 96,36 ± 0,74 | 0,0476 ± 0,0101 |
+| PI | 0,9837 ± 0,0089 | 0,9877 ± 0,0059 | 13,83 ± 6,06 | 96,47 ± 0,71 | 0,0474 ± 0,0102 |
+| PID | 0,9838 ± 0,0088 | 0,9877 ± 0,0058 | 13,83 ± 6,06 | 96,47 ± 0,71 | 0,0479 ± 0,0105 |
 
 **Hiệu ứng mô tả nổi bật:**
 
-- P cao hơn Static khoảng 3,37 điểm phần trăm ROC-AUC.
-- P cao hơn Dynamic khoảng 2,47 điểm phần trăm ROC-AUC.
-- P cao hơn Fixed khoảng 1,76 điểm phần trăm ROC-AUC.
-- Average và P gần nhau; P chỉ cao hơn Average khoảng 0,10 điểm phần trăm.
+- Average cao hơn Static khoảng 1,42 điểm phần trăm ROC-AUC.
+- Average cao hơn Dynamic khoảng 1,12 điểm phần trăm ROC-AUC.
+- Average cao hơn PID khoảng 0,064 điểm phần trăm ROC-AUC.
+- Fixed đạt FPR thấp nhất; không có một luật tốt nhất trên mọi tiêu chí.
 
 **PID so với Fixed trên dự đoán out-of-fold:**
 
-- ΔAUC = `+0,0130`, bootstrap 95% CI `[-0,0086; +0,0409]`.
-- ΔAP = `+0,0080`, bootstrap 95% CI `[-0,0102; +0,0272]`.
-- ΔTPR = `+4,10` điểm phần trăm, CI `[+0,94; +8,26]`.
-- ΔFPR = `+5,06` điểm phần trăm, CI `[0,00; +10,58]`; dấu dương nghĩa là PID có FPR cao hơn.
+- ΔAUC = `+0,00043`, bootstrap 95% CI `[-0,00088; +0,00175]`.
+- ΔAP = `+0,00027`, bootstrap 95% CI `[-0,00079; +0,00137]`.
+- ΔTPR = `+0,40` điểm phần trăm, CI `[-0,20; +1,00]`.
+- ΔFPR = `+2,16` điểm phần trăm, CI `[+0,84; +3,50]`; dấu dương nghĩa là PID có FPR cao hơn.
 
 ### 4.4. Kết quả riêng của thành phần D
 
-- Trung bình `|score_PID − score_PI| = 0,000109`.
-- Sai khác lớn nhất = `0,001196`.
-- Quyết định phân lớp khác nhau = `0/199`.
-- PI và PID có cùng ROC-AUC/AP/FPR/TPR tới độ chính xác báo cáo.
+- PID tối ưu so với PI tối ưu: ΔAUC `-0,000125`, CI 95% `[-0,000296; +0,000044]`; ΔBrier `+0,000512`, CI `[+0,000134; +0,000934]`, bất lợi cho PID.
+- Khi giữ cùng Kp, Ki, threshold và đặt Kd=0: ΔAUC `+0,000015`, CI 95% `[-0,000021; +0,000049]`.
+- Trung bình `|Δscore|` tại mốc cuối = `0,000207`; lớn nhất = `0,005207`.
+- Quyết định phân lớp khác nhau tại mốc cuối = `0/1.922`.
+- Trên cả bốn mốc, D làm đổi 6/7.688 dòng quyết định nhưng khác biệt biến mất ở mốc cuối.
 
-**Diễn giải phù hợp:** ở horizon 5–20 sự kiện, D chưa mang thêm thông tin nhận diện có thể đo được. Kết quả này ủng hộ cấu hình P đơn giản hơn trong pilot, thay vì ủng hộ full PID.
+**Diễn giải phù hợp:** ở horizon 5–20 sự kiện, D chưa mang thêm lợi ích nhận diện có thể đo được. Kết quả ủng hộ luật dung hợp đơn giản hơn, thay vì ủng hộ full PID.
 
 ### 4.5. Phát biểu được phép
 
-- Hai kênh tĩnh và động có tính bổ sung trong cohort pilot.
+- Hai kênh tĩnh và động có tính bổ sung trong cohort xác nhận.
 - Nhóm fusion cải thiện ranking so với từng kênh riêng.
-- P đạt AUC/AP trung bình cao nhất trong bảy cấu hình.
+- Average đạt AUC/AP/Brier trung bình tốt nhất; Fixed đạt FPR thấp nhất.
 - Ablation phát hiện I/D chưa tạo lợi ích gia tăng rõ trong horizon hiện tại.
 - Pipeline event-indexed có thể chạy an toàn chỉ từ report/metadata công khai.
 
@@ -251,12 +252,11 @@ Các ô là mean ± sample SD qua 5 outer folds.
 
 ### 4.7. Phần còn thiếu cho paper mạnh
 
-1. Hoàn tất cohort confirmatory tối thiểu 1.731/1.923 usable và chạy lại đúng protocol.
-2. Bổ sung `max-risk`, calibrated logistic stacking và ít nhất một learned-fusion baseline.
-3. Báo pAUC/TPR tại FPR thấp nếu số benign đủ lớn.
-4. Phân tích sensitivity của gain và weight trajectory.
-5. Nếu muốn giữ D, cần chuỗi dài hơn hoặc định nghĩa reliability/error có ý nghĩa hơn; không chọn lại split để tìm kết quả thuận lợi.
-6. Nếu D tiếp tục không hơn PI/P, đổi tên đóng góp và paper framing sang adaptive fusion/component selection.
+1. Bổ sung `max-risk`, calibrated logistic stacking và ít nhất một learned-fusion baseline.
+2. Báo pAUC/TPR tại FPR thấp và phân tích calibration theo mục tiêu vận hành.
+3. Phân tích sensitivity của gain và weight trajectory.
+4. Nếu muốn giữ D, cần chuỗi dài hơn hoặc định nghĩa reliability/error có ý nghĩa hơn; không chọn lại split để tìm kết quả thuận lợi.
+5. Đổi paper framing sang event-indexed fusion/component selection; không tuyên bố full PID vượt trội.
 
 ---
 

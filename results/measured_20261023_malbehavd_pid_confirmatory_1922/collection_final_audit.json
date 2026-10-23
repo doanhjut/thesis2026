@@ -1,0 +1,40 @@
+{
+  "status": "collection_complete_ready_for_confirmatory",
+  "network_requests_issued": false,
+  "cohort_rows": 1923,
+  "usable_rows": 1922,
+  "coverage": 0.999479979199168,
+  "minimum_coverage": 0.9,
+  "target_usable_rows": 1731,
+  "additional_usable_rows_needed": 0,
+  "deferred_rows": 0,
+  "request_status_counts": {
+    "cached": 1885,
+    "fetched": 37,
+    "http_404": 1
+  },
+  "recorded_network_attempt_status_counts": {
+    "fetched": 1698,
+    "error": 24,
+    "http_404": 8,
+    "http_429": 6
+  },
+  "class_coverage": {
+    "0": {
+      "cohort_rows": 932,
+      "usable_rows": 932,
+      "coverage": 1.0
+    },
+    "1": {
+      "cohort_rows": 991,
+      "usable_rows": 990,
+      "coverage": 0.9989909182643795
+    }
+  },
+  "fold_label_coverage_file": "coverage_by_fold_label.csv",
+  "cohort_manifest_sha256": "9540b88b0da2463f63b4e983f5ecc277e3845b7badebbb79695e35f2c3b1a669",
+  "static_features_sha256": "da7d8d56bc094aef5ccaa5909f7055bbf370a33d53fca910876d192a55f5e9dd",
+  "request_log_sha256": "a89b311b684fce041e8369486a3dd583feacde43d1fa7312272cfff5cc5d4b76",
+  "binary_downloaded": false,
+  "decision": "Run confirmatory modeling."
+}

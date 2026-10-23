@@ -1,0 +1,10 @@
+{
+  "repository_commit": "18353c5c01b3ccaf2377257c289669d85a813003",
+  "cohort_manifest_sha256": "9540b88b0da2463f63b4e983f5ecc277e3845b7badebbb79695e35f2c3b1a669",
+  "static_features_sha256": "da7d8d56bc094aef5ccaa5909f7055bbf370a33d53fca910876d192a55f5e9dd",
+  "selected_cohort_sha256": "9540b88b0da2463f63b4e983f5ecc277e3845b7badebbb79695e35f2c3b1a669",
+  "api_sequences_sha256": "db95299e001634061a0c1181ec064ed16b346e3357089262c7091b5f8d683f45",
+  "event_predictions_sha256": "9798a737a109e0459d06528baaddba4b1c045f310399e8bb4b4d8f161a17f760",
+  "binary_downloaded": false,
+  "raw_vt_metadata_committed": false
+}

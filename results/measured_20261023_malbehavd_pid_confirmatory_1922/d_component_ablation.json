@@ -1,0 +1,177 @@
+{
+  "status": "passed",
+  "samples": 1922,
+  "event_rows": 7688,
+  "comparison_1": "validation_selected_PID_minus_validation_selected_PI",
+  "optimized_pid_vs_pi": {
+    "pid": {
+      "auc": 0.9836736463345905,
+      "ap": 0.9874101348831665,
+      "brier": 0.04787936266204325,
+      "fpr": 0.13841201716738197,
+      "tpr": 0.9646464646464646,
+      "tn": 803,
+      "fp": 129,
+      "fn": 35,
+      "tp": 955
+    },
+    "pi": {
+      "auc": 0.9838004508605367,
+      "ap": 0.9875278044150214,
+      "brier": 0.04735784506864259,
+      "fpr": 0.13841201716738197,
+      "tpr": 0.9646464646464646,
+      "tn": 803,
+      "fp": 129,
+      "fn": 35,
+      "tp": 955
+    },
+    "bootstrap_pid_minus_pi": {
+      "auc": {
+        "mean": -0.00012478586688477022,
+        "ci95_low": -0.0002961644965602528,
+        "ci95_high": 4.3516195522122474e-05,
+        "iterations": 1000
+      },
+      "ap": {
+        "mean": -0.00011595726165454634,
+        "ci95_low": -0.0002740993221148458,
+        "ci95_high": 4.0050965587073946e-05,
+        "iterations": 1000
+      },
+      "brier": {
+        "mean": 0.0005116445484112192,
+        "ci95_low": 0.00013368317296997453,
+        "ci95_high": 0.0009339012492872998,
+        "iterations": 1000
+      },
+      "fpr": {
+        "mean": 0.0,
+        "ci95_low": 0.0,
+        "ci95_high": 0.0,
+        "iterations": 1000
+      },
+      "tpr": {
+        "mean": 0.0,
+        "ci95_low": 0.0,
+        "ci95_high": 0.0,
+        "iterations": 1000
+      }
+    },
+    "mean_absolute_score_difference": 0.0017462622149259964,
+    "max_absolute_score_difference": 0.09733669093073904,
+    "decision_changes": 0
+  },
+  "comparison_2": "selected_PID_minus_same_Kp_Ki_threshold_with_Kd_zero",
+  "same_gain_derivative_toggle": {
+    "pid": {
+      "auc": 0.9836736463345905,
+      "ap": 0.9874101348831665,
+      "brier": 0.04787936266204325,
+      "fpr": 0.13841201716738197,
+      "tpr": 0.9646464646464646,
+      "tn": 803,
+      "fp": 129,
+      "fn": 35,
+      "tp": 955
+    },
+    "same_kp_ki_kd_zero": {
+      "auc": 0.9836584731434518,
+      "ap": 0.9873976525360645,
+      "brier": 0.04788483242803853,
+      "fpr": 0.13841201716738197,
+      "tpr": 0.9646464646464646,
+      "tn": 803,
+      "fp": 129,
+      "fn": 35,
+      "tp": 955
+    },
+    "bootstrap_pid_minus_no_d": {
+      "auc": {
+        "mean": 1.4503889314234409e-05,
+        "ci95_low": -2.0579982023313793e-05,
+        "ci95_high": 4.8980617363536536e-05,
+        "iterations": 1000
+      },
+      "ap": {
+        "mean": 1.1821311785113587e-05,
+        "ci95_low": -1.8507529612651895e-05,
+        "ci95_high": 4.290791175488029e-05,
+        "iterations": 1000
+      },
+      "brier": {
+        "mean": -4.788002109814636e-06,
+        "ci95_low": -2.5546290110576955e-05,
+        "ci95_high": 1.8444309549748605e-05,
+        "iterations": 1000
+      },
+      "fpr": {
+        "mean": 0.0,
+        "ci95_low": 0.0,
+        "ci95_high": 0.0,
+        "iterations": 1000
+      },
+      "tpr": {
+        "mean": 0.0,
+        "ci95_low": 0.0,
+        "ci95_high": 0.0,
+        "iterations": 1000
+      }
+    },
+    "mean_absolute_score_change_all_events": 0.0002725262024558685,
+    "max_absolute_score_change_all_events": 0.03235315989346299,
+    "mean_absolute_score_change_final_event": 0.00020709501576531198,
+    "max_absolute_score_change_final_event": 0.005207067598982151,
+    "decision_changes_all_events": 6,
+    "decision_changes_final_event": 0
+  },
+  "selected_pid_gains": [
+    {
+      "outer_fold": 0,
+      "kp": 1.0,
+      "ki": 0.005,
+      "kd": 0.5
+    },
+    {
+      "outer_fold": 1,
+      "kp": 0.5,
+      "ki": 0.02,
+      "kd": 1.0
+    },
+    {
+      "outer_fold": 2,
+      "kp": 2.0,
+      "ki": 0.005,
+      "kd": 1.0
+    },
+    {
+      "outer_fold": 3,
+      "kp": 0.25,
+      "ki": 0.005,
+      "kd": 1.0
+    },
+    {
+      "outer_fold": 4,
+      "kp": 0.5,
+      "ki": 0.02,
+      "kd": 0.25
+    }
+  ],
+  "interpretation": {
+    "auc": "positive_favors_PID",
+    "ap": "positive_favors_PID",
+    "brier": "negative_favors_PID",
+    "fpr": "negative_favors_PID",
+    "tpr": "positive_favors_PID"
+  },
+  "limitations": [
+    "The optimized PID-versus-PI comparison allows each family to select Kp and Ki on validation.",
+    "The same-gain toggle isolates the deployed derivative term but deliberately does not retune the no-D counterfactual.",
+    "Event count is an observation axis, not wall-clock latency."
+  ],
+  "source": {
+    "run": "/workspace/thesis2026/outputs/malbehavd_pid_20261023_confirmatory_1922",
+    "event_predictions_sha256": "9798a737a109e0459d06528baaddba4b1c045f310399e8bb4b4d8f161a17f760",
+    "validation_search_sha256": "5e8c5f3892070fa5f156d2f57a4595706de89e9b43cf76b9506fce1979c153e0"
+  }
+}

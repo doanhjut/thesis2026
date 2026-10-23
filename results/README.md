@@ -15,8 +15,13 @@ Kết quả hỗ trợ tính khả thi của adaptive fusion, nhưng chưa chứ
 FPR hoặc thành phần D vượt PI; xem README trong gói trước khi trích dẫn.
 
 `measured_20261020_malbehavd_pid_full_collection_progress/` lưu snapshot thu
-metadata cho confirmatory trên toàn cohort 1.923 mẫu. Hiện có 993 mẫu usable
-(51,64%); 929 mẫu còn lại được hoãn sau khi API trả HTTP 429, nên chưa chạy
-mô hình và chưa phân tích missingness cuối cùng.
+metadata cho confirmatory trên toàn cohort 1.923 mẫu. Collection cuối có 1.922
+mẫu usable (99,95%); một SHA trả HTTP 404.
+
+`measured_20261023_malbehavd_pid_confirmatory_1922/` là run PID xác nhận trên
+1.922 mẫu, 5 outer folds và 1.000 bootstrap. Gói chứa prediction từng mẫu,
+ablation Static/Dynamic/Average/Fixed/P/PI/PID và phép tắt riêng thành phần D
+với cùng Kp/Ki/threshold. Kết quả cho thấy dung hợp có lợi nhưng Average đạt AUC
+tốt nhất, Fixed có FPR thấp nhất và D không đổi quyết định cuối.
 
 Các file nằm trực tiếp tại `results/` được tạo bởi mã nguyên mẫu trước đây, không có cùng split/provenance/checkpoint để kiểm tra lại; không dùng chúng làm bằng chứng cho luận văn.

@@ -1,0 +1,19 @@
+% Generated from measured artifacts; requires booktabs.
+\begin{table}[htbp]
+\centering
+\small
+\caption{Pilot event-indexed trên các mẫu có metadata tĩnh; trung bình và sample SD qua 5 outer fold.}
+\begin{tabular}{lrrrrr}
+\toprule
+Phương pháp & ROC-AUC & AP & FPR (\%) & TPR (\%) & Brier \\
+\midrule
+Static\_only & 0.9702 $\pm$ 0.0140 & 0.9700 $\pm$ 0.0130 & 23.58 $\pm$ 11.74 & 96.56 $\pm$ 2.01 & 0.0567 $\pm$ 0.0146 \\
+Dynamic\_only & 0.9733 $\pm$ 0.0076 & 0.9802 $\pm$ 0.0055 & 16.40 $\pm$ 5.57 & 95.46 $\pm$ 2.11 & 0.0584 $\pm$ 0.0106 \\
+Average\_50\_50 & 0.9844 $\pm$ 0.0088 & 0.9883 $\pm$ 0.0059 & 13.40 $\pm$ 6.49 & 96.57 $\pm$ 0.66 & 0.0455 $\pm$ 0.0100 \\
+Fixed\_weight & 0.9832 $\pm$ 0.0086 & 0.9872 $\pm$ 0.0060 & 11.69 $\pm$ 3.58 & 96.06 $\pm$ 0.84 & 0.0481 $\pm$ 0.0108 \\
+P & 0.9838 $\pm$ 0.0088 & 0.9878 $\pm$ 0.0058 & 13.29 $\pm$ 6.07 & 96.36 $\pm$ 0.74 & 0.0476 $\pm$ 0.0101 \\
+PI & 0.9837 $\pm$ 0.0089 & 0.9877 $\pm$ 0.0059 & 13.83 $\pm$ 6.06 & 96.47 $\pm$ 0.71 & 0.0474 $\pm$ 0.0102 \\
+PID & 0.9838 $\pm$ 0.0088 & 0.9877 $\pm$ 0.0058 & 13.83 $\pm$ 6.06 & 96.47 $\pm$ 0.71 & 0.0479 $\pm$ 0.0105 \\
+\bottomrule
+\end{tabular}
+\end{table}
