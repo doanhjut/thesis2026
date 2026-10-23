@@ -23,6 +23,7 @@ from src.experiments.provenance import audit
 from src.experiments.recovery import (SOREL_TAGS, inspect_npz, recover,
                                       recover_ember_dataset, recover_sorel_metadata,
                                       sampled_source_indices)
+from src.experiments.reliability_pid import reliability_pid_trajectory
 from src.experiments.signals import normalize, shap_signals
 from src.experiments.temporal import validate as validate_temporal
 from src.experiments.temporal_fusion import pid_trajectory, run as run_temporal_fusion
@@ -111,6 +112,22 @@ class ExperimentMathTests(unittest.TestCase):
         self.assertTrue(result.score.between(0, 1).all())
         first = result.sort_values(['row_id', 'event_count']).groupby('row_id').head(1)
         np.testing.assert_allclose(first.pid_derivative, 0.)
+
+    def test_reliability_pid_tracks_target_and_resets_each_execution(self):
+        frame = pd.DataFrame({
+            'row_id': [1, 1, 2, 2], 'execution_id': ['a', 'a', 'b', 'b'],
+            'time_step': [0, 1, 0, 1], 'event_count': [1., 2., 1., 2.],
+            'probability': [.8, .8, .8, .8], 'p_dynamic': [.2, .4, .2, .4],
+            'r_static': [.9, .9, .9, .9], 'r_dynamic': [.5, .7, .5, .7],
+        })
+        setting = {'w0': .5, 'beta': 4., 'kp': .5, 'ki': .01, 'kd': .25, 'alpha': .5}
+        result = reliability_pid_trajectory(frame, setting)
+        first = result.groupby('row_id', sort=False).head(1)
+        self.assertTrue((first.w_static > .5).all())
+        np.testing.assert_allclose(first.pid_derivative, 0.)
+        np.testing.assert_allclose(
+            result[result.row_id == 1].w_static.to_numpy(),
+            result[result.row_id == 2].w_static.to_numpy())
 
     def test_mask_metrics_are_directly_recomputable(self):
         y = np.array([0, 0, 1, 1])

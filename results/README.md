@@ -25,3 +25,11 @@ với cùng Kp/Ki/threshold. Kết quả cho thấy dung hợp có lợi nhưng 
 tốt nhất, Fixed có FPR thấp nhất và D không đổi quyết định cuối.
 
 Các file nằm trực tiếp tại `results/` được tạo bởi mã nguyên mẫu trước đây, không có cùng split/provenance/checkpoint để kiểm tra lại; không dùng chúng làm bằng chứng cho luận văn.
+
+`measured_20261023_reliability_pid_exploratory_1922/` là thí nghiệm phát triển
+sau confirmatory: dùng 20 tiền tố API, ước lượng độ tin cậy trên calibration và
+PID theo dõi trọng số mục tiêu quanh Fixed baseline. Reliability-P giảm FPR
+1,33 điểm phần trăm và cải thiện Brier so với Fixed với CI 95% loại trừ 0,
+nhưng P vẫn tốt hơn PI/PID; full PID không chứng minh được lợi ích của D. Vì
+phương pháp được thiết kế sau khi xem cohort này, kết quả chỉ là exploratory và
+cần cohort external/temporal mới để xác nhận.

@@ -1,0 +1,14 @@
+{
+  "sequences": {
+    "path": "/workspace/thesis2026/outputs/malbehavd_pid_20261020_prepared/api_sequences.csv.gz",
+    "sha256": "db95299e001634061a0c1181ec064ed16b346e3357089262c7091b5f8d683f45"
+  },
+  "static_features": {
+    "path": "/workspace/thesis2026/outputs/malbehavd_pid_20261020_vt_full/static_features.csv.gz",
+    "sha256": "da7d8d56bc094aef5ccaa5909f7055bbf370a33d53fca910876d192a55f5e9dd"
+  },
+  "selection": {
+    "path": "/workspace/thesis2026/outputs/malbehavd_pid_20261020_vt_full/selected_cohort.csv",
+    "sha256": "9540b88b0da2463f63b4e983f5ecc277e3845b7badebbb79695e35f2c3b1a669"
+  }
+}

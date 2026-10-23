@@ -7,7 +7,7 @@ import traceback
 
 from . import (active_learning, confirmatory, fidelity, fusion, gating,
                malbehavd_pid, provenance, recovery, robust_fidelity, temporal,
-               temporal_fusion)
+               temporal_fusion, reliability_pid)
 from .common import DEFAULT_DATA, REPO, finish_manifest, load_dataset, require, write_json
 from .verification import verify_al, verify_fidelity, verify_saved_run
 
@@ -184,6 +184,20 @@ def parser():
     event_pid.add_argument('--calibration-fraction', type=float, default=.2)
     event_pid.add_argument('--bootstrap', type=int, default=1000)
     event_pid.add_argument('--seed', type=int, default=2026)
+    reliability = sub.add_parser(
+        'reliability-pid-exploratory',
+        help='Develop reliability-aware PID on dense event prefixes; post-hoc/exploratory only.')
+    reliability.add_argument('--sequences', type=Path, required=True)
+    reliability.add_argument('--static-features', type=Path, required=True)
+    reliability.add_argument('--selection', type=Path, required=True)
+    reliability.add_argument('--output', type=Path, required=True)
+    reliability.add_argument('--windows', nargs='+', type=int, default=list(range(1, 21)))
+    reliability.add_argument('--target-tpr', type=float, default=.95)
+    reliability.add_argument('--min-coverage', type=float, default=.9)
+    reliability.add_argument('--validation-fraction', type=float, default=.2)
+    reliability.add_argument('--calibration-fraction', type=float, default=.2)
+    reliability.add_argument('--bootstrap', type=int, default=1000)
+    reliability.add_argument('--seed', type=int, default=2026)
     return p
 
 
@@ -308,6 +322,16 @@ def main(argv=None):
                 args.calibration_fraction, args.bootstrap, args.seed, args.selection)
             from . import reporting
             reporting.event_pid_report(args.output)
+            finish_manifest(args.output)
+            print(json.dumps({'status': result['status'], 'output': str(args.output.resolve()),
+                              'samples': result['samples']}, ensure_ascii=False, indent=2))
+            return 0
+        if args.command == 'reliability-pid-exploratory':
+            result = reliability_pid.run(
+                args.sequences, args.static_features, args.output, args.selection,
+                tuple(args.windows), args.target_tpr, args.min_coverage,
+                args.validation_fraction, args.calibration_fraction,
+                args.bootstrap, args.seed)
             finish_manifest(args.output)
             print(json.dumps({'status': result['status'], 'output': str(args.output.resolve()),
                               'samples': result['samples']}, ensure_ascii=False, indent=2))

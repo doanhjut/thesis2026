@@ -260,6 +260,26 @@ Các ô là mean ± sample SD qua 5 outer folds.
 
 ---
 
+## 4.8. Exploratory reliability-aware PID sau confirmatory
+
+Một runner mới được phát triển sau khi phân tích run xác nhận, dùng 20 tiền tố API,
+trọng số cơ sở `w0`, mô hình độ tin cậy học trên calibration và lưới gain cho phép
+`Ki=0`, `Kd=0`. Đây là kết quả post-hoc/exploratory, không thay thế bằng chứng
+confirmatory và cần cohort external/temporal mới.
+
+- Reliability-P đạt AUC 0,9826, FPR 11,15%, TPR 95,96%, Brier 0,0456.
+- So với Fixed, Reliability-P giảm FPR 1,33 điểm phần trăm, CI 95%
+  `[-2,45; -0,21]`, và giảm Brier 0,00308, CI `[-0,00560; -0,00071]`.
+- Full reliability-PID đạt AUC 0,9825 và FPR 11,58%; không hơn PI/P.
+- Full PID trừ PI có ΔAUC +0,00007 với CI đi qua 0; FPR tăng 0,11 điểm phần
+  trăm, CI `[0; +0,33]`; TPR không đổi.
+- Average vẫn tốt nhất về AUC/AP/event-AUC; do đó chưa được tuyên bố full PID
+  vượt các baseline dung hợp.
+
+Kết quả củng cố framing **reliability-aware adaptive fusion with PID component
+ablation**, trong đó thành phần P tạo lợi ích vận hành và D chưa có bằng chứng hỗ
+trợ. Nguồn: `results/measured_20261023_reliability_pid_exploratory_1922/`.
+
 ## 5. Đóng góp 2 — XAI-Guided Active Learning
 
 ### 5.1. Cơ chế
