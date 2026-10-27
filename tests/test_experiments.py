@@ -13,6 +13,7 @@ from src.experiments.common import (choose_threshold, choose_threshold_at_max_fp
 from src.experiments.fidelity import mask_metrics
 from src.experiments.fusion import sequence_scores
 from src.experiments.gating import gate_counts, select_gate
+from src.experiments.gated_pid import select_gate_grid
 from src.experiments.malbehavd_pid import (_bootstrap_difference, _fold_effects,
                                            _timepoint_metrics, _win_tie_loss,
                                            _write_gzip_csv,
@@ -147,6 +148,16 @@ class ExperimentMathTests(unittest.TestCase):
         self.assertEqual(selected['early_false_negatives'], 0)
         self.assertEqual(selected['early_false_positives'], 0)
         self.assertEqual(gate_counts(y, p, low, high), selected)
+
+    def test_cross_fitted_gate_grid_respects_each_error_cap(self):
+        y = np.array([0, 0, 0, 0, 1, 1, 1, 1])
+        p = np.array([.01, .1, .2, .8, .2, .7, .9, .99])
+        low, high, measured, feasible = select_gate_grid(
+            y, p, .25, lows=[.05, .15, .25], highs=[.75, .85, .95])
+        self.assertLessEqual(measured['early_fnr_all_positive'], .25)
+        self.assertLessEqual(measured['early_fpr_all_negative'], .25)
+        self.assertGreater(feasible, 0)
+        self.assertLessEqual(low, high)
 
 
 class DatasetGuardTests(unittest.TestCase):

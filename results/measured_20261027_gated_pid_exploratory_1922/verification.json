@@ -1,0 +1,7 @@
+{
+  "status": "passed",
+  "source_prediction_rows": 422840,
+  "primary_decision_rows": 20538,
+  "unique_static_oof_rows": 1922,
+  "test_fold_used_for_its_gate_selection": false
+}

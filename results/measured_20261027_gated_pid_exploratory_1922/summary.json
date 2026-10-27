@@ -1,0 +1,896 @@
+{
+  "status": "exploratory_cross_fitted_static_gate_on_saved_oof_predictions",
+  "source_run": "/workspace/thesis2026/results/measured_20261023_reliability_pid_exploratory_1922",
+  "source_predictions_sha256": "9f658efe38e61cb2cec99950bf163da21d791c7cdb3ae46873d8a43e800d2902",
+  "primary_error_cap": 0.01,
+  "sensitivity_caps": [
+    0.005,
+    0.01,
+    0.02
+  ],
+  "gate_selection": "For outer fold k, choose low/high from OOF static predictions in all other folds. Minimize routed fraction subject to separate early-FNR and early-FPR caps.",
+  "results": [
+    {
+      "scope": "end_to_end",
+      "method": "Average_50_50",
+      "samples": {
+        "mean": 384.4,
+        "sd": 0.5477225575051662,
+        "n": 5
+      },
+      "routed_fraction": {
+        "mean": 0.526678841991342,
+        "sd": 0.1540580068796593,
+        "n": 5
+      },
+      "auc": {
+        "mean": 0.9761855903985165,
+        "sd": 0.010829074988370489,
+        "n": 5
+      },
+      "ap": {
+        "mean": 0.9749612447390398,
+        "sd": 0.011389392837345816,
+        "n": 5
+      },
+      "brier": {
+        "mean": 0.04653262886411261,
+        "sd": 0.012098352132100228,
+        "n": 5
+      },
+      "fpr": {
+        "mean": 0.130791788856305,
+        "sd": 0.05633709104185447,
+        "n": 5
+      },
+      "tpr": {
+        "mean": 0.9646409765074152,
+        "sd": 0.006228779306968445,
+        "n": 5
+      }
+    },
+    {
+      "scope": "end_to_end",
+      "method": "Fixed_weight",
+      "samples": {
+        "mean": 384.4,
+        "sd": 0.5477225575051662,
+        "n": 5
+      },
+      "routed_fraction": {
+        "mean": 0.526678841991342,
+        "sd": 0.1540580068796593,
+        "n": 5
+      },
+      "auc": {
+        "mean": 0.9755558890487601,
+        "sd": 0.010047456617400523,
+        "n": 5
+      },
+      "ap": {
+        "mean": 0.9742837290997788,
+        "sd": 0.010712527027342527,
+        "n": 5
+      },
+      "brier": {
+        "mean": 0.04835916234341543,
+        "sd": 0.012273584139231528,
+        "n": 5
+      },
+      "fpr": {
+        "mean": 0.10618135817376803,
+        "sd": 0.023253189385286227,
+        "n": 5
+      },
+      "tpr": {
+        "mean": 0.9565295069924818,
+        "sd": 0.016712365291373283,
+        "n": 5
+      }
+    },
+    {
+      "scope": "end_to_end",
+      "method": "Logistic_stack",
+      "samples": {
+        "mean": 384.4,
+        "sd": 0.5477225575051662,
+        "n": 5
+      },
+      "routed_fraction": {
+        "mean": 0.526678841991342,
+        "sd": 0.1540580068796593,
+        "n": 5
+      },
+      "auc": {
+        "mean": 0.9772937010783999,
+        "sd": 0.010035648879723452,
+        "n": 5
+      },
+      "ap": {
+        "mean": 0.9793052446937562,
+        "sd": 0.005907950489174632,
+        "n": 5
+      },
+      "brier": {
+        "mean": 0.04593202280565154,
+        "sd": 0.013966379504613097,
+        "n": 5
+      },
+      "fpr": {
+        "mean": 0.1458283019952849,
+        "sd": 0.05185515059853295,
+        "n": 5
+      },
+      "tpr": {
+        "mean": 0.9646307216748256,
+        "sd": 0.01390227408511965,
+        "n": 5
+      }
+    },
+    {
+      "scope": "end_to_end",
+      "method": "Reliability_P",
+      "samples": {
+        "mean": 384.4,
+        "sd": 0.5477225575051662,
+        "n": 5
+      },
+      "routed_fraction": {
+        "mean": 0.526678841991342,
+        "sd": 0.1540580068796593,
+        "n": 5
+      },
+      "auc": {
+        "mean": 0.9761312790582478,
+        "sd": 0.010064997493418042,
+        "n": 5
+      },
+      "ap": {
+        "mean": 0.9747660340170755,
+        "sd": 0.011100883138342316,
+        "n": 5
+      },
+      "brier": {
+        "mean": 0.04659381972685738,
+        "sd": 0.011511131869406166,
+        "n": 5
+      },
+      "fpr": {
+        "mean": 0.09972399516991548,
+        "sd": 0.026669354755300807,
+        "n": 5
+      },
+      "tpr": {
+        "mean": 0.9575548356560013,
+        "sd": 0.011756936910276123,
+        "n": 5
+      }
+    },
+    {
+      "scope": "end_to_end",
+      "method": "Reliability_PI",
+      "samples": {
+        "mean": 384.4,
+        "sd": 0.5477225575051662,
+        "n": 5
+      },
+      "routed_fraction": {
+        "mean": 0.526678841991342,
+        "sd": 0.1540580068796593,
+        "n": 5
+      },
+      "auc": {
+        "mean": 0.9760988845610326,
+        "sd": 0.01004745727565015,
+        "n": 5
+      },
+      "ap": {
+        "mean": 0.9747390657720594,
+        "sd": 0.011093262134675628,
+        "n": 5
+      },
+      "brier": {
+        "mean": 0.046584099293984105,
+        "sd": 0.011507500035449354,
+        "n": 5
+      },
+      "fpr": {
+        "mean": 0.10294980162152838,
+        "sd": 0.02554955321394616,
+        "n": 5
+      },
+      "tpr": {
+        "mean": 0.9575548356560013,
+        "sd": 0.011756936910276123,
+        "n": 5
+      }
+    },
+    {
+      "scope": "end_to_end",
+      "method": "Reliability_PID",
+      "samples": {
+        "mean": 384.4,
+        "sd": 0.5477225575051662,
+        "n": 5
+      },
+      "routed_fraction": {
+        "mean": 0.526678841991342,
+        "sd": 0.1540580068796593,
+        "n": 5
+      },
+      "auc": {
+        "mean": 0.9760446599242177,
+        "sd": 0.010023903345377155,
+        "n": 5
+      },
+      "ap": {
+        "mean": 0.9746823417252969,
+        "sd": 0.01104278935800003,
+        "n": 5
+      },
+      "brier": {
+        "mean": 0.04657158654288758,
+        "sd": 0.01150539661930961,
+        "n": 5
+      },
+      "fpr": {
+        "mean": 0.10294980162152838,
+        "sd": 0.02554955321394616,
+        "n": 5
+      },
+      "tpr": {
+        "mean": 0.9575548356560013,
+        "sd": 0.011756936910276123,
+        "n": 5
+      }
+    },
+    {
+      "scope": "end_to_end",
+      "method": "Reliability_full_PID",
+      "samples": {
+        "mean": 384.4,
+        "sd": 0.5477225575051662,
+        "n": 5
+      },
+      "routed_fraction": {
+        "mean": 0.526678841991342,
+        "sd": 0.1540580068796593,
+        "n": 5
+      },
+      "auc": {
+        "mean": 0.9760446599242177,
+        "sd": 0.010023903345377155,
+        "n": 5
+      },
+      "ap": {
+        "mean": 0.9746823417252969,
+        "sd": 0.01104278935800003,
+        "n": 5
+      },
+      "brier": {
+        "mean": 0.046571649418281735,
+        "sd": 0.01150527381672944,
+        "n": 5
+      },
+      "fpr": {
+        "mean": 0.1040250704387327,
+        "sd": 0.02446634369926918,
+        "n": 5
+      },
+      "tpr": {
+        "mean": 0.9575548356560013,
+        "sd": 0.011756936910276123,
+        "n": 5
+      }
+    },
+    {
+      "scope": "routed_subset",
+      "method": "Average_50_50",
+      "samples": {
+        "mean": 202.4,
+        "sd": 59.0237240438114,
+        "n": 5
+      },
+      "routed_fraction": {
+        "mean": 0.526678841991342,
+        "sd": 0.1540580068796593,
+        "n": 5
+      },
+      "auc": {
+        "mean": 0.9562464864892707,
+        "sd": 0.025813476702609,
+        "n": 5
+      },
+      "ap": {
+        "mean": 0.9416658373732913,
+        "sd": 0.06508555905981542,
+        "n": 5
+      },
+      "brier": {
+        "mean": 0.07280489411813089,
+        "sd": 0.023670687013160833,
+        "n": 5
+      },
+      "fpr": {
+        "mean": 0.19762082600054864,
+        "sd": 0.08999157268226195,
+        "n": 5
+      },
+      "tpr": {
+        "mean": 0.9361374834686125,
+        "sd": 0.01964020510684798,
+        "n": 5
+      }
+    },
+    {
+      "scope": "routed_subset",
+      "method": "Fixed_weight",
+      "samples": {
+        "mean": 202.4,
+        "sd": 59.0237240438114,
+        "n": 5
+      },
+      "routed_fraction": {
+        "mean": 0.526678841991342,
+        "sd": 0.1540580068796593,
+        "n": 5
+      },
+      "auc": {
+        "mean": 0.9554489545822042,
+        "sd": 0.021024179821430927,
+        "n": 5
+      },
+      "ap": {
+        "mean": 0.9402695291293544,
+        "sd": 0.05883294632407529,
+        "n": 5
+      },
+      "brier": {
+        "mean": 0.07587618054848651,
+        "sd": 0.022720405064212433,
+        "n": 5
+      },
+      "fpr": {
+        "mean": 0.1564029330802575,
+        "sd": 0.04129950019137002,
+        "n": 5
+      },
+      "tpr": {
+        "mean": 0.9193113483902338,
+        "sd": 0.014899335168940204,
+        "n": 5
+      }
+    },
+    {
+      "scope": "routed_subset",
+      "method": "Logistic_stack",
+      "samples": {
+        "mean": 202.4,
+        "sd": 59.0237240438114,
+        "n": 5
+      },
+      "routed_fraction": {
+        "mean": 0.526678841991342,
+        "sd": 0.1540580068796593,
+        "n": 5
+      },
+      "auc": {
+        "mean": 0.9575164463342214,
+        "sd": 0.022212444241116874,
+        "n": 5
+      },
+      "ap": {
+        "mean": 0.9434893762955708,
+        "sd": 0.060840597633144734,
+        "n": 5
+      },
+      "brier": {
+        "mean": 0.07264662653102455,
+        "sd": 0.029750129800022628,
+        "n": 5
+      },
+      "fpr": {
+        "mean": 0.22197242105177722,
+        "sd": 0.09184791058090284,
+        "n": 5
+      },
+      "tpr": {
+        "mean": 0.9425944747531899,
+        "sd": 0.02563654398154163,
+        "n": 5
+      }
+    },
+    {
+      "scope": "routed_subset",
+      "method": "Reliability_P",
+      "samples": {
+        "mean": 202.4,
+        "sd": 59.0237240438114,
+        "n": 5
+      },
+      "routed_fraction": {
+        "mean": 0.526678841991342,
+        "sd": 0.1540580068796593,
+        "n": 5
+      },
+      "auc": {
+        "mean": 0.9556061886077452,
+        "sd": 0.02444240572647179,
+        "n": 5
+      },
+      "ap": {
+        "mean": 0.9387879529004689,
+        "sd": 0.06685396327264807,
+        "n": 5
+      },
+      "brier": {
+        "mean": 0.07331936483749993,
+        "sd": 0.023679513001876467,
+        "n": 5
+      },
+      "fpr": {
+        "mean": 0.1477324555326286,
+        "sd": 0.05484971953871819,
+        "n": 5
+      },
+      "tpr": {
+        "mean": 0.923116927160385,
+        "sd": 0.019581513714974498,
+        "n": 5
+      }
+    },
+    {
+      "scope": "routed_subset",
+      "method": "Reliability_PI",
+      "samples": {
+        "mean": 202.4,
+        "sd": 59.0237240438114,
+        "n": 5
+      },
+      "routed_fraction": {
+        "mean": 0.526678841991342,
+        "sd": 0.1540580068796593,
+        "n": 5
+      },
+      "auc": {
+        "mean": 0.9554566143961655,
+        "sd": 0.02443221857293538,
+        "n": 5
+      },
+      "ap": {
+        "mean": 0.9385603723983431,
+        "sd": 0.0667907989248404,
+        "n": 5
+      },
+      "brier": {
+        "mean": 0.07330134080065301,
+        "sd": 0.023680609161047885,
+        "n": 5
+      },
+      "fpr": {
+        "mean": 0.1527744723393513,
+        "sd": 0.0504432777047775,
+        "n": 5
+      },
+      "tpr": {
+        "mean": 0.923116927160385,
+        "sd": 0.019581513714974498,
+        "n": 5
+      }
+    },
+    {
+      "scope": "routed_subset",
+      "method": "Reliability_PID",
+      "samples": {
+        "mean": 202.4,
+        "sd": 59.0237240438114,
+        "n": 5
+      },
+      "routed_fraction": {
+        "mean": 0.526678841991342,
+        "sd": 0.1540580068796593,
+        "n": 5
+      },
+      "auc": {
+        "mean": 0.955280708065948,
+        "sd": 0.0243677260953923,
+        "n": 5
+      },
+      "ap": {
+        "mean": 0.9382676166139199,
+        "sd": 0.06665983110855858,
+        "n": 5
+      },
+      "brier": {
+        "mean": 0.07328220923437603,
+        "sd": 0.02368487475171753,
+        "n": 5
+      },
+      "fpr": {
+        "mean": 0.1527744723393513,
+        "sd": 0.0504432777047775,
+        "n": 5
+      },
+      "tpr": {
+        "mean": 0.923116927160385,
+        "sd": 0.019581513714974498,
+        "n": 5
+      }
+    },
+    {
+      "scope": "routed_subset",
+      "method": "Reliability_full_PID",
+      "samples": {
+        "mean": 202.4,
+        "sd": 59.0237240438114,
+        "n": 5
+      },
+      "routed_fraction": {
+        "mean": 0.526678841991342,
+        "sd": 0.1540580068796593,
+        "n": 5
+      },
+      "auc": {
+        "mean": 0.955280708065948,
+        "sd": 0.0243677260953923,
+        "n": 5
+      },
+      "ap": {
+        "mean": 0.9382676166139199,
+        "sd": 0.06665983110855858,
+        "n": 5
+      },
+      "brier": {
+        "mean": 0.07328231848392967,
+        "sd": 0.023684712252837564,
+        "n": 5
+      },
+      "fpr": {
+        "mean": 0.15430118989660319,
+        "sd": 0.04879520019922212,
+        "n": 5
+      },
+      "tpr": {
+        "mean": 0.923116927160385,
+        "sd": 0.019581513714974498,
+        "n": 5
+      }
+    }
+  ],
+  "paired_bootstrap": {
+    "end_to_end:Reliability_P_minus_Fixed_weight": {
+      "comparison": "Reliability_P_minus_Fixed_weight",
+      "scope": "end_to_end",
+      "samples": 1922,
+      "metrics": {
+        "auc": {
+          "mean": 0.0005580989234971654,
+          "ci95_low": -0.00019304346209652877,
+          "ci95_high": 0.0013103328414464626,
+          "iterations": 1000
+        },
+        "ap": {
+          "mean": 0.0005971595739890788,
+          "ci95_low": -3.336744305740824e-05,
+          "ci95_high": 0.0012462461207723345,
+          "iterations": 1000
+        },
+        "brier": {
+          "mean": -0.0017916261827297805,
+          "ci95_low": -0.003745926600076143,
+          "ci95_high": 6.981898976143554e-05,
+          "iterations": 1000
+        },
+        "fpr": {
+          "mean": -0.006610980084721419,
+          "ci95_low": -0.015252213212053601,
+          "ci95_high": 0.002075013643569324,
+          "iterations": 1000
+        },
+        "tpr": {
+          "mean": 0.0009931085105923118,
+          "ci95_low": -0.004040711061987684,
+          "ci95_high": 0.00699335699335698,
+          "iterations": 1000
+        }
+      }
+    },
+    "end_to_end:Reliability_PID_minus_Reliability_P": {
+      "comparison": "Reliability_PID_minus_Reliability_P",
+      "scope": "end_to_end",
+      "samples": 1922,
+      "metrics": {
+        "auc": {
+          "mean": -2.94068213491685e-05,
+          "ci95_low": -0.00018523927826644414,
+          "ci95_high": 0.000147772879298752,
+          "iterations": 1000
+        },
+        "ap": {
+          "mean": -3.217936425644874e-05,
+          "ci95_low": -0.00017587345275605905,
+          "ci95_high": 0.0001116915438159643,
+          "iterations": 1000
+        },
+        "brier": {
+          "mean": -1.724509234985852e-05,
+          "ci95_low": -0.0002895904171877411,
+          "ci95_high": 0.00025151559999902047,
+          "iterations": 1000
+        },
+        "fpr": {
+          "mean": 0.0031704215779217214,
+          "ci95_low": -0.0010970431531849793,
+          "ci95_high": 0.008430594572678045,
+          "iterations": 1000
+        },
+        "tpr": {
+          "mean": 0.0,
+          "ci95_low": 0.0,
+          "ci95_high": 0.0,
+          "iterations": 1000
+        }
+      }
+    },
+    "end_to_end:Reliability_full_PID_minus_Reliability_PI": {
+      "comparison": "Reliability_full_PID_minus_Reliability_PI",
+      "scope": "end_to_end",
+      "samples": 1922,
+      "metrics": {
+        "auc": {
+          "mean": -2.5896214451886944e-05,
+          "ci95_low": -0.00012705381472332964,
+          "ci95_high": 4.768766851726836e-05,
+          "iterations": 1000
+        },
+        "ap": {
+          "mean": -2.4729591003397222e-05,
+          "ci95_low": -0.00011743117686178194,
+          "ci95_high": 4.095787400315852e-05,
+          "iterations": 1000
+        },
+        "brier": {
+          "mean": -1.301100780372242e-05,
+          "ci95_low": -0.00014540217308764634,
+          "ci95_high": 0.00013748590750343803,
+          "iterations": 1000
+        },
+        "fpr": {
+          "mean": 0.0011026463320526062,
+          "ci95_low": 0.0,
+          "ci95_high": 0.0032824556604860128,
+          "iterations": 1000
+        },
+        "tpr": {
+          "mean": 0.0,
+          "ci95_low": 0.0,
+          "ci95_high": 0.0,
+          "iterations": 1000
+        }
+      }
+    },
+    "end_to_end:Reliability_full_PID_minus_Average_50_50": {
+      "comparison": "Reliability_full_PID_minus_Average_50_50",
+      "scope": "end_to_end",
+      "samples": 1922,
+      "metrics": {
+        "auc": {
+          "mean": -6.168902236366092e-05,
+          "ci95_low": -0.0011372959316305637,
+          "ci95_high": 0.0008596409875948146,
+          "iterations": 1000
+        },
+        "ap": {
+          "mean": 0.00013113370276629123,
+          "ci95_low": -0.0006828127692147717,
+          "ci95_high": 0.0008869269132328682,
+          "iterations": 1000
+        },
+        "brier": {
+          "mean": 9.733272986600574e-06,
+          "ci95_low": -0.0014650586779015539,
+          "ci95_high": 0.0016739675057789324,
+          "iterations": 1000
+        },
+        "fpr": {
+          "mean": -0.027169907025039457,
+          "ci95_low": -0.039913810522271144,
+          "ci95_high": -0.015001380965857765,
+          "iterations": 1000
+        },
+        "tpr": {
+          "mean": -0.007097038968271214,
+          "ci95_low": -0.014042832013628792,
+          "ci95_high": -0.0010362426114848306,
+          "iterations": 1000
+        }
+      }
+    },
+    "routed_subset:Reliability_P_minus_Fixed_weight": {
+      "comparison": "Reliability_P_minus_Fixed_weight",
+      "scope": "routed_subset",
+      "samples": 1012,
+      "metrics": {
+        "auc": {
+          "mean": 0.001775742503917495,
+          "ci95_low": -0.000834489082370124,
+          "ci95_high": 0.004461126075542598,
+          "iterations": 1000
+        },
+        "ap": {
+          "mean": 0.002444902646538325,
+          "ci95_low": -0.0004730060035506078,
+          "ci95_high": 0.005453467885193327,
+          "iterations": 1000
+        },
+        "brier": {
+          "mean": -0.003386254565427307,
+          "ci95_low": -0.007065534341565257,
+          "ci95_high": 0.00015724446269918963,
+          "iterations": 1000
+        },
+        "fpr": {
+          "mean": -0.010476048803827388,
+          "ci95_low": -0.025169221234657493,
+          "ci95_high": 0.003323377741982386,
+          "iterations": 1000
+        },
+        "tpr": {
+          "mean": 0.002446929537705263,
+          "ci95_low": -0.009346341570181008,
+          "ci95_high": 0.013891317016316969,
+          "iterations": 1000
+        }
+      }
+    },
+    "routed_subset:Reliability_PID_minus_Reliability_P": {
+      "comparison": "Reliability_PID_minus_Reliability_P",
+      "scope": "routed_subset",
+      "samples": 1012,
+      "metrics": {
+        "auc": {
+          "mean": -0.00011845532371302925,
+          "ci95_low": -0.0007133024029224195,
+          "ci95_high": 0.0005585719771903192,
+          "iterations": 1000
+        },
+        "ap": {
+          "mean": -0.00026248701354604953,
+          "ci95_low": -0.0010403973926744136,
+          "ci95_high": 0.0004172859978446325,
+          "iterations": 1000
+        },
+        "brier": {
+          "mean": -3.452862840270849e-05,
+          "ci95_low": -0.0005659014357185778,
+          "ci95_high": 0.00045330224938034747,
+          "iterations": 1000
+        },
+        "fpr": {
+          "mean": 0.005236844501214616,
+          "ci95_low": -0.001757702124488427,
+          "ci95_high": 0.013539849885027568,
+          "iterations": 1000
+        },
+        "tpr": {
+          "mean": 0.0,
+          "ci95_low": 0.0,
+          "ci95_high": 0.0,
+          "iterations": 1000
+        }
+      }
+    },
+    "routed_subset:Reliability_full_PID_minus_Reliability_PI": {
+      "comparison": "Reliability_full_PID_minus_Reliability_PI",
+      "scope": "routed_subset",
+      "samples": 1012,
+      "metrics": {
+        "auc": {
+          "mean": -0.00010512919296161571,
+          "ci95_low": -0.00045277751453742245,
+          "ci95_high": 0.0001726329604563009,
+          "iterations": 1000
+        },
+        "ap": {
+          "mean": -0.00019383408063446884,
+          "ci95_low": -0.0007490331351096225,
+          "ci95_high": 0.00019215363247099545,
+          "iterations": 1000
+        },
+        "brier": {
+          "mean": -1.9589467585755026e-05,
+          "ci95_low": -0.00025315019874051493,
+          "ci95_high": 0.00024722112938119515,
+          "iterations": 1000
+        },
+        "fpr": {
+          "mean": 0.0017869244869124184,
+          "ci95_low": 0.0,
+          "ci95_high": 0.005425447074692418,
+          "iterations": 1000
+        },
+        "tpr": {
+          "mean": 0.0,
+          "ci95_low": 0.0,
+          "ci95_high": 0.0,
+          "iterations": 1000
+        }
+      }
+    },
+    "routed_subset:Reliability_full_PID_minus_Average_50_50": {
+      "comparison": "Reliability_full_PID_minus_Average_50_50",
+      "scope": "routed_subset",
+      "samples": 1012,
+      "metrics": {
+        "auc": {
+          "mean": -0.0016571314328038165,
+          "ci95_low": -0.005381895457249106,
+          "ci95_high": 0.0017307792731363612,
+          "iterations": 1000
+        },
+        "ap": {
+          "mean": -0.002147387826826455,
+          "ci95_low": -0.0052512700927884876,
+          "ci95_high": 0.0006500145195388603,
+          "iterations": 1000
+        },
+        "brier": {
+          "mean": 6.757519533062983e-05,
+          "ci95_low": -0.0028243774838488745,
+          "ci95_high": 0.003230490020993941,
+          "iterations": 1000
+        },
+        "fpr": {
+          "mean": -0.04309553546833158,
+          "ci95_low": -0.06358488210323547,
+          "ci95_high": -0.024092266501905053,
+          "iterations": 1000
+        },
+        "tpr": {
+          "mean": -0.01623339851270032,
+          "ci95_low": -0.030732860520094607,
+          "ci95_high": -0.002293577981651418,
+          "iterations": 1000
+        }
+      }
+    }
+  },
+  "limitations": [
+    "The fusion methods were developed after inspecting this cohort; results remain exploratory.",
+    "Gate thresholds are cross-fitted across model-specific OOF score distributions, not selected from the current fold model validation scores.",
+    "Generic Windows malware labels do not establish ransomware-specific performance.",
+    "AUC of the end-to-end hybrid mixes static scores for early decisions and fusion scores for routed samples."
+  ],
+  "repository_commit": "dc15532c835f6cd3d11fd57761dbf445e2f8ea61",
+  "working_tree_status": "M docs/presentations/latex_content_only_20261021/Luan_van_Luu_Van_Doanh_UET_format_pdflatex_updated.tex\n M tests/test_experiments.py\n?? docs/presentations/latex_advisor_20261020/\n?? scripts/analyze_gated_pid.py\n?? scripts/plot_gated_pid_results.py\n?? src/experiments/gated_pid.py",
+  "source_sha256": {
+    "src/experiments/__init__.py": "63c0b7fd26cc89daa9ca4a0b60ef6af7606cd9d701f6976f6fcaeb62313f1566",
+    "src/experiments/active_learning.py": "6d8645265fbbfae8e1e9ac0180536b63146516935ac0f43eeefa81eeb9e5edfa",
+    "src/experiments/cli.py": "99eaed555c6da9930f621739116b4061e961c979439cf616e8e603b730b73839",
+    "src/experiments/common.py": "ede14099db6002a85b2bb6af63aa072ecf87b9caaec4dba5fc25f66c1486a52f",
+    "src/experiments/confirmatory.py": "3c3cdfad845d8bad9a485d26a13901c48322650b8a00959cd24cbeedcdf00a47",
+    "src/experiments/fidelity.py": "9984967241aac72899da01c5cbd7582484fa2e5314f641dea92b036ae090519d",
+    "src/experiments/fusion.py": "1dd57b9856bfea086f4c82aa84206c22409cf4a1ea4ae0399630fc67a9e8ee2e",
+    "src/experiments/gated_pid.py": "c2bdf4f176537c2d9f76abe45cd2046b98b6612e38f0fb489c492d570d887ec9",
+    "src/experiments/gating.py": "19c75cd124e47ff2c6748479fc3d1d752a75716ae50930c9a63fa8778063b7c5",
+    "src/experiments/malbehavd_pid.py": "a2dfc72cd27cb677082ef12364ea56548f273d307adfd9aa4b0ce7d6df442122",
+    "src/experiments/provenance.py": "5edd61a2332bfeb7d91dc3d99252de32d86883dce533dd7bdebfb79644bc4b1d",
+    "src/experiments/recovery.py": "93c6c8cf344301eb6511ce6803090f1df5fbb88cfa5166e6273b2a6af49a0e3f",
+    "src/experiments/reliability_pid.py": "d88187e292a9e5b356d50b00c9bc9ad9b72eec51349ef9d1d897c6d7993caa24",
+    "src/experiments/reporting.py": "5cfbf9a017c285bf4f0d850f6f0d31e6be4944c91551210460146d03c83a87bf",
+    "src/experiments/robust_fidelity.py": "52ce38ae22ee758d289b4142079a05821ce99f1a6ba98726e1e2fa5ee5b47533",
+    "src/experiments/signals.py": "8e3a773979b787a1b2fd4c199a70e4b877ee2a70ecfbc97428661a7c775c8638",
+    "src/experiments/temporal.py": "81454f7302b7075c0fd184141b0ab197cbc0ff129dd62ee5098e7926aaca0344",
+    "src/experiments/temporal_fusion.py": "9f5a63c96a1229a055fca27d0335ea53153c28b6e3605710572d173bc82688bc",
+    "src/experiments/verification.py": "421830b3acea0f308d63137ce967d4e19d49a2cc4f0f3f976d4559be5efb0cb0",
+    "src/pid_fusion.py": "82bd691040bc198749ef4fe2bd58d3c8cb88f14286e7046ffd40d52ce7a48a1f",
+    "scripts/run_experiments.py": "6700f7fc2ecabe2bb6a1ff8899d0c3ed6b134bcc333ac1b7dc69e9ac06ee5598"
+  },
+  "versions": {
+    "python": "3.12.14",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "sklearn": "1.9.1",
+    "lightgbm": "4.7.0"
+  }
+}

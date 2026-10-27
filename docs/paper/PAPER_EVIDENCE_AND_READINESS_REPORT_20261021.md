@@ -280,6 +280,32 @@ Kết quả củng cố framing **reliability-aware adaptive fusion with PID com
 ablation**, trong đó thành phần P tạo lợi ích vận hành và D chưa có bằng chứng hỗ
 trợ. Nguồn: `results/measured_20261023_reliability_pid_exploratory_1922/`.
 
+
+## 4.9. Exploratory uncertainty-gated PID
+
+Gate được chọn bằng cross-fitting: với outer fold đang kiểm thử, ngưỡng thấp/cao
+chỉ dùng OOF static predictions của các folds còn lại. Ở gate chính, early-FNR và
+early-FPR bị giới hạn 1% trên development; 52,67% outer-test được chuyển sang
+phân tích động.
+
+| Phương pháp end-to-end | AUC | FPR | TPR | Brier |
+|---|---:|---:|---:|---:|
+| Average | 0,9762 | 13,08% | 96,46% | 0,0465 |
+| Fixed | 0,9756 | 10,62% | 95,65% | 0,0484 |
+| Reliability-P | 0,9761 | **9,97%** | 95,76% | 0,0466 |
+| Reliability-PI | 0,9761 | 10,29% | 95,76% | 0,0466 |
+| Reliability-PID family | 0,9760 | 10,29% | 95,76% | 0,0466 |
+| Full PID (`Kd>0`) | 0,9760 | 10,40% | 95,76% | 0,0466 |
+
+Bootstrap end-to-end cho thấy Reliability-P giảm FPR 0,66 điểm phần trăm so với
+Fixed nhưng CI 95% `[-1,53; +0,21]` còn đi qua 0. Full PID so với PI tăng FPR
+0,11 điểm phần trăm, CI `[0; +0,33]`, TPR không đổi. So với Average, full PID
+giảm FPR 2,72 điểm phần trăm nhưng đồng thời giảm TPR 0,71 điểm, cả hai CI loại
+trừ 0. Gate vì vậy làm rõ đánh đổi vận hành nhưng không tạo bằng chứng full PID
+vượt P/PI.
+
+Nguồn: `results/measured_20261027_gated_pid_exploratory_1922/`.
+
 ## 5. Đóng góp 2 — XAI-Guided Active Learning
 
 ### 5.1. Cơ chế

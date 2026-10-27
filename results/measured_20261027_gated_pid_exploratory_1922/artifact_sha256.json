@@ -1,0 +1,11 @@
+{
+  "REPORT_VI.md": "e2241e74ca48c98c3f9b3f7f2a3c287c703812d8a912bb4b786f4845b02eb8b6",
+  "fold_metrics.csv": "8920f14d629bfe43fe2adcef6a5cab210807e6a35f01a01707ce46a1f77be5b3",
+  "gate_thresholds.csv": "96384a1c3ec3eb5b7a3c762c43c578a8fd2ad475db25151d5974a51dbfbe1519",
+  "gated_pid_operating_metrics.pdf": "eb4936751f3e7391c880dc327a15e28aa7fe93686fca71c2ef9bd3427a8b8628",
+  "gated_pid_operating_metrics.png": "1f2667ea26d547ec09b7726e283a794224217d05ed73c84465b091375fc4f888",
+  "gated_predictions.csv.gz": "df18d0cd76daa346ba40d86bbd59543ebcd466ec6ba12b749299e7fde01ce9f5",
+  "paired_bootstrap.json": "0043e492772caebc9cfe7d4a2a290fde0d49ac9078a2c7acf1e60d4d7934eb55",
+  "summary.json": "1eb86c50407178df548e239fbc31f48033e78d86ae990f8464b5013fa9aca9ff",
+  "verification.json": "9c2e4aa4452c042bf37161df8489d59c92fe18e7897009ecaab165cf18af55dc"
+}

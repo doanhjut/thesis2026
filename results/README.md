@@ -33,3 +33,10 @@ PID theo dõi trọng số mục tiêu quanh Fixed baseline. Reliability-P giả
 nhưng P vẫn tốt hơn PI/PID; full PID không chứng minh được lợi ích của D. Vì
 phương pháp được thiết kế sau khi xem cohort này, kết quả chỉ là exploratory và
 cần cohort external/temporal mới để xác nhận.
+
+`measured_20261027_gated_pid_exploratory_1922/` đánh giá uncertainty gate bằng
+cross-fitting: gate của mỗi outer fold chỉ được chọn từ OOF static predictions
+của các folds còn lại. Với giới hạn early-FN/FP 1% trên development, trung bình
+52,67% mẫu được chuyển sang dynamic. Reliability-P đạt FPR thấp nhất 9,97%;
+full PID đạt 10,40% và không hơn PI/P. Kết quả tiếp tục hỗ trợ adaptive P, không
+hỗ trợ phát biểu full PID vượt trội.
