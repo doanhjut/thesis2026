@@ -306,6 +306,26 @@ vượt P/PI.
 
 Nguồn: `results/measured_20261027_gated_pid_exploratory_1922/`.
 
+
+## 4.10. Effect size phù hợp cho trình bày bảo vệ
+
+Khi câu hỏi là lợi ích của full PID fusion so với từng kênh độc lập, hiệu ứng
+đủ lớn và bootstrap ghép cặp loại trừ 0:
+
+- Full PID so với Static: ΔAUC +1,34 điểm phần trăm, CI 95%
+  `[+0,78; +1,94]`; ΔFPR -12,06 điểm, CI `[-14,60; -9,57]`.
+- Full PID so với Dynamic: ΔAUC +1,14 điểm phần trăm, CI
+  `[+0,68; +1,61]`; ΔFPR -8,87 điểm, CI `[-11,16; -6,59]`.
+- FPR tương đối giảm 50,9% so với Static và 43,2% so với Dynamic.
+- Adaptive P so với Fixed giảm FPR 1,33 điểm, CI `[-2,45; -0,21]`, và giảm
+  Brier 0,00308, CI `[-0,00560; -0,00071]`.
+
+Các effect size này hỗ trợ phát biểu **PID-family fusion cải thiện so với phân
+tích đơn kênh** và **adaptive P cải thiện so với Fixed**. Chúng không thay đổi
+kết luận ablation rằng D chưa tạo lợi ích gia tăng so với PI/P.
+
+Nguồn: `results/measured_20261027_pid_defense_evidence_1922/`.
+
 ## 5. Đóng góp 2 — XAI-Guided Active Learning
 
 ### 5.1. Cơ chế

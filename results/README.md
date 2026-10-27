@@ -40,3 +40,9 @@ của các folds còn lại. Với giới hạn early-FN/FP 1% trên development
 52,67% mẫu được chuyển sang dynamic. Reliability-P đạt FPR thấp nhất 9,97%;
 full PID đạt 10,40% và không hơn PI/P. Kết quả tiếp tục hỗ trợ adaptive P, không
 hỗ trợ phát biểu full PID vượt trội.
+
+`measured_20261027_pid_defense_evidence_1922/` tổng hợp effect size dùng cho
+trình bày: full PID so với Static/Dynamic và adaptive P so với Fixed, kèm
+bootstrap ghép cặp 1.000 lần. Full PID tăng AUC 1,34/1,14 điểm phần trăm và
+giảm FPR 12,06/8,87 điểm so với Static/Dynamic; các CI 95% loại trừ 0. Gói
+cũng giữ rõ kết quả full PID chưa hơn Average/PI để tránh diễn giải quá mức.

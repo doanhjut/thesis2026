@@ -1,0 +1,7 @@
+{
+  "status": "passed",
+  "samples": 1922,
+  "methods": 11,
+  "bootstrap_iterations": 1000,
+  "effect_intervals_replayed_from_prediction_level_artifact": true
+}
