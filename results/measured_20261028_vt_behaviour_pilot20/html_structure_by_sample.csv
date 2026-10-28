@@ -1,21 +1,21 @@
-api_key_count,calls_key_count,clock_time_count,event_object_api_time_count,event_row_api_time_count,event_time_key_count,html_bytes,iso_datetime_count,label,outer_fold,process_id_key_count,sandbox_name,sha256,strong_event_timeline_signal,time_key_count,timestamp_key_count,weak_time_and_api_signal
-0,0,2155,0,1,0,896299,2152,0,0,0,CAPE Sandbox,001300a5323bf6c1812b686c1c896857d4cf85c676e48f451d8cb7b9a8f0afe0,True,0,0,True
-0,0,0,0,0,0,315770,0,1,4,0,Tencent HABO,001a9515fe0cb67fa49d200b330311b65822287bd2d1bff8c78247176781f131,False,0,0,False
-0,0,8,0,0,0,288205,4,0,0,0,CAPE Sandbox,00330a0e0eb1dbb6ee84997963f8e15c7c15c1df787f1c7f109609d7b31bd35c,False,0,0,True
-0,0,0,0,0,0,288216,0,0,2,0,Tencent HABO,0072caf5ecd841ecbef9bbe2b53802aea06b89bfb2e06daa9ee3962641f4f135,False,0,0,False
-0,0,11,0,0,0,324946,4,0,1,0,CAPE Sandbox,009e11f5e0c560e49527451fbdd0666c376a64e866b06668ad8c4d46fe53b370,False,0,0,True
-0,0,0,0,0,0,335459,0,1,2,0,Tencent HABO,00a316e53de939f82885157ce057f134eb26ffbdaed314aa50c0ef19318bcdf4,False,0,0,False
-0,0,7,0,0,0,644630,4,0,1,0,CAPE Sandbox,00a7c7b88877bf59dbaa70de734fcd3f287f1eb92caff4571a4c8e67a5dc0aca,False,0,0,True
-0,1,0,0,0,0,1624398,1,1,2,5052,VirusTotal Jujubox,00a80e2e0f0f72ba202536615fa98cb11afafd519d9212b01e0678bc7f6e9ab4,False,0,0,True
-0,1,0,0,0,0,1737844,1,1,3,3921,VirusTotal Jujubox,00abb163f70a649b034f85c4f93bef3c08c570d65f376fb40ef52a65a041be58,False,0,0,True
-0,1,0,0,0,0,1620750,1,1,1,5052,VirusTotal Jujubox,00b6eef6c5fe93102ae3d630f2ae4a842725b0c5dd051ec778bc89a2936bc2f5,False,0,0,True
-0,1,0,0,0,0,1239823,1,1,0,3273,VirusTotal Jujubox,00b95c5419e422f5ec2c030f0cb6d379269a71c763141f2075f7395b27164475,False,0,0,True
-0,0,5,0,0,0,342729,4,0,2,0,CAPE Sandbox,00bbf85de025a68c6431392c24f1826c0b1b04d665d32fb3319e4ed42b112d07,False,0,0,True
-0,1,0,0,0,0,338744,1,1,1,101,VirusTotal Jujubox,00c8d6ee5f434cd956febb0061b070c37c13162d934db13f702b3be51bce9c73,False,0,0,True
-0,1,0,0,0,0,1619827,1,1,4,5052,VirusTotal Jujubox,00c99d93961a43f6de1a1da795d47d002843ed567c2b0e99acd600cd8a7b6ec1,False,0,0,True
-0,0,0,0,0,0,124431,0,1,0,0,SecneurX,00cf0b25bad779041451c207fd46767ddd249d89a655089831153b4cadfed53b,False,0,0,False
-0,0,0,0,0,0,285807,0,1,3,0,Tencent HABO,00f91b9be9e3f228a5e350981f4f1eae44742b540526204f1fb8bd59d975d91c,False,0,0,False
-0,0,8,0,0,0,648999,4,0,4,0,CAPE Sandbox,020694eaaff76ef4121cbd08d456f910b077d0ffc81741b1db447b0a9570283d,False,0,0,True
-0,0,5,0,1,0,3411149,4,0,4,0,CAPE Sandbox,02993e304f31970a9a12f56e53477b921103a7d221115a1993b55c95f91b90c5,True,0,0,True
-0,0,9,0,0,0,321479,4,0,3,0,CAPE Sandbox,033b81744e0bd4219a4d698894b8403bb67b525c96049cbfef34677d4d6fc85c,False,0,0,True
-0,0,7,0,0,0,900202,4,0,3,0,CAPE Sandbox,048bd22abf158346ab991a377cc6e9d2b20b4d73ccee7656c96a41f657e7be7f,False,0,0,True
+api_key_count,api_timestamp_local_pair_count,api_timestamp_local_pair_fraction,calls_key_count,clock_time_count,event_object_api_time_count,event_row_api_time_count,event_time_key_count,html_bytes,iso_datetime_count,label,nested_event_timeline_signal,outer_fold,process_id_key_count,sandbox_name,sha256,strong_event_timeline_signal,time_key_count,timestamp_distinct_value_count,timestamp_key_count,timestamp_numeric_distinct_count,timestamp_numeric_nondecreasing_fraction,timestamp_numeric_value_count,timestamp_value_count,weak_time_and_api_signal
+0,0,,0,2155,0,1,0,896299,2152,0,False,0,0,CAPE Sandbox,001300a5323bf6c1812b686c1c896857d4cf85c676e48f451d8cb7b9a8f0afe0,True,0,0,0,0,,0,0,True
+0,0,,0,0,0,0,0,315770,0,1,False,4,0,Tencent HABO,001a9515fe0cb67fa49d200b330311b65822287bd2d1bff8c78247176781f131,False,0,0,0,0,,0,0,False
+0,0,,0,8,0,0,0,288205,4,0,False,0,0,CAPE Sandbox,00330a0e0eb1dbb6ee84997963f8e15c7c15c1df787f1c7f109609d7b31bd35c,False,0,0,0,0,,0,0,True
+0,0,,0,0,0,0,0,288216,0,0,False,2,0,Tencent HABO,0072caf5ecd841ecbef9bbe2b53802aea06b89bfb2e06daa9ee3962641f4f135,False,0,0,0,0,,0,0,False
+0,0,,0,11,0,0,0,324946,4,0,False,1,0,CAPE Sandbox,009e11f5e0c560e49527451fbdd0666c376a64e866b06668ad8c4d46fe53b370,False,0,0,0,0,,0,0,True
+0,0,,0,0,0,0,0,335459,0,1,False,2,0,Tencent HABO,00a316e53de939f82885157ce057f134eb26ffbdaed314aa50c0ef19318bcdf4,False,0,0,0,0,,0,0,False
+0,0,,0,7,0,0,0,644630,4,0,False,1,0,CAPE Sandbox,00a7c7b88877bf59dbaa70de734fcd3f287f1eb92caff4571a4c8e67a5dc0aca,False,0,0,0,0,,0,0,True
+0,0,,1,0,0,0,0,1624398,1,1,False,2,5052,VirusTotal Jujubox,00a80e2e0f0f72ba202536615fa98cb11afafd519d9212b01e0678bc7f6e9ab4,False,0,0,0,0,,0,0,True
+0,0,,1,0,0,0,0,1737844,1,1,False,3,3921,VirusTotal Jujubox,00abb163f70a649b034f85c4f93bef3c08c570d65f376fb40ef52a65a041be58,False,0,0,0,0,,0,0,True
+0,0,,1,0,0,0,0,1620750,1,1,False,1,5052,VirusTotal Jujubox,00b6eef6c5fe93102ae3d630f2ae4a842725b0c5dd051ec778bc89a2936bc2f5,False,0,0,0,0,,0,0,True
+0,0,,1,0,0,0,0,1239823,1,1,False,0,3273,VirusTotal Jujubox,00b95c5419e422f5ec2c030f0cb6d379269a71c763141f2075f7395b27164475,False,0,0,0,0,,0,0,True
+0,0,,0,5,0,0,0,342729,4,0,False,2,0,CAPE Sandbox,00bbf85de025a68c6431392c24f1826c0b1b04d665d32fb3319e4ed42b112d07,False,0,0,0,0,,0,0,True
+0,0,,1,0,0,0,0,338744,1,1,False,1,101,VirusTotal Jujubox,00c8d6ee5f434cd956febb0061b070c37c13162d934db13f702b3be51bce9c73,False,0,0,0,0,,0,0,True
+0,0,,1,0,0,0,0,1619827,1,1,False,4,5052,VirusTotal Jujubox,00c99d93961a43f6de1a1da795d47d002843ed567c2b0e99acd600cd8a7b6ec1,False,0,0,0,0,,0,0,True
+0,0,,0,0,0,0,0,124431,0,1,False,0,0,SecneurX,00cf0b25bad779041451c207fd46767ddd249d89a655089831153b4cadfed53b,False,0,0,0,0,,0,0,False
+0,0,,0,0,0,0,0,285807,0,1,False,3,0,Tencent HABO,00f91b9be9e3f228a5e350981f4f1eae44742b540526204f1fb8bd59d975d91c,False,0,0,0,0,,0,0,False
+0,0,,0,8,0,0,0,648999,4,0,False,4,0,CAPE Sandbox,020694eaaff76ef4121cbd08d456f910b077d0ffc81741b1db447b0a9570283d,False,0,0,0,0,,0,0,True
+0,0,,0,5,0,1,0,3411149,4,0,False,4,0,CAPE Sandbox,02993e304f31970a9a12f56e53477b921103a7d221115a1993b55c95f91b90c5,True,0,0,0,0,,0,0,True
+0,0,,0,9,0,0,0,321479,4,0,False,3,0,CAPE Sandbox,033b81744e0bd4219a4d698894b8403bb67b525c96049cbfef34677d4d6fc85c,False,0,0,0,0,,0,0,True
+0,0,,0,7,0,0,0,900202,4,0,False,3,0,CAPE Sandbox,048bd22abf158346ab991a377cc6e9d2b20b4d73ccee7656c96a41f657e7be7f,False,0,0,0,0,,0,0,True
