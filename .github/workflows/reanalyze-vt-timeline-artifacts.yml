@@ -1,0 +1,62 @@
+name: Reanalyze VirusTotal timeline artifacts
+
+on:
+  push:
+    branches:
+      - feat/reproducible-thesis-experiments
+    paths:
+      - .github/workflows/reanalyze-vt-timeline-artifacts.yml
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  reanalyze:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out experiment branch
+        uses: actions/checkout@v4
+        with:
+          ref: feat/reproducible-thesis-experiments
+
+      - name: Download original and provider artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh run download 40642154122 \
+            --repo doanhjut/thesis2026 \
+            --name vt-behaviour-pilot20 \
+            --dir /tmp/vt-original
+          gh run download 40644339149 \
+            --repo doanhjut/thesis2026 \
+            --name vt-provider-timeline-probe \
+            --dir /tmp/vt-provider
+
+      - name: Reanalyze original reports
+        run: |
+          python scripts/audit_vt_behaviour_html.py \
+            --reports /tmp/vt-original/raw_html_reports \
+            --coverage /tmp/vt-original/coverage_by_sample.csv \
+            --output /tmp/audit-original
+
+      - name: Reanalyze Cuckoofork reports
+        run: |
+          python scripts/audit_vt_behaviour_html.py \
+            --reports /tmp/vt-provider/raw_html_reports \
+            --coverage /tmp/vt-provider/provider_probe_coverage.csv \
+            --output /tmp/audit-provider
+
+      - name: Commit updated structural audits
+        run: |
+          target=results/measured_20261028_vt_behaviour_pilot20
+          cp /tmp/audit-original/html_structure_audit.json "$target/"
+          cp /tmp/audit-original/html_structure_by_sample.csv "$target/"
+          cp /tmp/audit-provider/html_structure_audit.json "$target/provider_html_structure_audit.json"
+          cp /tmp/audit-provider/html_structure_by_sample.csv "$target/provider_html_structure_by_sample.csv"
+          (cd "$target" && find . -type f ! -name artifact_sha256.txt -print0 | sort -z | xargs -0 sha256sum > artifact_sha256.txt)
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$target"
+          git commit -m "Refine VT event timeline structural audit"
+          git push origin HEAD:feat/reproducible-thesis-experiments

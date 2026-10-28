@@ -35,6 +35,10 @@ CLOCK_TIME = re.compile(r"\b\d{1,2}:\d{2}:\d{2}(?:\.\d{1,6})?\b")
 HTML_ROW = re.compile(r"<tr\b[^>]*>.*?</tr>", re.I | re.S)
 LEAF_OBJECT = re.compile(r"\{[^{}]{1,8000}\}", re.S)
 TAG = re.compile(r"<[^>]+>")
+TIMESTAMP_VALUE = re.compile(
+    r"[\"']timestamp[\"']\s*:\s*(\"(?:\\.|[^\"])*\"|'(?:\\.|[^'])*'|-?\d+(?:\.\d+)?)",
+    re.I,
+)
 
 
 def count_event_objects(text: str) -> int:
@@ -61,6 +65,66 @@ def count_event_rows(text: str) -> int:
         if has_time and has_api:
             count += 1
     return count
+
+
+def timestamp_values(text: str) -> list[str]:
+    values = []
+    for match in TIMESTAMP_VALUE.finditer(text):
+        value = match.group(1)
+        if len(value) >= 2 and value[0] == value[-1] and value[0] in {'"', "'"}:
+            value = value[1:-1]
+        values.append(value)
+    return values
+
+
+def numeric_timestamp_stats(values: list[str]) -> dict[str, Any]:
+    numeric = []
+    for value in values:
+        try:
+            numeric.append(float(value))
+        except ValueError:
+            pass
+    transitions = max(0, len(numeric) - 1)
+    nondecreasing = sum(
+        current >= previous for previous, current in zip(numeric, numeric[1:])
+    )
+    return {
+        "timestamp_numeric_value_count": len(numeric),
+        "timestamp_numeric_distinct_count": len(set(numeric)),
+        "timestamp_numeric_nondecreasing_fraction": (
+            nondecreasing / transitions if transitions else None
+        ),
+    }
+
+
+def positional_pair_stats(text: str) -> dict[str, int | float | None]:
+    api_positions = [m.start() for m in KEY_PATTERNS["api_key_count"].finditer(text)]
+    timestamp_positions = [
+        m.start() for m in KEY_PATTERNS["timestamp_key_count"].finditer(text)
+    ]
+    if not api_positions or not timestamp_positions:
+        return {
+            "api_timestamp_local_pair_count": 0,
+            "api_timestamp_local_pair_fraction": None,
+        }
+    radius = 2000
+    paired = 0
+    timestamp_index = 0
+    for api_position in api_positions:
+        while (
+            timestamp_index + 1 < len(timestamp_positions)
+            and timestamp_positions[timestamp_index + 1] <= api_position
+        ):
+            timestamp_index += 1
+        neighbors = timestamp_positions[
+            max(0, timestamp_index - 1) : min(len(timestamp_positions), timestamp_index + 2)
+        ]
+        if any(abs(api_position - position) <= radius for position in neighbors):
+            paired += 1
+    return {
+        "api_timestamp_local_pair_count": paired,
+        "api_timestamp_local_pair_fraction": paired / len(api_positions),
+    }
 
 
 def load_coverage(path: pathlib.Path) -> dict[str, dict[str, str]]:
@@ -121,9 +185,22 @@ def main() -> int:
         }
         for name, pattern in KEY_PATTERNS.items():
             row[name] = len(pattern.findall(text))
+        values = timestamp_values(text)
+        row["timestamp_value_count"] = len(values)
+        row["timestamp_distinct_value_count"] = len(set(values))
+        row.update(numeric_timestamp_stats(values))
+        row.update(positional_pair_stats(text))
+        nested_event_signal = bool(
+            row["api_key_count"] >= 3
+            and row["timestamp_key_count"] >= 3
+            and row["timestamp_distinct_value_count"] >= 3
+            and (row["api_timestamp_local_pair_fraction"] or 0.0) >= 0.8
+        )
+        row["nested_event_timeline_signal"] = nested_event_signal
         row["strong_event_timeline_signal"] = bool(
             row["event_object_api_time_count"] > 0
             or row["event_row_api_time_count"] > 0
+            or nested_event_signal
         )
         row["weak_time_and_api_signal"] = bool(
             (
@@ -174,7 +251,9 @@ def main() -> int:
         },
         "interpretation": (
             "Strong means the HTML contains an API key and a time key in the same "
-            "leaf JSON object, or an HTML row with API/call and a clock timestamp. "
+            "leaf JSON object, an HTML row with API/call and a clock timestamp, "
+            "or at least three distinct timestamp values locally paired with at "
+            "least 80% of API keys in nested report data. "
             "It is a structural screening result; a provider-specific parser and "
             "monotonicity validation are still required before PID evaluation."
         ),
