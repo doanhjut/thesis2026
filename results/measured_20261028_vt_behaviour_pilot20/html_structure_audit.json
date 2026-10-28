@@ -1,0 +1,33 @@
+{
+  "reports_audited": 20,
+  "strong_event_timeline_signal_reports": 2,
+  "weak_time_and_api_signal_reports": 15,
+  "strong_by_label": {
+    "0": 2,
+    "1": 0
+  },
+  "provider_counts": {
+    "CAPE Sandbox": {
+      "reports": 9,
+      "strong": 2,
+      "weak": 9
+    },
+    "SecneurX": {
+      "reports": 1,
+      "strong": 0,
+      "weak": 0
+    },
+    "Tencent HABO": {
+      "reports": 4,
+      "strong": 0,
+      "weak": 0
+    },
+    "VirusTotal Jujubox": {
+      "reports": 6,
+      "strong": 0,
+      "weak": 6
+    }
+  },
+  "interpretation": "Strong means the HTML contains an API key and a time key in the same leaf JSON object, or an HTML row with API/call and a clock timestamp. It is a structural screening result; a provider-specific parser and monotonicity validation are still required before PID evaluation.",
+  "raw_report_content_committed": false
+}
