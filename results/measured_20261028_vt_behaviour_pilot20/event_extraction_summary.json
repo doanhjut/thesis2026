@@ -1,0 +1,20 @@
+{
+  "reports": 9,
+  "events": 4697,
+  "status_counts": {
+    "usable": 8,
+    "rejected": 1
+  },
+  "usable_by_label": {
+    "0": 2,
+    "1": 6
+  },
+  "unit_inference_counts": {
+    "epoch_milliseconds": 9
+  },
+  "limitations": [
+    "API and timestamp values are paired by their ordered occurrence in the provider report.",
+    "Unit inference must be confirmed before computing wall-clock derivatives.",
+    "Process IDs are not yet joined to individual calls."
+  ]
+}
