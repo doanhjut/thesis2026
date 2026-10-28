@@ -1,0 +1,39 @@
+name: VirusTotal behaviour pilot (report only)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  collect-pilot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Collect 20 balanced behaviour reports
+        env:
+          VT_API_KEY: ${{ secrets.VT_API_KEY }}
+        run: |
+          python scripts/collect_vt_behaviour_pilot.py \
+            --cohort results/measured_20261023_malbehavd_pid_confirmatory_1922/selected_cohort.csv \
+            --output outputs/vt_behaviour_pilot20 \
+            --per-fold-label 2 \
+            --requests-per-minute 4
+
+      - name: Upload audit and raw reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vt-behaviour-pilot20
+          path: outputs/vt_behaviour_pilot20/
+          if-no-files-found: error
+          retention-days: 14
