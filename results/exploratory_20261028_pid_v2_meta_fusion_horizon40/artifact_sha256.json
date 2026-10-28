@@ -1,0 +1,9 @@
+{
+  "REPORT_VI.md": "b396a19c5911fb8475259fed1a13306a51a6c236a929dd0a559158baed1226cc",
+  "final_predictions.csv.gz": "68e6c1e1086743c69112145c476a8e2c55b8ce828a6c2b033fa6149af4a465dc",
+  "fold_metrics.csv": "b4336f0813e5bb8b88efd0852cdf9e61192ec7ddd3a0f7412456b3990b6f620a",
+  "model_coefficients.json": "9cb5bdd0710582415cbc415535ee70ab6463d393f76359b3ba614bbc7643dbb0",
+  "model_search.json": "fcf4722f91ddd3a689c63a5ac9658b7468618e7c11e57caddb7de2ff94fa8d06",
+  "summary.json": "49975d7708286eb11677c1c99a9183729c9c68fd40938a16e2859ddceccc522f",
+  "verification.json": "b82f65cc8d8d7c61fe5df63695e586eed32316b8ff7e71a8e65e8219bdefd9c3"
+}

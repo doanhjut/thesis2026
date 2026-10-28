@@ -1,0 +1,9 @@
+{
+  "status": "passed",
+  "samples": 1186,
+  "outer_folds": 5,
+  "methods": 9,
+  "prediction_rows": 10674,
+  "outer_test_used_for_model_or_threshold_selection": false,
+  "evidence_status": "exploratory_post_hoc"
+}

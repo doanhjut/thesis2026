@@ -288,6 +288,10 @@ def _select(validation, candidates, builder, target_tpr):
 
 
 def _reliability_grids(w0):
+    # Fixed fusion can select the endpoints 0/1. The controller uses a logit
+    # state and the declared [.05, .95] weight limits, so project an endpoint
+    # into that same feasible interval before building PID candidates.
+    w0 = float(np.clip(w0, .05, .95))
     betas = [2., 4., 8.]
     kp = [.25, .5, 1.]
     ki = [.005, .02]
@@ -619,6 +623,7 @@ def run(sequences, static_features, out, selection=None, windows=tuple(range(1, 
 
 
 def _report(summary):
+    windows = summary['event_windows']
     rows = []
     for result in summary['results']:
         rows.append(
@@ -630,7 +635,8 @@ def _report(summary):
         '# Exploratory reliability-aware PID\n\n'
         '> This algorithm was designed after inspecting the locked confirmatory run. '
         'The results below are exploratory and require a new external/temporal cohort for confirmation.\n\n'
-        'The controller tracks a validation-trained reliability target on dense 1--20 API-event prefixes. '
+        f"The controller tracks a validation-trained reliability target on dense "
+        f"{min(windows)}--{max(windows)} API-event prefixes. "
         'All thresholds and gains are selected without outer-test labels.\n\n'
         '| Method | AUC | FPR | TPR | Event-AUC | Brier |\n'
         '|---|---:|---:|---:|---:|---:|\n' + '\n'.join(rows) + '\n\n'

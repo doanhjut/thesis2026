@@ -1,0 +1,7 @@
+{
+  "status": "passed",
+  "metric_rows_replayed": 55,
+  "prediction_rows_checked": 13046,
+  "test_labels_used_for_control": false,
+  "no_executable_downloaded_or_executed": true
+}

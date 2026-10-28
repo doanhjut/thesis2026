@@ -1,0 +1,20 @@
+{
+  "status": "exploratory_long_horizon_selection",
+  "criterion": "api_count >= 40; static metadata available",
+  "post_hoc": true,
+  "rows": 1186,
+  "class_counts": {
+    "0": 603,
+    "1": 583
+  },
+  "outer_fold_counts": {
+    "0": 229,
+    "1": 234,
+    "2": 244,
+    "3": 246,
+    "4": 233
+  },
+  "source": "/workspace/thesis2026/outputs/malbehavd_pid_20261020_vt_full/selected_cohort.csv",
+  "source_sha256": "9540b88b0da2463f63b4e983f5ecc277e3845b7badebbb79695e35f2c3b1a669",
+  "selection_sha256": "75d00f3634f071b3ccfb646a0376f9f65f7135fd62fab45a10cbf9d24ca59a5e"
+}

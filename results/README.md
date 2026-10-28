@@ -1,5 +1,18 @@
 # Trạng thái kết quả trong thư mục này
 
+`exploratory_20261028_reliability_pid_horizon40/` kiểm tra giả thuyết chuỗi 20
+sự kiện quá ngắn bằng cohort 1.186 mẫu có ít nhất 40 API events. Kết quả cho
+thấy chỉ kéo dài horizon không giúp controller cũ: Average có AUC tốt nhất và
+Logistic stacking có FPR thấp nhất. Gói này là exploratory vì tiêu chí độ dài
+được chọn sau khi xem run 20 sự kiện.
+
+`exploratory_20261028_pid_v2_meta_fusion_horizon40/` là phương án thuật toán
+mới: học các thành phần bất đồng logit P/I/D và thống kê nhiễu trên meta-train,
+chọn regularization/threshold trên validation rồi đo outer-test. Robust PID v2
+đạt AUC/AP nhỉnh hơn Average, FPR thấp hơn khoảng một điểm phần trăm và giảm FPR
+có ý nghĩa so với PID full v2 cũ, nhưng CI so với Average vẫn đi qua 0 và
+Logistic stacking tương đương. Cần cohort external/temporal mới để xác nhận.
+
 `measured_20261028_fusion_only_evidence_1922/` so sánh trực tiếp các biến thể
 dung hợp thích nghi với Average, Max-risk, Fixed weight và Logistic stacking
 trên dự đoán outer-test của 1.922 mẫu. Audit ghép cặp hỗ trợ Adaptive P so với

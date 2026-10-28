@@ -24,7 +24,8 @@ from src.experiments.provenance import audit
 from src.experiments.recovery import (SOREL_TAGS, inspect_npz, recover,
                                       recover_ember_dataset, recover_sorel_metadata,
                                       sampled_source_indices)
-from src.experiments.reliability_pid import reliability_pid_trajectory
+from src.experiments.reliability_pid import (_reliability_grids,
+                                             reliability_pid_trajectory)
 from src.experiments.signals import normalize, shap_signals
 from src.experiments.temporal import validate as validate_temporal
 from src.experiments.temporal_fusion import pid_trajectory, run as run_temporal_fusion
@@ -129,6 +130,13 @@ class ExperimentMathTests(unittest.TestCase):
         np.testing.assert_allclose(
             result[result.row_id == 1].w_static.to_numpy(),
             result[result.row_id == 2].w_static.to_numpy())
+
+    def test_reliability_pid_grid_projects_fixed_endpoint_into_weight_limits(self):
+        for endpoint, expected in [(0.0, 0.05), (1.0, 0.95)]:
+            grids = _reliability_grids(endpoint)
+            for candidates in grids.values():
+                self.assertTrue(candidates)
+                self.assertTrue(all(item['w0'] == expected for item in candidates))
 
     def test_mask_metrics_are_directly_recomputable(self):
         y = np.array([0, 0, 1, 1])
