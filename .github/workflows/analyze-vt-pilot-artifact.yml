@@ -7,6 +7,7 @@ on:
     paths:
       - .github/workflows/analyze-vt-pilot-artifact.yml
       - scripts/audit_vt_behaviour_html.py
+      - scripts/audit_vt_behaviour_availability.py
 
 permissions:
   actions: read
@@ -37,11 +38,20 @@ jobs:
             --coverage /tmp/vt-behaviour-pilot20/coverage_by_sample.csv \
             --output /tmp/vt-structure-audit
 
+      - name: Audit provider and EVTX availability
+        run: |
+          python scripts/audit_vt_behaviour_availability.py \
+            --listings /tmp/vt-behaviour-pilot20/raw_listings \
+            --manifest /tmp/vt-behaviour-pilot20/pilot_manifest.csv \
+            --output /tmp/vt-structure-audit
+
       - name: Commit structural audit
         run: |
           target=results/measured_20261028_vt_behaviour_pilot20
           cp /tmp/vt-structure-audit/html_structure_audit.json "$target/"
           cp /tmp/vt-structure-audit/html_structure_by_sample.csv "$target/"
+          cp /tmp/vt-structure-audit/provider_availability_audit.json "$target/"
+          cp /tmp/vt-structure-audit/provider_availability_by_sample.csv "$target/"
           sha256sum "$target"/* > "$target/artifact_sha256.txt"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
