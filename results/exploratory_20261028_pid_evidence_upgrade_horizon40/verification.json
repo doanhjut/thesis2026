@@ -1,0 +1,10 @@
+{
+  "status": "passed",
+  "samples": 1186,
+  "outer_folds": 5,
+  "history_information_matched": true,
+  "d_ablation_same_kp_ki_gate_threshold": true,
+  "stress_seeds": 10,
+  "outer_test_used_for_selection": false,
+  "evidence_status": "exploratory_post_hoc"
+}

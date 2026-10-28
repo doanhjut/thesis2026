@@ -1,5 +1,14 @@
 # Trạng thái kết quả trong thư mục này
 
+`exploratory_20261028_pid_evidence_upgrade_horizon40/` khắc phục hai nguy cơ
+quy kết: History-aware stacking nhận đúng cùng P/I/D, volatility và event
+history; full PID và Matched PI chỉ khác Kd. Benchmark chạy delay/onset ở ba
+mức và dropout/noise/burst ở ba mức x 10 seed. Safe PID giảm FPR theo cùng chiều
+ở mọi stress nhưng CI theo năm folds đều đi qua 0, đồng thời TPR/Event-AULC giảm
+nhẹ. Matched ablation không tìm thấy lợi ích ổn định của D và D thường làm tăng
+threshold crossings. Đây là bằng chứng âm có kiểm soát, không hỗ trợ tuyên bố D
+cải thiện hiệu năng.
+
 `exploratory_20261028_stateful_gated_residual_pid_horizon40/` giữ nguyên
 Temporal Logistic stacking và chỉ cộng một PID residual có gate, với gain=0 là
 fallback hợp lệ. Trên clean, PID giảm 5 FP và mất thêm 1 TP; dưới delay 5 events
