@@ -10,7 +10,7 @@
     "1": 6
   },
   "unit_inference_counts": {
-    "epoch_milliseconds": 9
+    "cuckoofork_yyyymmddHHMMSS_fractional_seconds": 9
   },
   "limitations": [
     "API and timestamp values are paired by their ordered occurrence in the provider report.",
