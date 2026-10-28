@@ -1,0 +1,72 @@
+name: VirusTotal provider timeline probe
+
+on:
+  push:
+    branches:
+      - feat/reproducible-thesis-experiments
+    paths:
+      - .github/workflows/vt-provider-timeline-probe.yml
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  provider-probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out experiment branch
+        uses: actions/checkout@v4
+        with:
+          ref: feat/reproducible-thesis-experiments
+
+      - name: Download original pilot artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh run download 40642154122 \
+            --repo doanhjut/thesis2026 \
+            --name vt-behaviour-pilot20 \
+            --dir /tmp/vt-behaviour-pilot20
+
+      - name: Download alternate provider reports
+        env:
+          VT_API_KEY: ${{ secrets.VT_API_KEY }}
+        run: |
+          python scripts/collect_vt_provider_probe.py \
+            --listings /tmp/vt-behaviour-pilot20/raw_listings \
+            --manifest /tmp/vt-behaviour-pilot20/pilot_manifest.csv \
+            --output /tmp/vt-provider-probe \
+            --requests-per-minute 4
+
+      - name: Audit alternate report structure
+        run: |
+          python scripts/audit_vt_behaviour_html.py \
+            --reports /tmp/vt-provider-probe/raw_html_reports \
+            --coverage /tmp/vt-provider-probe/provider_probe_coverage.csv \
+            --output /tmp/vt-provider-structure
+
+      - name: Commit audit evidence
+        run: |
+          target=results/measured_20261028_vt_behaviour_pilot20
+          cp /tmp/vt-provider-probe/provider_probe_coverage.csv "$target/"
+          cp /tmp/vt-provider-probe/provider_probe_summary.json "$target/"
+          cp /tmp/vt-provider-probe/request_history.csv "$target/provider_probe_request_history.csv"
+          cp /tmp/vt-provider-structure/html_structure_audit.json "$target/provider_html_structure_audit.json"
+          cp /tmp/vt-provider-structure/html_structure_by_sample.csv "$target/provider_html_structure_by_sample.csv"
+          sha256sum "$target"/* > "$target/artifact_sha256.txt"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$target"
+          git commit -m "Record alternate VT provider timeline probe"
+          git push origin HEAD:feat/reproducible-thesis-experiments
+
+      - name: Upload raw alternate reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vt-provider-timeline-probe
+          path: /tmp/vt-provider-probe/
+          if-no-files-found: error
+          retention-days: 14
