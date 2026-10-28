@@ -1,0 +1,48 @@
+name: Publish VirusTotal pilot audit
+
+on:
+  push:
+    branches:
+      - feat/reproducible-thesis-experiments
+    paths:
+      - .github/workflows/publish-vt-pilot-audit.yml
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  publish-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out experiment branch
+        uses: actions/checkout@v4
+        with:
+          ref: feat/reproducible-thesis-experiments
+
+      - name: Download completed pilot artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh run download 40642154122 \
+            --repo doanhjut/thesis2026 \
+            --name vt-behaviour-pilot20 \
+            --dir /tmp/vt-behaviour-pilot20
+
+      - name: Copy audit-only evidence
+        run: |
+          target=results/measured_20261028_vt_behaviour_pilot20
+          mkdir -p "$target"
+          cp /tmp/vt-behaviour-pilot20/coverage_audit.json "$target/"
+          cp /tmp/vt-behaviour-pilot20/coverage_by_sample.csv "$target/"
+          cp /tmp/vt-behaviour-pilot20/pilot_manifest.csv "$target/"
+          cp /tmp/vt-behaviour-pilot20/request_history.csv "$target/"
+          sha256sum "$target"/* > "$target/artifact_sha256.txt"
+
+      - name: Commit audit evidence
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add results/measured_20261028_vt_behaviour_pilot20
+          git commit -m "Record VirusTotal behaviour pilot audit"
+          git push origin HEAD:feat/reproducible-thesis-experiments
