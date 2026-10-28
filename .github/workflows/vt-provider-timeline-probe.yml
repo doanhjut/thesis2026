@@ -61,8 +61,8 @@ jobs:
           target=results/measured_20261028_vt_behaviour_pilot20
           mkdir -p "$target/provider_probe_diagnostic"
           cp /tmp/vt-provider-probe/collector_exit_code.txt "$target/provider_probe_diagnostic/" 2>/dev/null || true
-          cp /tmp/vt-provider-probe/collector_stdout.log "$target/provider_probe_diagnostic/" 2>/dev/null || true
-          cp /tmp/vt-provider-probe/collector_stderr.log "$target/provider_probe_diagnostic/" 2>/dev/null || true
+          cp /tmp/vt-provider-probe/collector_stdout.log "$target/provider_probe_diagnostic/collector_stdout.txt" 2>/dev/null || true
+          cp /tmp/vt-provider-probe/collector_stderr.log "$target/provider_probe_diagnostic/collector_stderr.txt" 2>/dev/null || true
           cp /tmp/vt-provider-probe/provider_probe_coverage.csv "$target/" 2>/dev/null || true
           cp /tmp/vt-provider-probe/provider_probe_summary.json "$target/" 2>/dev/null || true
           cp /tmp/vt-provider-probe/request_history.csv "$target/provider_probe_request_history.csv" 2>/dev/null || true
