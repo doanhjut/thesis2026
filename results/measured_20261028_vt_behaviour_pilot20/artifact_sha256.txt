@@ -1,3 +1,4 @@
+d947f78dbeb0de7474b92b1f4003a7a5c43175a47ef0f592b796210b658a1ef5  ./REPORT_VI.md
 092c6a7e2cc0bb0cb50cbc53ad9a17cf4fa5389c61723044efeb5e3981e22e18  ./coverage_audit.json
 67c7d3936eee6424f489ac095b20fa14d318638bb7db5aedd4e540589e3aa1ed  ./coverage_by_sample.csv
 2e1ab76e95d4b2c2486b09f71176219e7213b11c0bfd2df68acfd61bf1a70309  ./event_extraction_summary.json
