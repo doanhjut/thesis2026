@@ -1,0 +1,10 @@
+attempted_at_utc,endpoint,http_status
+2026-10-28T06:31:19.337255Z,/api/v3/file_behaviours/001a9515fe0cb67fa49d200b330311b65822287bd2d1bff8c78247176781f131_VirusTotal%20Cuckoofork/html,302
+2026-10-28T06:31:34.716195Z,/api/v3/file_behaviours/0072caf5ecd841ecbef9bbe2b53802aea06b89bfb2e06daa9ee3962641f4f135_VirusTotal%20Cuckoofork/html,302
+2026-10-28T06:31:50.132460Z,/api/v3/file_behaviours/00a7c7b88877bf59dbaa70de734fcd3f287f1eb92caff4571a4c8e67a5dc0aca_VirusTotal%20Cuckoofork/html,302
+2026-10-28T06:32:05.655140Z,/api/v3/file_behaviours/00a80e2e0f0f72ba202536615fa98cb11afafd519d9212b01e0678bc7f6e9ab4_VirusTotal%20Cuckoofork/html,302
+2026-10-28T06:32:21.004563Z,/api/v3/file_behaviours/00abb163f70a649b034f85c4f93bef3c08c570d65f376fb40ef52a65a041be58_VirusTotal%20Cuckoofork/html,302
+2026-10-28T06:32:36.444310Z,/api/v3/file_behaviours/00b95c5419e422f5ec2c030f0cb6d379269a71c763141f2075f7395b27164475_VirusTotal%20Cuckoofork/html,302
+2026-10-28T06:32:51.868617Z,/api/v3/file_behaviours/00c8d6ee5f434cd956febb0061b070c37c13162d934db13f702b3be51bce9c73_VirusTotal%20Cuckoofork/html,302
+2026-10-28T06:33:07.519206Z,/api/v3/file_behaviours/00c99d93961a43f6de1a1da795d47d002843ed567c2b0e99acd600cd8a7b6ec1_VirusTotal%20Cuckoofork/html,302
+2026-10-28T06:33:23.062659Z,/api/v3/file_behaviours/00f91b9be9e3f228a5e350981f4f1eae44742b540526204f1fb8bd59d975d91c_VirusTotal%20Cuckoofork/html,302

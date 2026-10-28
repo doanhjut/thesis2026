@@ -1,0 +1,18 @@
+{
+  "reports_audited": 9,
+  "strong_event_timeline_signal_reports": 0,
+  "weak_time_and_api_signal_reports": 9,
+  "strong_by_label": {
+    "0": 0,
+    "1": 0
+  },
+  "provider_counts": {
+    "VirusTotal Cuckoofork": {
+      "reports": 9,
+      "strong": 0,
+      "weak": 9
+    }
+  },
+  "interpretation": "Strong means the HTML contains an API key and a time key in the same leaf JSON object, or an HTML row with API/call and a clock timestamp. It is a structural screening result; a provider-specific parser and monotonicity validation are still required before PID evaluation.",
+  "raw_report_content_committed": false
+}

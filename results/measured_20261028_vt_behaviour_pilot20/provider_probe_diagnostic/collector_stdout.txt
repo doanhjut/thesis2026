@@ -1,0 +1,17 @@
+{
+  "status": "probe_complete",
+  "generated_at_utc": "2026-10-28T06:33:23.614412Z",
+  "binary_downloaded": false,
+  "provider_priority": [
+    "VirusTotal Cuckoofork",
+    "VenusEye Sandbox"
+  ],
+  "attempted_rows": 9,
+  "status_counts": {
+    "report_collected": 9
+  },
+  "label_counts": {
+    "0": 2,
+    "1": 7
+  }
+}
