@@ -26,7 +26,10 @@ from typing import Any
 
 
 VT_API_ROOT = "https://www.virustotal.com/api/v3"
-ALLOWED_REPORT_HOSTS = {"vtbehaviour.commondatastorage.googleapis.com"}
+ALLOWED_REPORT_HOSTS = {
+    "vtbehaviour.commondatastorage.googleapis.com",
+    "vtcuckoo.commondatastorage.googleapis.com",
+}
 PREFERRED_SANDBOXES = (
     "CAPE Sandbox",
     "VirusTotal Jujubox",

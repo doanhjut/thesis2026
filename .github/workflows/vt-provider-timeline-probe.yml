@@ -6,6 +6,7 @@ on:
       - feat/reproducible-thesis-experiments
     paths:
       - .github/workflows/vt-provider-timeline-probe.yml
+      - scripts/collect_vt_behaviour_pilot.py
 
 permissions:
   actions: read
