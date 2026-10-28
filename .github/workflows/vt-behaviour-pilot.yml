@@ -2,6 +2,11 @@ name: VirusTotal behaviour pilot (report only)
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - feat/reproducible-thesis-experiments
+    paths:
+      - .github/workflows/vt-behaviour-pilot.yml
 
 permissions:
   contents: read
