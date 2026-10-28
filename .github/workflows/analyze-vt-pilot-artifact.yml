@@ -1,0 +1,49 @@
+name: Analyze VirusTotal pilot artifact
+
+on:
+  push:
+    branches:
+      - feat/reproducible-thesis-experiments
+    paths:
+      - .github/workflows/analyze-vt-pilot-artifact.yml
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  analyze-artifact:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out experiment branch
+        uses: actions/checkout@v4
+        with:
+          ref: feat/reproducible-thesis-experiments
+
+      - name: Download completed pilot artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh run download 40642154122 \
+            --repo doanhjut/thesis2026 \
+            --name vt-behaviour-pilot20 \
+            --dir /tmp/vt-behaviour-pilot20
+
+      - name: Audit event-level timestamp structure
+        run: |
+          python scripts/audit_vt_behaviour_html.py \
+            --reports /tmp/vt-behaviour-pilot20/raw_html_reports \
+            --coverage /tmp/vt-behaviour-pilot20/coverage_by_sample.csv \
+            --output /tmp/vt-structure-audit
+
+      - name: Commit structural audit
+        run: |
+          target=results/measured_20261028_vt_behaviour_pilot20
+          cp /tmp/vt-structure-audit/html_structure_audit.json "$target/"
+          cp /tmp/vt-structure-audit/html_structure_by_sample.csv "$target/"
+          sha256sum "$target"/* > "$target/artifact_sha256.txt"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$target"
+          git commit -m "Audit VirusTotal behaviour report structure"
+          git push origin HEAD:feat/reproducible-thesis-experiments
