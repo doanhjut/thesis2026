@@ -34,13 +34,21 @@ jobs:
         env:
           VT_API_KEY: ${{ secrets.VT_API_KEY }}
         run: |
+          mkdir -p /tmp/vt-provider-probe
+          set +e
           python scripts/collect_vt_provider_probe.py \
             --listings /tmp/vt-behaviour-pilot20/raw_listings \
             --manifest /tmp/vt-behaviour-pilot20/pilot_manifest.csv \
             --output /tmp/vt-provider-probe \
-            --requests-per-minute 4
+            --requests-per-minute 4 \
+            > /tmp/vt-provider-probe/collector_stdout.log \
+            2> /tmp/vt-provider-probe/collector_stderr.log
+          code=$?
+          printf '%s\n' "$code" > /tmp/vt-provider-probe/collector_exit_code.txt
+          exit "$code"
 
       - name: Audit alternate report structure
+        if: success()
         run: |
           python scripts/audit_vt_behaviour_html.py \
             --reports /tmp/vt-provider-probe/raw_html_reports \
@@ -48,18 +56,23 @@ jobs:
             --output /tmp/vt-provider-structure
 
       - name: Commit audit evidence
+        if: always()
         run: |
           target=results/measured_20261028_vt_behaviour_pilot20
-          cp /tmp/vt-provider-probe/provider_probe_coverage.csv "$target/"
-          cp /tmp/vt-provider-probe/provider_probe_summary.json "$target/"
-          cp /tmp/vt-provider-probe/request_history.csv "$target/provider_probe_request_history.csv"
-          cp /tmp/vt-provider-structure/html_structure_audit.json "$target/provider_html_structure_audit.json"
-          cp /tmp/vt-provider-structure/html_structure_by_sample.csv "$target/provider_html_structure_by_sample.csv"
-          sha256sum "$target"/* > "$target/artifact_sha256.txt"
+          mkdir -p "$target/provider_probe_diagnostic"
+          cp /tmp/vt-provider-probe/collector_exit_code.txt "$target/provider_probe_diagnostic/" 2>/dev/null || true
+          cp /tmp/vt-provider-probe/collector_stdout.log "$target/provider_probe_diagnostic/" 2>/dev/null || true
+          cp /tmp/vt-provider-probe/collector_stderr.log "$target/provider_probe_diagnostic/" 2>/dev/null || true
+          cp /tmp/vt-provider-probe/provider_probe_coverage.csv "$target/" 2>/dev/null || true
+          cp /tmp/vt-provider-probe/provider_probe_summary.json "$target/" 2>/dev/null || true
+          cp /tmp/vt-provider-probe/request_history.csv "$target/provider_probe_request_history.csv" 2>/dev/null || true
+          cp /tmp/vt-provider-structure/html_structure_audit.json "$target/provider_html_structure_audit.json" 2>/dev/null || true
+          cp /tmp/vt-provider-structure/html_structure_by_sample.csv "$target/provider_html_structure_by_sample.csv" 2>/dev/null || true
+          (cd "$target" && find . -type f ! -name artifact_sha256.txt -print0 | sort -z | xargs -0 sha256sum > artifact_sha256.txt)
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add "$target"
-          git commit -m "Record alternate VT provider timeline probe"
+          git commit -m "Record alternate VT provider probe status"
           git push origin HEAD:feat/reproducible-thesis-experiments
 
       - name: Upload raw alternate reports
