@@ -6,6 +6,7 @@ on:
       - feat/reproducible-thesis-experiments
     paths:
       - .github/workflows/analyze-vt-pilot-artifact.yml
+      - scripts/audit_vt_behaviour_html.py
 
 permissions:
   actions: read

@@ -65,7 +65,23 @@ def count_event_rows(text: str) -> int:
 
 def load_coverage(path: pathlib.Path) -> dict[str, dict[str, str]]:
     with path.open(newline="", encoding="utf-8") as handle:
-        return {row["sha256"]: row for row in csv.DictReader(handle)}
+        output: dict[str, dict[str, str]] = {}
+        for row in csv.DictReader(handle):
+            sample_sha256 = row.get("sample_sha256")
+            if not sample_sha256:
+                # Pilot run 40642154122 used `sha256` for the report digest and
+                # accidentally overwrote the sample digest. The behaviour
+                # object ID is provider-defined but starts with the exact
+                # 64-character sample SHA-256, so the audit can recover it
+                # without using report content or labels.
+                object_id = row.get("behaviour_object_id", "")
+                match = re.match(r"^([0-9a-fA-F]{64})_", object_id)
+                sample_sha256 = match.group(1).lower() if match else row.get("sha256")
+                row["report_sha256"] = row.get("sha256", "")
+                row["sample_sha256_recovered_from_object_id"] = str(bool(match))
+            if sample_sha256:
+                output[sample_sha256.lower()] = row
+        return output
 
 
 def write_csv(path: pathlib.Path, rows: list[dict[str, Any]]) -> None:
@@ -89,7 +105,9 @@ def main() -> int:
         sha256 = report_path.name.removesuffix(".html.gz")
         body = gzip.decompress(report_path.read_bytes())
         text = body.decode("utf-8", errors="replace")
-        metadata = coverage.get(sha256, {})
+        metadata = coverage.get(sha256.lower(), {})
+        if not metadata:
+            raise ValueError(f"No coverage metadata for report {report_path.name}")
         row: dict[str, Any] = {
             "sha256": sha256,
             "label": int(metadata["label"]),

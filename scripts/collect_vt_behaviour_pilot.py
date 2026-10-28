@@ -178,7 +178,7 @@ def inspect_report(body: bytes) -> dict[str, Any]:
     lowered = body.lower()
     return {
         "size_bytes": len(body),
-        "sha256": sha256_bytes(body),
+        "report_sha256": sha256_bytes(body),
         "contains_timestamp_token": b"timestamp" in lowered,
         "contains_api_token": b"api" in lowered,
         "contains_calls_token": b"calls" in lowered,
@@ -219,7 +219,7 @@ def main() -> int:
     for row in pilot:
         sha256 = row["sha256"].lower()
         record: dict[str, Any] = {
-            "sha256": sha256,
+            "sample_sha256": sha256,
             "label": int(row["label"]),
             "outer_fold": int(row["outer_fold"]),
         }
