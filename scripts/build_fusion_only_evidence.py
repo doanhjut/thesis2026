@@ -87,6 +87,10 @@ def bootstrap_difference(
     y = wide[left].label.to_numpy(dtype=int)
     if not np.array_equal(y, wide[right].label.to_numpy(dtype=int)):
         raise ValueError(f"Unpaired labels for {left} and {right}")
+    left_score = wide[left].score.to_numpy(dtype=float)
+    right_score = wide[right].score.to_numpy(dtype=float)
+    left_decision = wide[left].predicted_label.to_numpy(dtype=int)
+    right_decision = wide[right].predicted_label.to_numpy(dtype=int)
     rng = np.random.default_rng(seed)
     class_indices = [np.flatnonzero(y == value) for value in (0, 1)]
     values = {name: [] for name in ("auc", "ap", "brier", "fpr", "tpr")}
@@ -94,10 +98,33 @@ def bootstrap_difference(
         sampled = np.concatenate([
             rng.choice(index, size=len(index), replace=True) for index in class_indices
         ])
-        for name in values:
-            left_value = metrics(wide[left].iloc[sampled])[name]
-            right_value = metrics(wide[right].iloc[sampled])[name]
-            values[name].append(float(left_value - right_value))
+        sampled_y = y[sampled]
+        negative = sampled_y == 0
+        positive = sampled_y == 1
+        sampled_left_score = left_score[sampled]
+        sampled_right_score = right_score[sampled]
+        sampled_left_decision = left_decision[sampled]
+        sampled_right_decision = right_decision[sampled]
+        values["auc"].append(float(
+            roc_auc_score(sampled_y, sampled_left_score)
+            - roc_auc_score(sampled_y, sampled_right_score)
+        ))
+        values["ap"].append(float(
+            average_precision_score(sampled_y, sampled_left_score)
+            - average_precision_score(sampled_y, sampled_right_score)
+        ))
+        values["brier"].append(float(
+            np.mean((sampled_y - sampled_left_score) ** 2)
+            - np.mean((sampled_y - sampled_right_score) ** 2)
+        ))
+        values["fpr"].append(float(
+            np.mean(sampled_left_decision[negative])
+            - np.mean(sampled_right_decision[negative])
+        ))
+        values["tpr"].append(float(
+            np.mean(sampled_left_decision[positive])
+            - np.mean(sampled_right_decision[positive])
+        ))
     return {
         "comparison": f"{left}_minus_{right}",
         "samples": int(len(y)),
@@ -132,6 +159,20 @@ def build_report(summary: dict) -> str:
         )
     p_fixed = summary["comparisons"]["Reliability_P_minus_Fixed_weight"]["metrics"]
     full_p = summary["comparisons"]["Reliability_full_PID_minus_Reliability_P"]["metrics"]
+    full_baseline_rows = []
+    for baseline in ("Average_50_50", "Max_score", "Fixed_weight", "Logistic_stack"):
+        comparison = summary["comparisons"][
+            f"Reliability_full_PID_minus_{baseline}"
+        ]["metrics"]
+        full_baseline_rows.append(
+            f"| {LABELS[baseline]} | {pp(comparison['fpr']['mean'])} "
+            f"[{pp(comparison['fpr']['ci95_low'])}; {pp(comparison['fpr']['ci95_high'])}] | "
+            f"{pp(comparison['tpr']['mean'])} "
+            f"[{pp(comparison['tpr']['ci95_low'])}; {pp(comparison['tpr']['ci95_high'])}] | "
+            f"{100 * comparison['auc']['mean']:+.2f} pp "
+            f"[{100 * comparison['auc']['ci95_low']:+.2f}; "
+            f"{100 * comparison['auc']['ci95_high']:+.2f}] |"
+        )
     p = summary["methods"]["Reliability_P"]
     fixed = summary["methods"]["Fixed_weight"]
     return f"""# Kiểm định fusion-only cho đóng góp dung hợp
@@ -163,6 +204,22 @@ tạo {p['fp']} báo động nhầm so với {fixed['fp']} của Fixed, trong kh
 cố định ở operating point đã khóa. Average và Logistic stacking vẫn tạo đánh đổi
 khác: AUC/TPR cao hơn nhưng FPR cao hơn. Vì vậy Adaptive P là một điểm trên biên
 đánh đổi, không phải phương pháp thắng mọi chỉ số.
+
+## Full PID so với các luật dung hợp bên ngoài họ PID
+
+Các hiệu ứng dưới đây là `Full PID - baseline`; giá trị FPR âm có lợi cho PID,
+giá trị TPR/AUC dương có lợi cho PID.
+
+| Baseline | ΔFPR (CI 95%) | ΔTPR (CI 95%) | ΔAUC (CI 95%) |
+|---|---:|---:|---:|
+{chr(10).join(full_baseline_rows)}
+
+Full PID có FPR quan sát thấp nhất trong nhóm baseline bên ngoài họ PID. Mức giảm
+FPR có CI loại 0 so với Average, Max-risk và Logistic stacking; so với Fixed,
+CI FPR còn đi qua 0 nhưng Brier cải thiện. Tuy nhiên, so với Average/Max-risk,
+PID đồng thời giảm khoảng 0,8 điểm phần trăm TPR. Đây là đánh đổi vận hành, không
+phải thống trị toàn diện. Không được mô tả các hàng này là so sánh "cùng TPR"
+vì threshold được chọn riêng trên validation và TPR outer-test có sai khác.
 
 ## Điều dữ liệu bác bỏ
 
@@ -224,11 +281,14 @@ def main() -> None:
     if missing:
         raise ValueError(f"Missing methods: {sorted(missing)}")
     methods = {method: metrics(final[final.method == method]) for method in METHODS}
-    # Confidence intervals are computed for the two comparisons that answer
-    # the contribution and ablation questions directly.  The remaining
-    # methods are still reported as fusion baselines in the full table/plot.
+    # Compare the adaptive controller with every external fusion baseline,
+    # then keep the P-vs-Fixed contribution test and full-PID-vs-P ablation.
     pairs = [
         ("Reliability_P", "Fixed_weight"),
+        ("Reliability_full_PID", "Average_50_50"),
+        ("Reliability_full_PID", "Max_score"),
+        ("Reliability_full_PID", "Fixed_weight"),
+        ("Reliability_full_PID", "Logistic_stack"),
         ("Reliability_full_PID", "Reliability_P"),
     ]
     comparisons = {

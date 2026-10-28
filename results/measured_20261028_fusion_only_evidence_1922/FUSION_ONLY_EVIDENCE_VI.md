@@ -34,10 +34,29 @@ cố định ở operating point đã khóa. Average và Logistic stacking vẫn
 khác: AUC/TPR cao hơn nhưng FPR cao hơn. Vì vậy Adaptive P là một điểm trên biên
 đánh đổi, không phải phương pháp thắng mọi chỉ số.
 
+## Full PID so với các luật dung hợp bên ngoài họ PID
+
+Các hiệu ứng dưới đây là `Full PID - baseline`; giá trị FPR âm có lợi cho PID,
+giá trị TPR/AUC dương có lợi cho PID.
+
+| Baseline | ΔFPR (CI 95%) | ΔTPR (CI 95%) | ΔAUC (CI 95%) |
+|---|---:|---:|---:|
+| Average 50/50 | -3.13 pp [-4.40 pp; -1.82 pp] | -0.80 pp [-1.41 pp; -0.20 pp] | -0.12 pp [-0.29; +0.03] |
+| Max-risk | -5.04 pp [-6.55 pp; -3.43 pp] | -0.83 pp [-1.62 pp; -0.10 pp] | +0.49 pp [+0.16; +0.84] |
+| Fixed weight | -0.87 pp [-1.93 pp; +0.21 pp] | -0.09 pp [-0.81 pp; +0.61 pp] | +0.07 pp [-0.08; +0.21] |
+| Logistic stacking | -3.32 pp [-4.94 pp; -1.72 pp] | -0.62 pp [-1.21 pp; +0.00 pp] | +0.08 pp [-0.19; +0.37] |
+
+Full PID có FPR quan sát thấp nhất trong nhóm baseline bên ngoài họ PID. Mức giảm
+FPR có CI loại 0 so với Average, Max-risk và Logistic stacking; so với Fixed,
+CI FPR còn đi qua 0 nhưng Brier cải thiện. Tuy nhiên, so với Average/Max-risk,
+PID đồng thời giảm khoảng 0,8 điểm phần trăm TPR. Đây là đánh đổi vận hành, không
+phải thống trị toàn diện. Không được mô tả các hàng này là so sánh "cùng TPR"
+vì threshold được chọn riêng trên validation và TPR outer-test có sai khác.
+
 ## Điều dữ liệu bác bỏ
 
 Full PID không hơn Adaptive P: chênh lệch FPR là
-+0.44 pp, CI 95% [+0.11 pp;
++0.43 pp, CI 95% [+0.11 pp;
 +0.86 pp], trong khi TPR không đổi. Full PID cũng không
 đạt AUC cao nhất. Do đó không được tuyên bố thành phần I/D tạo cải thiện trên
 chuỗi 1--20 sự kiện hiện tại.
