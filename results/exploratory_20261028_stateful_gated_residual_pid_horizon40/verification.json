@@ -1,0 +1,9 @@
+{
+  "status": "passed",
+  "samples": 1186,
+  "outer_folds": 5,
+  "outer_test_used_for_selection": false,
+  "zero_gain_fallback_in_grid": true,
+  "same_stress_realizations_for_methods": true,
+  "evidence_status": "exploratory_post_hoc"
+}

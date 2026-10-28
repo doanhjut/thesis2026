@@ -1,5 +1,13 @@
 # Trạng thái kết quả trong thư mục này
 
+`exploratory_20261028_stateful_gated_residual_pid_horizon40/` giữ nguyên
+Temporal Logistic stacking và chỉ cộng một PID residual có gate, với gain=0 là
+fallback hợp lệ. Trên clean, PID giảm 5 FP và mất thêm 1 TP; dưới delay 5 events
+PID giảm 8 FP và mất 1 TP. Kiểm định exact cho FP dưới delay còn ý nghĩa sau
+Holm correction (`p=0,0312`). Event-AULC/early-AUC không cải thiện và ba trong
+năm folds chọn gain=0, nên gói chỉ hỗ trợ lợi ích giảm cảnh báo dưới stress có
+kiểm soát, chưa chứng minh PID vượt stacking toàn diện.
+
 `exploratory_20261028_reliability_pid_horizon40/` kiểm tra giả thuyết chuỗi 20
 sự kiện quá ngắn bằng cohort 1.186 mẫu có ít nhất 40 API events. Kết quả cho
 thấy chỉ kéo dài horizon không giúp controller cũ: Average có AUC tốt nhất và

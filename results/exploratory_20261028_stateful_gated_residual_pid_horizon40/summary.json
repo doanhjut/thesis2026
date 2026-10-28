@@ -1,0 +1,631 @@
+{
+  "status": "exploratory_stateful_gated_residual_pid",
+  "samples": 1186,
+  "outer_folds": 5,
+  "event_horizon": 40,
+  "stress_modes": [
+    "clean",
+    "delay_5",
+    "dropout_20",
+    "noise_logit_025"
+  ],
+  "target_validation_tpr": 0.95,
+  "selection_objective": "minimum clean validation FPR at target TPR; then mean clean/stress event-AUC, clean event-AUC, final AUC and Brier",
+  "results": [
+    {
+      "method": "Gated_residual_PID",
+      "stress": "clean",
+      "auc": {
+        "mean": 0.9892902064333196,
+        "sd": 0.0040347597633677065
+      },
+      "ap": {
+        "mean": 0.991054712439912,
+        "sd": 0.0025091164302974574
+      },
+      "fpr": {
+        "mean": 0.03465067941077537,
+        "sd": 0.02045758273195276
+      },
+      "tpr": {
+        "mean": 0.9417393360708617,
+        "sd": 0.026585835168131327
+      },
+      "brier": {
+        "mean": 0.03560301950314214,
+        "sd": 0.007354482880584165
+      },
+      "event_auc": {
+        "mean": 0.9865619272938997,
+        "sd": 0.003825816872303623
+      },
+      "early_auc_10": {
+        "mean": 0.9809965192538443,
+        "sd": 0.004598963548614211
+      },
+      "median_stable_detection_event": {
+        "mean": 1.0,
+        "sd": 0.0
+      },
+      "benign_any_alarm_rate": {
+        "mean": 0.17434335789493727,
+        "sd": 0.15998488505944944
+      },
+      "mean_threshold_crossings": {
+        "mean": 0.33910200594700435,
+        "sd": 0.15250271165897916
+      },
+      "counts": {
+        "tn": 582,
+        "fp": 21,
+        "fn": 34,
+        "tp": 549
+      }
+    },
+    {
+      "method": "Gated_residual_PID",
+      "stress": "delay_5",
+      "auc": {
+        "mean": 0.989220204580613,
+        "sd": 0.003947478807240532
+      },
+      "ap": {
+        "mean": 0.9910261408721104,
+        "sd": 0.002354502945849694
+      },
+      "fpr": {
+        "mean": 0.02611990124585087,
+        "sd": 0.02123991417283201
+      },
+      "tpr": {
+        "mean": 0.9449471967559987,
+        "sd": 0.021938719398104847
+      },
+      "brier": {
+        "mean": 0.03565619320116013,
+        "sd": 0.006772104290797677
+      },
+      "event_auc": {
+        "mean": 0.9848161913266829,
+        "sd": 0.0040754835730068655
+      },
+      "early_auc_10": {
+        "mean": 0.9766350949198749,
+        "sd": 0.00638573039944586
+      },
+      "median_stable_detection_event": {
+        "mean": 1.0,
+        "sd": 0.0
+      },
+      "benign_any_alarm_rate": {
+        "mean": 0.17419698787151808,
+        "sd": 0.1605026474765631
+      },
+      "mean_threshold_crossings": {
+        "mean": 0.3248047379648858,
+        "sd": 0.14224287475207456
+      },
+      "counts": {
+        "tn": 587,
+        "fp": 16,
+        "fn": 32,
+        "tp": 551
+      }
+    },
+    {
+      "method": "Gated_residual_PID",
+      "stress": "dropout_20",
+      "auc": {
+        "mean": 0.9893287929172386,
+        "sd": 0.004047562417776394
+      },
+      "ap": {
+        "mean": 0.9911113078059539,
+        "sd": 0.002532615167759591
+      },
+      "fpr": {
+        "mean": 0.03465067941077537,
+        "sd": 0.02045758273195276
+      },
+      "tpr": {
+        "mean": 0.9417393360708617,
+        "sd": 0.026585835168131327
+      },
+      "brier": {
+        "mean": 0.03564128622674717,
+        "sd": 0.0072822363366857575
+      },
+      "event_auc": {
+        "mean": 0.9864904211740306,
+        "sd": 0.0039378107630108706
+      },
+      "early_auc_10": {
+        "mean": 0.98085334100864,
+        "sd": 0.005111800202282261
+      },
+      "median_stable_detection_event": {
+        "mean": 1.0,
+        "sd": 0.0
+      },
+      "benign_any_alarm_rate": {
+        "mean": 0.17275605630763569,
+        "sd": 0.16070839621575128
+      },
+      "mean_threshold_crossings": {
+        "mean": 0.32212825873853884,
+        "sd": 0.13770676753880493
+      },
+      "counts": {
+        "tn": 582,
+        "fp": 21,
+        "fn": 34,
+        "tp": 549
+      }
+    },
+    {
+      "method": "Gated_residual_PID",
+      "stress": "noise_logit_025",
+      "auc": {
+        "mean": 0.989218898237558,
+        "sd": 0.0042123341606237754
+      },
+      "ap": {
+        "mean": 0.9910846761570141,
+        "sd": 0.002648801205651664
+      },
+      "fpr": {
+        "mean": 0.03631734607744204,
+        "sd": 0.023786582920275197
+      },
+      "tpr": {
+        "mean": 0.9400444208166243,
+        "sd": 0.027596682265232233
+      },
+      "brier": {
+        "mean": 0.035374488950226234,
+        "sd": 0.007593632236713673
+      },
+      "event_auc": {
+        "mean": 0.986347437430628,
+        "sd": 0.003709600733990121
+      },
+      "early_auc_10": {
+        "mean": 0.9805087457000317,
+        "sd": 0.004471042620400928
+      },
+      "median_stable_detection_event": {
+        "mean": 1.0,
+        "sd": 0.0
+      },
+      "benign_any_alarm_rate": {
+        "mean": 0.184207412273186,
+        "sd": 0.16370418147440127
+      },
+      "mean_threshold_crossings": {
+        "mean": 0.4664380015697123,
+        "sd": 0.19392878898964824
+      },
+      "counts": {
+        "tn": 581,
+        "fp": 22,
+        "fn": 35,
+        "tp": 548
+      }
+    },
+    {
+      "method": "Temporal_stacking",
+      "stress": "clean",
+      "auc": {
+        "mean": 0.9894216111073184,
+        "sd": 0.004181689808786744
+      },
+      "ap": {
+        "mean": 0.9911478341185462,
+        "sd": 0.0026216141973609635
+      },
+      "fpr": {
+        "mean": 0.04287472312662237,
+        "sd": 0.026887191909425564
+      },
+      "tpr": {
+        "mean": 0.9433522392966681,
+        "sd": 0.028716948076834725
+      },
+      "brier": {
+        "mean": 0.03558399394852992,
+        "sd": 0.007365391789528021
+      },
+      "event_auc": {
+        "mean": 0.986880810034776,
+        "sd": 0.004197988403212639
+      },
+      "early_auc_10": {
+        "mean": 0.9815601216712182,
+        "sd": 0.005191579145603662
+      },
+      "median_stable_detection_event": {
+        "mean": 1.0,
+        "sd": 0.0
+      },
+      "benign_any_alarm_rate": {
+        "mean": 0.2171302431408389,
+        "sd": 0.18313283919035472
+      },
+      "mean_threshold_crossings": {
+        "mean": 0.35954791782970397,
+        "sd": 0.1450209877700602
+      },
+      "counts": {
+        "tn": 577,
+        "fp": 26,
+        "fn": 33,
+        "tp": 550
+      }
+    },
+    {
+      "method": "Temporal_stacking",
+      "stress": "delay_5",
+      "auc": {
+        "mean": 0.9893892008077116,
+        "sd": 0.004163444649323304
+      },
+      "ap": {
+        "mean": 0.991161797132655,
+        "sd": 0.0025391980135310343
+      },
+      "fpr": {
+        "mean": 0.03931662255732628,
+        "sd": 0.03528067315094585
+      },
+      "tpr": {
+        "mean": 0.9465600999818051,
+        "sd": 0.024212165577904583
+      },
+      "brier": {
+        "mean": 0.03555282190415935,
+        "sd": 0.0068623624638778
+      },
+      "event_auc": {
+        "mean": 0.9851962990152833,
+        "sd": 0.004543858484274249
+      },
+      "early_auc_10": {
+        "mean": 0.9772983784276221,
+        "sd": 0.007267516122089639
+      },
+      "median_stable_detection_event": {
+        "mean": 1.0,
+        "sd": 0.0
+      },
+      "benign_any_alarm_rate": {
+        "mean": 0.21698387311741968,
+        "sd": 0.18544835503581478
+      },
+      "mean_threshold_crossings": {
+        "mean": 0.35305055754098547,
+        "sd": 0.15279295488776903
+      },
+      "counts": {
+        "tn": 579,
+        "fp": 24,
+        "fn": 31,
+        "tp": 552
+      }
+    },
+    {
+      "method": "Temporal_stacking",
+      "stress": "dropout_20",
+      "auc": {
+        "mean": 0.9894490470746268,
+        "sd": 0.004178890254951806
+      },
+      "ap": {
+        "mean": 0.9911802058063799,
+        "sd": 0.0026112884683020796
+      },
+      "fpr": {
+        "mean": 0.0412080564599557,
+        "sd": 0.024555135050686003
+      },
+      "tpr": {
+        "mean": 0.9433522392966681,
+        "sd": 0.028716948076834725
+      },
+      "brier": {
+        "mean": 0.03560614516960718,
+        "sd": 0.00730495164417168
+      },
+      "event_auc": {
+        "mean": 0.9868093322157104,
+        "sd": 0.004311564770894082
+      },
+      "early_auc_10": {
+        "mean": 0.9814137114742447,
+        "sd": 0.005678394195534673
+      },
+      "median_stable_detection_event": {
+        "mean": 1.0,
+        "sd": 0.0
+      },
+      "benign_any_alarm_rate": {
+        "mean": 0.21554294155353731,
+        "sd": 0.1842266299530018
+      },
+      "mean_threshold_crossings": {
+        "mean": 0.3380866497634971,
+        "sd": 0.11590990103551062
+      },
+      "counts": {
+        "tn": 578,
+        "fp": 25,
+        "fn": 33,
+        "tp": 550
+      }
+    },
+    {
+      "method": "Temporal_stacking",
+      "stress": "noise_logit_025",
+      "auc": {
+        "mean": 0.9893461629082904,
+        "sd": 0.004362465571901398
+      },
+      "ap": {
+        "mean": 0.9911669588385836,
+        "sd": 0.0027571115980832414
+      },
+      "fpr": {
+        "mean": 0.04618073405558411,
+        "sd": 0.03114965212601572
+      },
+      "tpr": {
+        "mean": 0.9416573240424307,
+        "sd": 0.029770248286020828
+      },
+      "brier": {
+        "mean": 0.03529982547521525,
+        "sd": 0.007670691602750987
+      },
+      "event_auc": {
+        "mean": 0.9866949795866965,
+        "sd": 0.004114128185216216
+      },
+      "early_auc_10": {
+        "mean": 0.9811247223931071,
+        "sd": 0.005091071068280928
+      },
+      "median_stable_detection_event": {
+        "mean": 1.0,
+        "sd": 0.0
+      },
+      "benign_any_alarm_rate": {
+        "mean": 0.22035495325679255,
+        "sd": 0.17755851614785856
+      },
+      "mean_threshold_crossings": {
+        "mean": 0.5072091167044445,
+        "sd": 0.177724595025182
+      },
+      "counts": {
+        "tn": 575,
+        "fp": 28,
+        "fn": 34,
+        "tp": 549
+      }
+    }
+  ],
+  "selected_pid_by_fold": [
+    {
+      "outer_fold": 0,
+      "order": 13,
+      "gains": [
+        0.25,
+        0.1,
+        0.0
+      ],
+      "gate": {
+        "quantile": 0.5,
+        "temperature": 0.5,
+        "max_gate": 0.5
+      },
+      "gate_threshold": 0.9185260175083805,
+      "threshold": 0.2877267342094449,
+      "robust_event_auc": 0.9873242144583608,
+      "auc": 0.9911374789423569,
+      "ap": 0.9917374369374543,
+      "brier": 0.035082260505927644,
+      "fpr": 0.032520325203252036,
+      "tpr": 0.954954954954955,
+      "tn": 119,
+      "fp": 4,
+      "fn": 5,
+      "tp": 106,
+      "event_auc": 0.9879513660001464,
+      "early_auc_10": 0.981886764813594,
+      "median_stable_detection_event": 1.0,
+      "benign_any_alarm_rate": 0.25203252032520324,
+      "mean_threshold_crossings": 0.5170940170940171
+    },
+    {
+      "outer_fold": 1,
+      "order": 0,
+      "gains": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gate": {
+        "quantile": 0.5,
+        "temperature": 1.0,
+        "max_gate": 0.0
+      },
+      "gate_threshold": 0.9844370262474751,
+      "threshold": 0.5405984452133328,
+      "robust_event_auc": 0.9818288438256659,
+      "auc": 0.9845305353779931,
+      "ap": 0.9879710777296113,
+      "brier": 0.04379002331348227,
+      "fpr": 0.047619047619047616,
+      "tpr": 0.9576271186440678,
+      "tn": 120,
+      "fp": 6,
+      "fn": 5,
+      "tp": 113,
+      "event_auc": 0.9821731234866828,
+      "early_auc_10": 0.9770648372343288,
+      "median_stable_detection_event": 1.0,
+      "benign_any_alarm_rate": 0.12698412698412698,
+      "mean_threshold_crossings": 0.3442622950819672
+    },
+    {
+      "outer_fold": 2,
+      "order": 0,
+      "gains": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gate": {
+        "quantile": 0.5,
+        "temperature": 1.0,
+        "max_gate": 0.0
+      },
+      "gate_threshold": 1.0791271059157483,
+      "threshold": 0.638247187892767,
+      "robust_event_auc": 0.9902601963246961,
+      "auc": 0.9932575356953993,
+      "ap": 0.9937939096684155,
+      "brier": 0.03117114996282129,
+      "fpr": 0.01639344262295082,
+      "tpr": 0.9516129032258065,
+      "tn": 120,
+      "fp": 2,
+      "fn": 6,
+      "tp": 118,
+      "event_auc": 0.9906646615547331,
+      "early_auc_10": 0.9846377578001059,
+      "median_stable_detection_event": 1.0,
+      "benign_any_alarm_rate": 0.040983606557377046,
+      "mean_threshold_crossings": 0.2926829268292683
+    },
+    {
+      "outer_fold": 3,
+      "order": 32,
+      "gains": [
+        0.5,
+        0.1,
+        0.1
+      ],
+      "gate": {
+        "quantile": 0.75,
+        "temperature": 1.0,
+        "max_gate": 1.0
+      },
+      "gate_threshold": 1.6527593657624162,
+      "threshold": 0.4407051375860135,
+      "robust_event_auc": 0.9829573125737899,
+      "auc": 0.9874557260920898,
+      "ap": 0.9902262978874531,
+      "brier": 0.03894632937394467,
+      "fpr": 0.044642857142857144,
+      "tpr": 0.9504132231404959,
+      "tn": 107,
+      "fp": 5,
+      "fn": 6,
+      "tp": 115,
+      "event_auc": 0.9840337219598585,
+      "early_auc_10": 0.974586776859504,
+      "median_stable_detection_event": 1.0,
+      "benign_any_alarm_rate": 0.16964285714285715,
+      "mean_threshold_crossings": 0.4678111587982833
+    },
+    {
+      "outer_fold": 4,
+      "order": 0,
+      "gains": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "gate": {
+        "quantile": 0.5,
+        "temperature": 1.0,
+        "max_gate": 0.0
+      },
+      "gate_threshold": 0.9090488663223705,
+      "threshold": 0.6005830987424107,
+      "robust_event_auc": 0.9899498279816514,
+      "auc": 0.9925076452599388,
+      "ap": 0.9932023332271447,
+      "brier": 0.029516748954060847,
+      "fpr": 0.025,
+      "tpr": 0.9541284403669725,
+      "tn": 117,
+      "fp": 3,
+      "fn": 5,
+      "tp": 104,
+      "event_auc": 0.9902886085626911,
+      "early_auc_10": 0.9875611620795105,
+      "median_stable_detection_event": 1.0,
+      "benign_any_alarm_rate": 0.125,
+      "mean_threshold_crossings": 0.21397379912663755
+    }
+  ],
+  "limitations": [
+    "Post-hoc development on a previously inspected cohort; external confirmation is required.",
+    "Dropout is missing score-update stress, not removal of raw API calls from sandbox reports.",
+    "Delay and logit noise are controlled stress tests, not newly observed malware executions.",
+    "The event axis is ordered API count, not wall-clock seconds."
+  ],
+  "source": "/workspace/thesis2026/results/exploratory_20261028_reliability_pid_horizon40/event_predictions.csv.gz",
+  "source_sha256": "58f8adbf946f131cf039a21179f05e9cefd4d299e2a8a6fd9f79e0b06b190826",
+  "paired_final_decision_tests": [
+    {
+      "stress": "clean",
+      "stack_only_false_positives_removed_by_pid": 5,
+      "pid_only_false_positives_added": 0,
+      "benign_discordant": 5,
+      "benign_exact_two_sided_p": 0.0625,
+      "stack_only_true_positives_lost_by_pid": 1,
+      "pid_only_true_positives_gained": 0,
+      "malware_discordant": 1,
+      "malware_exact_two_sided_p": 1.0,
+      "benign_holm_adjusted_p_across_stresses": 0.125
+    },
+    {
+      "stress": "delay_5",
+      "stack_only_false_positives_removed_by_pid": 8,
+      "pid_only_false_positives_added": 0,
+      "benign_discordant": 8,
+      "benign_exact_two_sided_p": 0.0078125,
+      "stack_only_true_positives_lost_by_pid": 1,
+      "pid_only_true_positives_gained": 0,
+      "malware_discordant": 1,
+      "malware_exact_two_sided_p": 1.0,
+      "benign_holm_adjusted_p_across_stresses": 0.03125
+    },
+    {
+      "stress": "dropout_20",
+      "stack_only_false_positives_removed_by_pid": 4,
+      "pid_only_false_positives_added": 0,
+      "benign_discordant": 4,
+      "benign_exact_two_sided_p": 0.125,
+      "stack_only_true_positives_lost_by_pid": 1,
+      "pid_only_true_positives_gained": 0,
+      "malware_discordant": 1,
+      "malware_exact_two_sided_p": 1.0,
+      "benign_holm_adjusted_p_across_stresses": 0.125
+    },
+    {
+      "stress": "noise_logit_025",
+      "stack_only_false_positives_removed_by_pid": 6,
+      "pid_only_false_positives_added": 0,
+      "benign_discordant": 6,
+      "benign_exact_two_sided_p": 0.03125,
+      "stack_only_true_positives_lost_by_pid": 1,
+      "pid_only_true_positives_gained": 0,
+      "malware_discordant": 1,
+      "malware_exact_two_sided_p": 1.0,
+      "benign_holm_adjusted_p_across_stresses": 0.09375
+    }
+  ]
+}
