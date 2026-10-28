@@ -6,6 +6,7 @@ on:
       - feat/reproducible-thesis-experiments
     paths:
       - .github/workflows/extract-vt-cuckoofork-events.yml
+      - scripts/extract_vt_cuckoofork_events.py
 
 permissions:
   actions: read

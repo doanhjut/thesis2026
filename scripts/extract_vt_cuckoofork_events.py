@@ -11,6 +11,7 @@ import pathlib
 import re
 import statistics
 from collections import Counter
+from datetime import datetime, timezone
 from typing import Any
 
 
@@ -22,6 +23,7 @@ TIMESTAMP_VALUE = re.compile(
     r"[\"']timestamp[\"']\s*:\s*(\"(?:\\.|[^\"])*\"|'(?:\\.|[^'])*'|-?\d+(?:\.\d+)?)",
     re.I,
 )
+CUCKOO_DATETIME = re.compile(r"^(\d{14})(?:\.(\d+))?$")
 
 
 def decode_string(token: str) -> str:
@@ -53,7 +55,10 @@ def write_gzip_csv(path: pathlib.Path, rows: list[dict[str, Any]]) -> None:
         writer.writerows(rows)
 
 
-def infer_unit(values: list[float]) -> str:
+def infer_unit(tokens: list[str]) -> str:
+    if tokens and all(CUCKOO_DATETIME.fullmatch(token) for token in tokens):
+        return "cuckoofork_yyyymmddHHMMSS_fractional_seconds"
+    values = [float(token) for token in tokens]
     magnitude = statistics.median(abs(value) for value in values)
     if magnitude >= 1e16:
         return "windows_filetime_or_high_resolution_unknown"
@@ -64,13 +69,20 @@ def infer_unit(values: list[float]) -> str:
     return "relative_or_unknown"
 
 
-def to_seconds_delta(value: float, first: float, unit: str) -> float | None:
-    delta = value - first
+def timestamp_to_seconds(token: str, unit: str) -> float:
+    if unit == "cuckoofork_yyyymmddHHMMSS_fractional_seconds":
+        match = CUCKOO_DATETIME.fullmatch(token)
+        if not match:
+            raise ValueError(f"Invalid Cuckoofork timestamp: {token}")
+        base = datetime.strptime(match.group(1), "%Y%m%d%H%M%S").replace(
+            tzinfo=timezone.utc
+        )
+        fraction = float(f"0.{match.group(2)}") if match.group(2) else 0.0
+        return base.timestamp() + fraction
+    value = float(token)
     if unit == "epoch_milliseconds":
-        return delta / 1000.0
-    if unit == "epoch_seconds":
-        return delta
-    return None
+        return value / 1000.0
+    return value
 
 
 def main() -> int:
@@ -100,29 +112,31 @@ def main() -> int:
             api_name = decode_string(api_match.group(1))
             timestamp_token = decode_string(timestamp_match.group(1))
             try:
-                timestamp = float(timestamp_token)
+                float(timestamp_token)
             except ValueError:
                 continue
             pairs.append(
                 {
                     "event_index": index,
                     "api_name": api_name,
-                    "timestamp_raw": timestamp,
+                    "timestamp_raw": timestamp_token,
                     "key_position_distance": abs(
                         api_match.start() - timestamp_match.start()
                     ),
                 }
             )
 
-        timestamps = [pair["timestamp_raw"] for pair in pairs]
-        unit = infer_unit(timestamps) if timestamps else "unavailable"
+        timestamp_tokens = [str(pair["timestamp_raw"]) for pair in pairs]
+        unit = infer_unit(timestamp_tokens) if timestamp_tokens else "unavailable"
+        timestamps = [
+            timestamp_to_seconds(token, unit) for token in timestamp_tokens
+        ]
         if timestamps:
-            first = timestamps[0]
+            first_seconds = timestamps[0]
             for pair in pairs:
-                pair["timestamp_relative_raw"] = pair["timestamp_raw"] - first
-                pair["timestamp_relative_seconds"] = to_seconds_delta(
-                    pair["timestamp_raw"], first, unit
-                )
+                seconds = timestamp_to_seconds(str(pair["timestamp_raw"]), unit)
+                pair["timestamp_seconds"] = seconds
+                pair["timestamp_relative_seconds"] = seconds - first_seconds
         transitions = max(0, len(timestamps) - 1)
         nondecreasing = sum(
             current >= previous
@@ -154,10 +168,10 @@ def main() -> int:
                 "unique_api_count": len({pair["api_name"] for pair in pairs}),
                 "distinct_timestamp_count": len(set(timestamps)),
                 "timestamp_unit_inference": unit,
-                "timestamp_min": min(timestamps) if timestamps else None,
-                "timestamp_max": max(timestamps) if timestamps else None,
-                "elapsed_raw": max(timestamps) - min(timestamps) if timestamps else None,
-                "median_positive_delta_raw": (
+                "timestamp_raw_min": min(timestamp_tokens) if timestamp_tokens else None,
+                "timestamp_raw_max": max(timestamp_tokens) if timestamp_tokens else None,
+                "elapsed_seconds": max(timestamps) - min(timestamps) if timestamps else None,
+                "median_positive_delta_seconds": (
                     statistics.median(positive_deltas) if positive_deltas else None
                 ),
                 "nondecreasing_fraction": (
