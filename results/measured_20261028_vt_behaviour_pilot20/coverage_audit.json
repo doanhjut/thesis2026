@@ -1,0 +1,20 @@
+{
+  "status": "pilot_complete",
+  "generated_at_utc": "2026-10-28T06:19:41.406322Z",
+  "binary_downloaded": false,
+  "cohort": "results/measured_20261023_malbehavd_pid_confirmatory_1922/selected_cohort.csv",
+  "cohort_sha256": "9540b88b0da2463f63b4e983f5ecc277e3845b7badebbb79695e35f2c3b1a669",
+  "selected_rows": 20,
+  "attempted_rows": 20,
+  "requests_per_minute": 4,
+  "status_counts": {
+    "report_collected": 20
+  },
+  "timestamp_token_reports": 14,
+  "api_token_reports": 20,
+  "limitations": [
+    "Token presence is a schema triage signal, not proof of per-event timestamps.",
+    "Raw reports must be parsed and validated before PID evaluation.",
+    "No executable or PE binary endpoint is requested by this collector."
+  ]
+}
