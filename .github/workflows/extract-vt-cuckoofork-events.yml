@@ -1,0 +1,57 @@
+name: Extract VirusTotal Cuckoofork events
+
+on:
+  push:
+    branches:
+      - feat/reproducible-thesis-experiments
+    paths:
+      - .github/workflows/extract-vt-cuckoofork-events.yml
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  extract-events:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out experiment branch
+        uses: actions/checkout@v4
+        with:
+          ref: feat/reproducible-thesis-experiments
+
+      - name: Download provider probe artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh run download 40644339149 \
+            --repo doanhjut/thesis2026 \
+            --name vt-provider-timeline-probe \
+            --dir /tmp/vt-provider
+
+      - name: Extract timestamped API sequences
+        run: |
+          python scripts/extract_vt_cuckoofork_events.py \
+            --reports /tmp/vt-provider/raw_html_reports \
+            --coverage /tmp/vt-provider/provider_probe_coverage.csv \
+            --output /tmp/vt-events
+
+      - name: Commit extraction audit
+        run: |
+          target=results/measured_20261028_vt_behaviour_pilot20
+          cp /tmp/vt-events/event_sequence_audit.csv "$target/"
+          cp /tmp/vt-events/event_extraction_summary.json "$target/"
+          (cd "$target" && find . -type f ! -name artifact_sha256.txt -print0 | sort -z | xargs -0 sha256sum > artifact_sha256.txt)
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$target"
+          git commit -m "Record Cuckoofork event extraction audit"
+          git push origin HEAD:feat/reproducible-thesis-experiments
+
+      - name: Upload extracted event sequences
+        uses: actions/upload-artifact@v4
+        with:
+          name: vt-cuckoofork-events-pilot
+          path: /tmp/vt-events/
+          if-no-files-found: error
+          retention-days: 14
