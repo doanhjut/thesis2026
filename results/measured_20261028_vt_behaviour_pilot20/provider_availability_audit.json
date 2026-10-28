@@ -1,0 +1,139 @@
+{
+  "samples": 20,
+  "behaviour_objects": 111,
+  "samples_with_html": 20,
+  "samples_with_evtx": 10,
+  "samples_with_evtx_by_label": {
+    "0": 9,
+    "1": 1
+  },
+  "provider_summary": {
+    "C2AE": {
+      "objects": 14,
+      "samples": 14,
+      "benign_samples": 4,
+      "malware_samples": 10,
+      "html_samples": 0,
+      "evtx_samples": 0,
+      "pcap_samples": 0
+    },
+    "CAPA": {
+      "objects": 11,
+      "samples": 11,
+      "benign_samples": 9,
+      "malware_samples": 2,
+      "html_samples": 0,
+      "evtx_samples": 0,
+      "pcap_samples": 0
+    },
+    "CAPE Sandbox": {
+      "objects": 9,
+      "samples": 9,
+      "benign_samples": 9,
+      "malware_samples": 0,
+      "html_samples": 9,
+      "evtx_samples": 8,
+      "pcap_samples": 6
+    },
+    "Dr.Web vxCube": {
+      "objects": 1,
+      "samples": 1,
+      "benign_samples": 1,
+      "malware_samples": 0,
+      "html_samples": 1,
+      "evtx_samples": 0,
+      "pcap_samples": 0
+    },
+    "Microsoft Sysinternals": {
+      "objects": 11,
+      "samples": 11,
+      "benign_samples": 9,
+      "malware_samples": 2,
+      "html_samples": 0,
+      "evtx_samples": 0,
+      "pcap_samples": 0
+    },
+    "SNDBOX": {
+      "objects": 1,
+      "samples": 1,
+      "benign_samples": 1,
+      "malware_samples": 0,
+      "html_samples": 0,
+      "evtx_samples": 0,
+      "pcap_samples": 0
+    },
+    "Sangfor ZSand": {
+      "objects": 3,
+      "samples": 3,
+      "benign_samples": 3,
+      "malware_samples": 0,
+      "html_samples": 0,
+      "evtx_samples": 0,
+      "pcap_samples": 1
+    },
+    "SecneurX": {
+      "objects": 1,
+      "samples": 1,
+      "benign_samples": 0,
+      "malware_samples": 1,
+      "html_samples": 1,
+      "evtx_samples": 0,
+      "pcap_samples": 0
+    },
+    "Tencent HABO": {
+      "objects": 14,
+      "samples": 14,
+      "benign_samples": 5,
+      "malware_samples": 9,
+      "html_samples": 14,
+      "evtx_samples": 0,
+      "pcap_samples": 0
+    },
+    "VenusEye Sandbox": {
+      "objects": 4,
+      "samples": 4,
+      "benign_samples": 0,
+      "malware_samples": 4,
+      "html_samples": 4,
+      "evtx_samples": 0,
+      "pcap_samples": 0
+    },
+    "VirusTotal Cuckoofork": {
+      "objects": 9,
+      "samples": 9,
+      "benign_samples": 2,
+      "malware_samples": 7,
+      "html_samples": 9,
+      "evtx_samples": 0,
+      "pcap_samples": 9
+    },
+    "VirusTotal Jujubox": {
+      "objects": 15,
+      "samples": 15,
+      "benign_samples": 9,
+      "malware_samples": 6,
+      "html_samples": 15,
+      "evtx_samples": 0,
+      "pcap_samples": 8
+    },
+    "VirusTotal Observer": {
+      "objects": 8,
+      "samples": 8,
+      "benign_samples": 3,
+      "malware_samples": 5,
+      "html_samples": 0,
+      "evtx_samples": 1,
+      "pcap_samples": 0
+    },
+    "Zenbox": {
+      "objects": 10,
+      "samples": 10,
+      "benign_samples": 9,
+      "malware_samples": 1,
+      "html_samples": 3,
+      "evtx_samples": 8,
+      "pcap_samples": 10
+    }
+  },
+  "raw_report_content_committed": false
+}
