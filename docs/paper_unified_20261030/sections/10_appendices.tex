@@ -1,0 +1,196 @@
+\section{Fusion Replay and External-Validation Checklist}
+\label{app:fusion}
+
+A submission-quality replay of RQ1 should retain, for every outer fold:
+
+\begin{enumerate}
+    \item the cohort manifest with SHA-256, label, split, session/sequence ID,
+    static metadata row, and ordered dynamic event identifiers;
+    \item proof that verdict, detection-count, threat-name, filename, and other
+    direct label proxies are excluded from the static allow-list;
+    \item channel models, calibration objects, prefix scores, validation/test
+    predictions, and the provenance of each score;
+    \item fixed-weight grid, stacking configuration, P/PI/PID settings,
+    controller-state reset, clipping rule, and deterministic tie breaking;
+    \item validation-only selection records for gains, mixture settings, and
+    thresholds, with no state transfer into held-out rows;
+    \item per-prefix and final predictions for Average, Max-risk, Fixed,
+    Stacking, P, PI, and PID using identical paired inputs;
+    \item ROC--AUC, AP, Brier, FPR, TPR, confusion counts, and paired bootstrap
+    indices sufficient to reproduce every interval;
+    \item separate wall-clock measurements for collection, feature extraction,
+    channel inference, fusion arithmetic, queueing, and total response if a
+    latency claim is introduced.
+\end{enumerate}
+
+The external experiment should freeze Adaptive P and any robust PID candidate
+before data access. A common target TPR or a preregistered cost function should
+govern threshold comparison. Noninferiority and superiority margins must be
+declared before evaluation. Timestamped sequences should establish whether a
+derivative term sees meaningful elapsed-time change rather than event-count
+noise.
+
+\section{Active-Learning Replay Checklist}
+\label{app:al}
+
+For each outer fold and AL seed, retain:
+
+\begin{enumerate}
+    \item development, validation, and test row identifiers;
+    \item the shared 200-row initial labeled set and ordered remaining pool;
+    \item model configuration, library versions, and deterministic seeds;
+    \item validation/test probabilities and labels at every round;
+    \item pool probabilities, $U/H/V$ components, normalized values, composite
+    scores, ranks, and queried row identifiers;
+    \item the full-pool validation reference and target calculation;
+    \item per-round ROC--AUC, AP, low-FPR summaries, and scoped timing records;
+    \item checkpoints or a deterministic reconstruction mechanism;
+    \item verification of query membership, uniqueness, additivity, metric
+    recomputation, and absence of validation/test leakage.
+\end{enumerate}
+
+Every policy in a fold/seed must begin from the same initial set. The test
+partition must remain unavailable to query selection, target construction,
+threshold choice, weight selection, and stopping. A stronger extension should
+add uncertainty plus k-center diversity, a calibrated committee, direct
+margin-plus-attribution-norm controls, and frozen sensitivity grids for
+normalization and $\alpha,\beta,\gamma$.
+
+\section{TreeSHAP Audit Checklist}
+\label{app:fidelity}
+
+For each fold and model seed:
+
+\begin{enumerate}
+    \item retain the fitted model, split IDs, feature schema, training mean and
+    median, and raw TreeSHAP matrix with bias stored separately;
+    \item verify raw-score additivity before ranking features;
+    \item save top-$k$ and random mask indices for every sample, $k$, control
+    draw, and replacement baseline;
+    \item reconstruct masked matrices from original test vectors and saved
+    indices, rather than from plotted summaries;
+    \item retain original and masked probabilities and recompute AUC decreases;
+    \item retain global rankings and model-pair identifiers used for Spearman and
+    Jaccard summaries;
+    \item label EC/CF as geometry diagnostics and confirm that no composite OFS
+    is introduced without validated scaling, weights, and sensitivity analysis.
+\end{enumerate}
+
+Required stronger controls include random masks restricted to model-used
+features, standardized-displacement matching, attribution-column permutation,
+schema-aware group replacement, conditional backgrounds, and comparison with at
+least one alternative explainer or importance method.
+
+\section{Metric and Interpretation Boundaries}
+
+\begin{table*}[h]
+\centering
+\caption{What the reported quantities establish and do not establish.}
+\label{tab:boundaries}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{p{2.7cm}p{5.6cm}p{6.4cm}}
+\toprule
+Quantity & Supported interpretation & Unsupported interpretation \\
+\midrule
+Fusion AUC/AP & Ranking of paired cohort scores & Deployment utility or external transfer \\
+FPR/TPR & Decisions at validation-selected thresholds & Same-TPR comparison when thresholds differ \\
+Brier & Squared probabilistic error on the cohort & Complete calibration characterization \\
+P improvement & Value of current disagreement in measured development cohort & Classical-control stability or universal PID value \\
+I/D ablation & No stable incremental benefit in tested prefixes & Proof that temporal memory can never help \\
+ROC/AP-AULC & Ranking quality integrated over measured label budgets & Analyst labor, calibration, or external generalization \\
+Labels to target & Training labels to a fold-specific validation target & Total annotation cost or hours saved \\
+Low-FPR AL summaries & Relative behavior at 1\%/5\% caps in outer folds & Reliable FPR at $10^{-3}$ or $10^{-4}$ \\
+$H$ & Balance of positive/negative TreeSHAP mass & Predictive entropy or causal conflict \\
+$V$ & Dispersion across signed attribution coordinates & Ensemble or posterior uncertainty \\
+Top-$k$ deletion & Fitted-model sensitivity under training-statistic replacement & Valid PE transformation or causal malware mechanism \\
+Additivity & Numerical reconstruction of the raw tree score & Correct feature identity or human usefulness \\
+Seed/fold agreement & Sensitivity to fitted model and data partition & Stability across organizations and time \\
+Replay verification & Consistency with retained code/data/artifacts & Independent replication or upstream data authenticity \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\section{Claim--Evidence Map}
+
+\begin{table*}[h]
+\centering
+\caption{Central claims, evidence tier, and manuscript status.}
+\label{tab:claims}
+\scriptsize
+\begin{tabular}{p{5.2cm}p{3.1cm}p{6.8cm}}
+\toprule
+Claim & Status/tier & Required scope \\
+\midrule
+Adaptive P lowers FPR and Brier versus Fixed & Supported, development & 1,922-sample same-cohort development; paired intervals exclude zero \\
+Full PID outperforms all fusion baselines & Not supported & Average leads AUC/Brier; P leads FPR; PID has TPR trade-off \\
+I/D improve fusion & Not supported & No stable incremental benefit over P at 1--20 prefixes \\
+Robust PID v2 matches stacking & Exploratory & Horizon-40 development subset; external confirmation pending \\
+$U+H$ exceeds Random in ROC/AP-AULC & Supported, confirmatory & Five outer folds; paired effect and direction reported \\
+$U+H$ universally exceeds Uncertainty & Not supported & Small effects; favorable in four of five folds \\
+\xfull saves 92 training labels versus Random & Supported, confirmatory & Validation/reference and analyst cost are additional \\
+\xfull is best on every criterion & Not supported & $U+H$ leads AULC; $U+V$ uses fewest labels \\
+Top-SHAP deletion exceeds random deletion & Supported, confirmatory & Feature-space intervention; 25 models; mean/median \\
+TreeSHAP identifies causal malware features & Not supported & No executable-valid or causal intervention \\
+The complete architecture is validated end-to-end & Not supported & Two datasets and three component-level estimands \\
+The study detects ransomware or zero-day malware & Not supported & Generic Windows malware labels only \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\section{Artifact Traceability}
+
+The submission package should map each paper object to the following retained
+families:
+
+\begin{itemize}
+    \item \textbf{EMBER identity:}
+    \path{results/confirmatory_20261019_ember_identity/}
+    \path{static_identity_audit.json} and \path{SHA256SUMS}.
+    \item \textbf{Active learning:} \path{al/aulc_summary.csv},
+    \path{target_reach_summary.csv},
+    \path{fold_level_effects.csv},
+    \path{low_fpr_aulc_by_fold.csv},
+    \path{overhead_by_fold.csv}, and \path{verification.json}.
+    \item \textbf{Fidelity:} \path{fidelity/deletion_summary.csv},
+    \path{shap_stability_summary.csv},
+    \path{model_deletion_comparisons.csv}, and
+    \path{verification.json}.
+    \item \textbf{Fusion confirmatory:}
+    \path{results/measured_20261023_malbehavd_pid_confirmatory_1922/}
+    including cohort, source, summary, D-ablation, paired-bootstrap, and
+    verification records.
+    \item \textbf{Fusion development:}
+    \path{results/measured_20261028_fusion_only_evidence_1922/}
+    including \path{fusion_only_summary.json}.
+    \item \textbf{Exploratory fusion:}
+    \path{results/exploratory_20261028_pid_v2_meta_fusion_horizon40/}
+    and the stateful/stress result families.
+    \item \textbf{Timestamp feasibility:}
+    \path{results/measured_20261028_vt_behaviour_pilot20/}.
+\end{itemize}
+
+The machine-readable companion file \path{CLAIM_EVIDENCE_MAP.csv} expands
+this mapping with permitted manuscript locations and exact qualifiers.
+
+\section{Pre-Submission Evidence Gates}
+
+Before journal submission:
+
+\begin{enumerate}
+    \item synchronize source commit \texttt{8bfa06b65b93} and every artifact
+    named above; run hash and replay verification in a clean environment;
+    \item regenerate tables, confidence intervals, and figures directly from
+    fold-level records, including uncertainty visualization;
+    \item freeze Adaptive P/robust PID and run a new external or temporal cohort
+    at a preregistered common operating target;
+    \item add uncertainty-plus-diversity, a calibrated committee, and
+    acquisition-weight/normalization sensitivity;
+    \item add identity-sensitive, used-feature, magnitude-matched, and
+    group-aware fidelity controls;
+    \item obtain temporal, family-disjoint, or source-disjoint evidence if the
+    target venue expects broad generalization;
+    \item verify all bibliography metadata against publisher records and confirm
+    authorship, ORCID, corresponding author, data rights, funding, conflicts, and
+    the current journal template.
+\end{enumerate}

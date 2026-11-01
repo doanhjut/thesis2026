@@ -1,0 +1,259 @@
+\section{Methodology}
+\label{sec:method}
+
+\subsection{Decision--Adaptation--Audit Architecture}
+
+Figure~\ref{fig:architecture} presents the unified flow. The online decision path
+computes a static score and, when behavioral evidence is available, updates a
+dynamic score at ordered event prefixes. A fusion rule returns a final score.
+The offline adaptation path trains a static model, ranks the remaining pool, asks
+an oracle for a restricted label batch, and retrains. The audit path freezes a
+model and tests the attribution ranking through controlled deletion and
+cross-model stability.
+
+\begin{figure*}[t]
+\centering
+\fbox{\begin{minipage}{0.96\textwidth}
+\centering
+\textbf{Online decision allocation (MalBehavD-V1)}\par\smallskip
+PE metadata $\rightarrow \pstatic$
+$\quad\parallel\quad$
+ordered API prefixes $z_{1:k}\rightarrow p_{\mathrm{d},k}$
+$\rightarrow$ validation-locked Average/Fixed/Stacking/P/PI/PID
+$\rightarrow \pfused$ and decision
+\par\medskip\hrule\medskip
+\textbf{Offline label allocation (EMBER)}\par\smallskip
+$\mathcal{L}_r\rightarrow$ LightGBM $\rightarrow$
+pool probability and TreeSHAP $\rightarrow U,H,V\rightarrow Q_r$
+$\rightarrow$ oracle batch $\rightarrow\mathcal{L}_{r+1}$
+\par\medskip\hrule\medskip
+\textbf{Explanation audit (EMBER)}\par\smallskip
+fixed LightGBM $\rightarrow$ TreeSHAP ranking $\rightarrow$
+top-$k$/random mean--median replacement $\rightarrow$
+AUC degradation and seed/fold stability
+\end{minipage}}
+\caption{One auditable evidence-allocation formulation with component-wise
+evaluation. Solid flows show the measured components. The horizontal boundaries
+mark distinct benchmarks; they are not a single end-to-end experiment.}
+\label{fig:architecture}
+\end{figure*}
+
+TreeSHAP has two offline roles. It supplies local summaries to the acquisition
+function and a ranking to the audit experiment. These uses share a fitted
+explanation method, but their estimands differ: acquisition asks which object to
+label, while deletion asks whether a ranked coordinate set influences model
+behavior under a specific intervention. A positive deletion result does not
+prove that SHAP causes the active-learning improvement.
+
+\subsection{Static Learner and TreeSHAP}
+
+LightGBM represents a raw score as an additive tree ensemble
+\begin{equation}
+F(x)=\sum_{m=1}^{M}\eta h_m(x),
+\label{eq:lgbm}
+\end{equation}
+where $h_m$ is a decision tree, $M$ is the number of boosting rounds, and $\eta$
+is the learning rate \cite{ke2017lightgbm}. Its histogram-based learner handles
+heterogeneous PE attributes without forcing a common feature unit. The binary
+score follows from the logistic link.
+
+Native TreeSHAP returns one signed contribution per feature and a separate bias
+\cite{lundberg2020local}. Equation~(\ref{eq:additivity}) is checked before using
+an explanation. The bias is excluded from feature ranking, directional entropy,
+variance, and deletion budgets. Including it as a coordinate would confound the
+model base rate with an observed PE feature.
+
+\subsection{Control-Inspired Reliability-Aware Fusion}
+
+\subsubsection{Translation from classical PID}
+
+Classical discrete PID maps tracking error to an actuation signal. Here, the
+available surrogate is detector disagreement at event prefix $k$:
+\begin{equation}
+e_{ik}=p_i^{\mathrm{s}}-p_{ik}^{\mathrm{d}}.
+\label{eq:pid-error}
+\end{equation}
+Positive $e_{ik}$ means that the static channel currently assigns higher malware
+risk; negative $e_{ik}$ means the dynamic channel assigns higher risk. This
+choice is interpretable but does not make either detector a reference signal.
+
+For each sample sequence, the state is initialized to zero and updated as
+\begin{align}
+I_{ik} &= I_{i,k-1}+e_{ik}, \label{eq:pid-i}\\
+D_{ik} &= e_{ik}-e_{i,k-1}, \label{eq:pid-d}\\
+u_{ik} &= K_p e_{ik}+K_i I_{ik}+K_d D_{ik}. \label{eq:pid-u}
+\end{align}
+Controller output is mapped to a bounded static-channel weight:
+\begin{equation}
+w_{ik}^{\mathrm{s}}=\operatorname{clip}\!\left(
+\frac{1}{1+\exp(-u_{ik})},w_{\min},w_{\max}\right),
+\label{eq:pid-weight}
+\end{equation}
+and the fused score is
+\begin{equation}
+p_{ik}^{\mathrm{f}}=w_{ik}^{\mathrm{s}}p_i^{\mathrm{s}}+
+(1-w_{ik}^{\mathrm{s}})p_{ik}^{\mathrm{d}}.
+\label{eq:fusion}
+\end{equation}
+The measured implementation bounds the mixture weight; state and threshold are
+reset or selected without test transfer. An output clip is not equivalent to
+integral anti-windup, and no $\Delta t$ appears because the primary sequences are
+indexed by event count.
+
+The nested family provides the scientific ablation. Adaptive P sets
+$K_i=K_d=0$ and responds to current disagreement. PI additionally remembers
+persistent signed disagreement. Full PID also reacts to the change between
+adjacent prefixes. If P performs as well as PI/PID, the data do not support the
+extra memory terms. This is a useful negative conclusion because derivative
+action can amplify noisy prefix-to-prefix score changes and integral action can
+accumulate a cohort-specific bias.
+
+\subsubsection{Fusion baselines}
+
+All measured rules receive the same paired static and dynamic scores. Average is
+$0.5p^{\mathrm{s}}+0.5p^{\mathrm{d}}$. Max-risk takes the larger channel score.
+Fixed weighting selects one constant mixture using validation data. Logistic
+stacking fits a learned combination on development inputs. P, PI, and PID use
+the update above, with controller settings and decision threshold locked before
+test evaluation. The paper compares discrimination, Brier score, and paired
+FPR/TPR outcomes. A lower FPR at two separately selected thresholds is not called
+a same-TPR improvement.
+
+\subsection{Explanation-Guided Active Learning}
+
+\subsubsection{Predictive uncertainty}
+
+For pool probability $p_i$, uncertainty is
+\begin{equation}
+U_i=1-2|p_i-0.5|.
+\label{eq:uncertainty}
+\end{equation}
+It equals one at the decision boundary and zero at either probability extreme.
+It is inexpensive and provides the strongest measured baseline beyond random
+selection.
+
+\subsubsection{Directional entropy}
+
+For signed attribution vector $\boldsymbol{\phi}_i$, define positive and negative
+attribution masses
+\begin{equation}
+A_i^+=\sum_j\max(\phi_{ij},0),\qquad
+A_i^-=-\sum_j\min(\phi_{ij},0).
+\end{equation}
+When $A_i^++A_i^->0$, the positive-mass share is
+\begin{equation}
+q_i=\frac{A_i^+}{A_i^++A_i^-}.
+\end{equation}
+Directional entropy is
+\begin{equation}
+H_i=-q_i\log_2 q_i-(1-q_i)\log_2(1-q_i),
+\label{eq:entropy}
+\end{equation}
+with $H_i=0$ for a zero or one-sided vector. High $H_i$ indicates substantial
+positive and negative attribution masses in the same prediction. It is not
+class entropy or calibrated epistemic uncertainty.
+
+Let $S_i=\sum_j\phi_{ij}$ and $L_i=\|\boldsymbol{\phi}_i\|_1$. Since
+$A_i^+-A_i^-=S_i$ and $A_i^++A_i^-=L_i$,
+\begin{equation}
+q_i=\frac{1}{2}+\frac{S_i}{2L_i},\qquad L_i>0.
+\label{eq:h-identity}
+\end{equation}
+Thus $H_i$ summarizes signed-mass balance determined by raw-score contribution
+and attribution magnitude. Future work should compare it with direct margin and
+norm controls.
+
+\subsubsection{Signed-attribution variance}
+
+The dispersion signal is
+\begin{equation}
+V_i=\frac{1}{d}\sum_{j=1}^{d}(\phi_{ij}-\bar{\phi}_i)^2,
+\qquad
+\bar{\phi}_i=\frac{1}{d}\sum_j\phi_{ij}.
+\label{eq:variance}
+\end{equation}
+Equivalently,
+\begin{equation}
+V_i=\frac{\|\boldsymbol{\phi}_i\|_2^2}{d}-\frac{S_i^2}{d^2}.
+\label{eq:v-identity}
+\end{equation}
+It measures dispersion across coordinates of one explanation, not variance
+across trees, posterior draws, or independently trained models.
+
+\subsubsection{Composite acquisition policies}
+
+Because $U,H,V$ have different numeric ranges, each signal $S$ is min--max
+normalized over the current pool:
+\begin{equation}
+\widetilde{S}_i=\begin{cases}
+\dfrac{S_i-S_{\min}}{S_{\max}-S_{\min}},&S_{\max}>S_{\min},\\
+0,&\text{otherwise}.
+\end{cases}
+\label{eq:normalization}
+\end{equation}
+The general acquisition function is
+\begin{equation}
+Q_i=\alpha\widetilde{U}_i+
+\beta\widetilde{H}_i+
+\gamma\widetilde{V}_i.
+\label{eq:query}
+\end{equation}
+Table~\ref{tab:policies} defines the measured policies. Random assigns an
+independent random score. Ties in deterministic policies use the retained row
+identifier. Min--max scaling is pool dependent, and the fixed weights were not
+selected through an independent outer sensitivity study; they are measured
+configurations rather than established optima.
+
+\begin{table}[t]
+\centering
+\caption{Measured acquisition policies.}
+\label{tab:policies}
+\small
+\begin{tabular}{lc}
+\toprule
+Policy & $(\alpha,\beta,\gamma)$ \\
+\midrule
+Random & not applicable \\
+Uncertainty & $(1,0,0)$ \\
+$U+H$ & $(3/7,4/7,0)$ \\
+$U+V$ & $(0.5,0,0.5)$ \\
+\xfull & $(0.3,0.4,0.3)$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+At each round the algorithm fits a fresh LightGBM model, evaluates validation
+and held-out test outputs for reporting, computes $Q$ only on the remaining
+development pool, reveals the top batch labels, and repeats. Test outcomes never
+affect queries, target construction, or stopping. TreeSHAP is recomputed after
+each model update, so the acquisition geometry follows the current learner.
+
+\subsection{Quantitative TreeSHAP Audit}
+
+For $k\in\{10,25,50\}$, every test sample receives a top-$|\phi|$ mask and 20
+uniform random masks of equal size. The intervention in
+Equation~(\ref{eq:mask}) is repeated with training-column mean and median. The
+model is not retrained. The primary relative deletion effect is
+\begin{equation}
+\Delta_k^{\mathrm{rel}}=
+\Delta\mathrm{AUC}_k^{\mathrm{top}}-
+\Delta\mathrm{AUC}_k^{\mathrm{random}}.
+\label{eq:relative-deletion}
+\end{equation}
+Absolute differences are preferred to ratios because random-mask AUC decreases
+are near zero.
+
+Global ranking stability is measured by Spearman correlation. Agreement between
+top-$k$ feature sets is
+\begin{equation}
+J_k(A,B)=\frac{|T_k(A)\cap T_k(B)|}{|T_k(A)\cup T_k(B)|},
+\label{eq:jaccard}
+\end{equation}
+where $T_k(A)$ is the top-$k$ set from model $A$. Comparisons are separated into
+different seeds within one fold and models trained on different folds.
+
+The retained artifact also reports explanation consistency (EC), contrastive
+geometry (CF), and numerical additivity. We keep them descriptive. They have
+different scales and constructs; column permutations can preserve additivity
+and much of the geometry while assigning contributions to incorrect feature
+names. We therefore do not aggregate them into an Overall Fidelity Score.

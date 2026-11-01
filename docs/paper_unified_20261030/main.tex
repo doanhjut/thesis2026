@@ -1,0 +1,80 @@
+\documentclass[journal]{IEEEtran}
+
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{cite}
+\usepackage{url}
+\usepackage{xspace}
+\usepackage[hidelinks]{hyperref}
+
+\graphicspath{{figures/}}
+\newcommand{\xfull}{\textsc{XAI-Full}\xspace}
+\newcommand{\pstatic}{p_{\mathrm{s}}}
+\newcommand{\pdynamic}{p_{\mathrm{d}}}
+\newcommand{\pfused}{p_{\mathrm{f}}}
+
+\title{Auditable Adaptive Learning for Windows Malware Detection:\
+Reliability-Aware Fusion, Explanation-Guided Sampling, and TreeSHAP Validation}
+
+\author{Luu Van Doanh and Truong Ninh Thuan%
+\thanks{The authors are with the VNU University of Engineering and Technology,
+Vietnam National University, Hanoi, Vietnam.}%
+}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Windows malware detection requires decisions from incomplete evidence while
+expert labels remain scarce. Static scores provide early coverage, whereas
+dynamic API prefixes supply complementary observations after execution; the
+resulting models also require explanations that can be audited before they guide
+data acquisition. We formulate these requirements as an auditable adaptive-
+learning framework with three component-level research questions. First, a
+control-inspired fusion rule maps disagreement between static and dynamic scores
+to an adaptive weight and ablates proportional, integral, and derivative terms.
+Second, a pool-based policy combines predictive uncertainty with TreeSHAP
+directional entropy and attribution variance. Third, controlled deletion and
+rank-stability tests assess whether TreeSHAP rankings track fitted-model
+behavior. The components are evaluated on complementary, non-integrated
+benchmarks: 1,922 paired MalBehavD-V1 samples for fusion and an identity-audited
+2,000-sample, 2,381-feature EMBER subset for active learning and fidelity. On the
+fusion development cohort, Adaptive P reduced false-positive rate from 12.45\%
+to 11.16\% relative to fixed weighting (difference $-1.28$ percentage points;
+95\% CI $[-2.47,-0.11]$) and improved Brier score, while integral and derivative
+terms supplied no consistent incremental benefit. Across five outer folds and
+five seeds, uncertainty plus directional entropy achieved the best ROC/AP
+learning-curve areas; the full three-signal policy reached a predeclared
+validation target with 492 labels, 92 (15.8\%) fewer than random acquisition.
+Replacing the top 50 TreeSHAP-ranked features by training means reduced AUC by
+0.306729, versus 0.000979 for equal-budget random replacement, with moderate
+ranking stability. These results support component-wise evidence allocation and
+model auditing for generic Windows malware; they do not constitute ransomware-
+specific, external, or end-to-end validation.
+\end{abstract}
+
+\begin{IEEEkeywords}
+active learning, explainable artificial intelligence, LightGBM, malware
+detection, model auditing, PID control, score fusion, SHAP, TreeSHAP
+\end{IEEEkeywords}
+
+\input{sections/01_introduction}
+\input{sections/02_related_work}
+\input{sections/03_problem_formulation}
+\input{sections/04_methodology}
+\input{sections/05_experimental_protocol}
+\input{sections/06_results}
+\input{sections/07_discussion}
+\input{sections/08_threats}
+\input{sections/09_conclusion}
+
+\appendices
+\input{sections/10_appendices}
+\clearpage
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+\end{document}

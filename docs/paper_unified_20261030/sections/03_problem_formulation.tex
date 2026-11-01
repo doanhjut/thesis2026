@@ -1,0 +1,141 @@
+\section{Unified Problem Formulation}
+\label{sec:problem}
+
+\subsection{Evidence Allocation under Partial Observability}
+
+Let $i$ index a PE sample with binary label $y_i\in\{0,1\}$, where one denotes
+generic malware. Static representation $x_i^{\mathrm{s}}$ is available before
+execution and produces score $p_i^{\mathrm{s}}$. A monitored run produces an
+ordered dynamic sequence
+$z_i=(z_{i1},\ldots,z_{iT_i})$. At prefix $k$, dynamic model $g$ produces
+$p_{ik}^{\mathrm{d}}=g(z_{i1:k})$. The online task is to map the available
+evidence to a fused score
+\begin{equation}
+p_{ik}^{\mathrm{f}}=
+F\!\left(p_i^{\mathrm{s}},p_{i1:k}^{\mathrm{d}};\theta_F\right),
+\label{eq:online-object}
+\end{equation}
+and a decision at a validation-selected threshold. Because $k$ counts API
+events, it is an observation index rather than elapsed seconds.
+
+The development task has a different resource constraint. Given labeled set
+$\mathcal{L}_r$, unlabeled pool $\mathcal{U}_r$, and batch budget $b$, model
+$f_r$ ranks pool samples with acquisition function $Q_r$. The oracle reveals
+labels only for selected batch $\mathcal{B}_r$:
+\begin{equation}
+\mathcal{B}_r=\operatorname*{arg\,top}_{\substack{
+\mathcal{B}\subset\mathcal{U}_r\\|\mathcal{B}|=b}}
+\sum_{x\in\mathcal{B}}Q_r(x),
+\qquad
+\mathcal{L}_{r+1}=\mathcal{L}_r\cup\mathcal{B}_r.
+\label{eq:batch-object}
+\end{equation}
+The retained experiment uses a pointwise top-$b$ rule; it does not optimize
+joint diversity.
+
+The audit task operates on a fixed fitted model and explanation
+$\boldsymbol{\phi}_i$. It tests whether coordinates ranked highly by
+$|\boldsymbol{\phi}_i|$ produce greater model-performance degradation under a
+specified replacement intervention than equal-count random coordinates. It also
+measures ranking agreement across fitted models. This task estimates relative
+model reliance and sensitivity, not causal behavior of the executable.
+
+These three tasks share an allocation principle but not one objective function.
+Online fusion allocates weight between evidence channels; active learning
+allocates labeling budget; explanation audit allocates confidence to a ranked
+attribution. Reporting one metric as proof of all three would conflate distinct
+estimands. We therefore use one architecture and three RQs, with separate data
+and evaluation units.
+
+\subsection{Fusion Estimands}
+
+Fusion is assessed along three axes. ROC--AUC and average precision (AP) measure
+ranking. The Brier score
+\begin{equation}
+\mathrm{Brier}=\frac{1}{n}\sum_{i=1}^{n}(p_i-y_i)^2
+\label{eq:brier}
+\end{equation}
+measures squared probabilistic error. FPR and TPR measure decisions at thresholds
+selected using validation data. An FPR comparison is interpreted together with
+TPR because two independently chosen thresholds need not correspond to the same
+operating point.
+
+Paired differences use identical test rows. For Adaptive P versus Fixed, the
+primary operating-point effects are
+$\Delta\mathrm{FPR}$, $\Delta\mathrm{TPR}$, and
+$\Delta\mathrm{Brier}$. For PID versus learned stacking, the report additionally
+uses $\Delta\mathrm{AUC}$. Bootstrap intervals quantify paired uncertainty over
+the retained cohort. The post-confirmatory fusion development used this same
+cohort; its intervals describe resampling uncertainty, not external
+confirmation.
+
+\subsection{Learning-Curve Estimands}
+
+Every active-learning run produces ROC--AUC and AP at budgets
+$B\in\{200,300,\ldots,1200\}$. For metric $m(B)$, normalized area under the
+learning curve is
+\begin{equation}
+\mathrm{AULC}(m)=\frac{1}{B_{\max}-B_{\min}}
+\int_{B_{\min}}^{B_{\max}}m(B)\,dB,
+\label{eq:aulc}
+\end{equation}
+computed by trapezoidal integration over measured budgets. This quantity rewards
+useful models earlier in the acquisition process. Endpoint comparison is less
+informative because every policy eventually receives the same full pool.
+
+A full-pool reference model defines a fold-specific validation target
+\begin{equation}
+t_{\mathrm{fold}}=0.5+0.95\left(
+\mathrm{AUC}^{\mathrm{full}}_{\mathrm{val}}-0.5\right).
+\label{eq:target}
+\end{equation}
+Labels-to-target is the first training budget that reaches this value. It counts
+queried training labels; the validation labels, original retained labels, and
+full-pool reference are additional experimental resources. Low-FPR summaries
+include normalized partial AUC up to FPR 5\% and TPR-AULC at FPR caps of 1\% and
+5\%. These are cohort metrics, not estimates for operational FPR near
+$10^{-3}$ or below.
+
+\subsection{Explanation Object and Intervention}
+
+For a fitted tree model and sample $x_i\in\mathbb{R}^d$, let
+$\boldsymbol{\phi}_i=(\phi_{i1},\ldots,\phi_{id})$ denote signed TreeSHAP
+contributions and $\phi_{i0}$ the bias. Native TreeSHAP is verified on the raw
+score scale:
+\begin{equation}
+f_{\mathrm{raw}}(x_i)=\phi_{i0}+\sum_{j=1}^{d}\phi_{ij}.
+\label{eq:additivity}
+\end{equation}
+This identity checks numerical reconstruction; it does not verify feature
+semantics or causal correctness.
+
+For deletion budget $k$, sample-specific mask $M_i^{(k)}$ replaces selected
+coordinates with training-derived baseline $b_j$:
+\begin{equation}
+\widetilde{x}_{ij}=\begin{cases}
+b_j,&j\in M_i^{(k)},\\
+x_{ij},&\text{otherwise}.
+\end{cases}
+\label{eq:mask}
+\end{equation}
+The top mask contains the $k$ largest $|\phi_{ij}|$ values; the control contains
+$k$ uniformly sampled coordinates. $b_j$ is the training-column mean or median.
+The comparison estimates fitted-model sensitivity under two feature-space
+interventions. A modified vector need not correspond to a buildable or
+executable PE file.
+
+\subsection{Security and Claim Boundaries}
+
+The labels in both benchmarks denote generic benign/malware status. Neither
+dataset establishes ransomware ground truth. The EMBER folds are random row
+folds, not temporal or family-disjoint splits. MalBehavD-V1 dynamic sequences are
+event-indexed, not wall-clock traces, and source differences may correlate with
+class. The study excludes a white-box adversary who manipulates features, pool
+membership, or the oracle against the complete pipeline.
+
+The unified architecture is consequently a research framework. The fusion
+component is evaluated on MalBehavD-V1; active learning and fidelity are
+evaluated on EMBER. There is no measured interaction between adaptive fusion and
+active learning, no end-to-end latency, and no common cohort supporting a joint
+performance metric. These boundaries determine the wording of the abstract,
+results, and conclusion.

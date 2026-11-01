@@ -1,0 +1,154 @@
+\section{Experimental Protocol}
+\label{sec:protocol}
+
+\subsection{Component-Wise Evaluation Design}
+
+The study uses two complementary benchmarks because no retained cohort contains
+all required static features, dynamic sequences, active-learning identity, and
+fidelity artifacts. MalBehavD-V1 answers RQ1. An identity-audited EMBER subset
+answers RQ2 and RQ3. Table~\ref{tab:data} makes their semantics and roles
+explicit. Results are never pooled across datasets.
+
+\begin{table*}[t]
+\centering
+\caption{Dataset provenance, label semantics, observation unit, and evaluation role.}
+\label{tab:data}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{p{2.5cm}p{2.2cm}p{2.2cm}p{3.2cm}p{2.2cm}p{2.9cm}}
+\toprule
+Dataset & Retained samples & Class counts & Inputs / observation unit & Split & Role \\
+\midrule
+MalBehavD-V1 & 1,922 usable of 1,923 with $\geq20$ events & 932 benign / 990 malware & 199 static metadata attributes and ordered API-event prefixes & 5 outer folds; seed 2026 & Fusion baselines and P/PI/PID ablation (RQ1) \\
+EMBER-derived identity audit & 2,000 & 1,500 benign / 500 malware & 2,381 static PE features; unique SHA-256, row ID, source index & 5 random outer folds; 5 AL/model seeds & Active learning (RQ2) and TreeSHAP audit (RQ3) \\
+MalBehavD-V1 horizon-40 subset & 1,186 & Generic benign/malware & Ordered API-event prefixes through event 40 & Development subset & Exploratory robust PID only \\
+Timestamp feasibility pilot & 8 usable sequences from 20 selected samples & 2 benign / 6 malware usable & 4,697 API--timestamp pairs from Cuckoofork reports & No outer-fold evaluation & Parser/data-source feasibility only \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+Both labels mean generic benign/malware status. AVClass is available for 498
+EMBER malware rows but is not used as ransomware ground truth. MalBehavD-V1 may
+contain source differences between benign and malware collection. The experiment
+does not infer family-held-out, temporal, or cross-organization performance.
+
+\subsection{EMBER Identity, Splits, and Configuration}
+
+The EMBER-derived table contains 2,000 unique SHA-256 identities, unique row and
+source indices, and no exactly duplicated feature vectors. Samples appeared in
+November--December 2018. The locked dataset SHA-256 is
+\texttt{69f0ae680846edd95458d1e7aaabe36f8}\-
+\texttt{866f4f22a6d11488b126ed026b28963}, and the manifest SHA-256 is
+\texttt{a2ca16402653e6cc51fdd7a4857d007f}\-
+\texttt{af86807b044d78654f180409c73565bb}. The subset was recovered from EMBER
+material but does not reproduce the complete official benchmark protocol.
+
+Five random outer folds create held-out test partitions. Within each outer
+development partition, retained rows are separated into an acquisition pool and
+validation resource. Test rows do not enter query selection, target definition,
+threshold choice, or stopping. All policies in the same fold/seed receive the
+same initial labeled set and remaining pool. Exact identity auditing reduces
+row-level leakage, but random folds can still place related families, sources,
+or time periods on both sides.
+
+Each AL run begins with 200 stratified labels and performs ten rounds of 100
+queries, reaching a maximum of 1,200 training labels. Five AL seeds are used per
+outer fold. The retained LightGBM configuration uses 60 trees, learning rate
+0.05, 15 leaves, maximum depth 4, and seed-specific deterministic training. Each
+round retains pool membership, query components, selected row IDs, model
+configuration, and validation/test predictions.
+
+For fidelity, each fold fits five LightGBM models with seeds 41--45, 100 trees,
+learning rate 0.1, feature fraction 0.8, bagging fraction 0.8, 15 leaves, and
+maximum depth 4. The 25 fitted models are evaluated with mean and median
+replacement, three deletion budgets, and 20 random masks per budget. Seed
+comparisons stay within a fold; fold comparisons change the data partition.
+
+\subsection{MalBehavD-V1 Pairing and Fusion Protocol}
+
+The MalBehavD-V1 source contains 2,570 rows, balanced between 1,285 benign and
+1,285 malware entries, with 2,543 unique SHA-256 values. Twenty-six SHA values
+are duplicated without label conflict. Requiring at least 20 API events yields
+1,923 candidates; 1,922 have usable static metadata and dynamic sequences,
+providing 99.95\% metadata coverage. The final paired cohort contains 932 benign
+and 990 malware samples. Its manifest SHA-256 is
+\texttt{9540b88b0da2463f63b4e983f5ecc277}\-
+\texttt{e3845b7badebbb79695e35f2c3b1a669}.
+
+Static input comprises 199 structural metadata attributes. The allow-list
+excludes verdict, detection count, threat name, tag, and filename fields that
+could directly encode collection or label information. The dynamic input is an
+ordered API sequence scored at prefixes. The collector obtains metadata/report
+records by SHA-256 and does not download or execute PE objects. Event index is
+the primary observation axis; it cannot support a wall-clock latency claim.
+
+Five outer folds use seed 2026. Model, fusion parameters, fixed weight, stacking,
+and decision thresholds are selected with development/validation resources and
+then locked for each held-out evaluation. All fusion methods use the same paired
+channel scores. Paired bootstrap intervals compare predictions on identical
+rows. The threshold objective is validation based, so every reported FPR is
+paired with TPR and is not treated as a common-TPR comparison unless explicitly
+stated.
+
+The original confirmatory run established channel complementarity and the
+absence of a useful derivative effect under its protocol. Adaptive P and the
+new fusion-only comparison were then developed on the same 1,922-sample cohort.
+Those values are measured on outer-test rows but are classified as development
+evidence because design choices followed inspection of the confirmatory result.
+External or temporal validation is required before promoting them to an
+independent confirmatory claim.
+
+\subsection{Metrics and Paired Reporting}
+
+Fusion reports ROC--AUC, AP, FPR, TPR, and Brier score. The main table compares
+Average, Max-risk, Fixed, Logistic stacking, Adaptive P, Adaptive PI, and Full
+PID. Primary paired effects are Adaptive P minus Fixed and Full PID minus
+Logistic stacking. An additional P versus PID comparison tests incremental I/D
+value.
+
+Active learning reports ROC-AULC, AP-AULC, training labels to the fold-specific
+target, restricted-FPR summaries, and scoped computation. The paired comparison
+unit is outer fold after averaging its seed trajectories; 25 fold--seed runs are
+not treated as 25 independent datasets. Query timing includes pool prediction,
+TreeSHAP where applicable, additivity verification, normalization, and ranking.
+It excludes human annotation and endpoint feature extraction.
+
+Fidelity reports AUC decrease under top and random deletion, the absolute
+top-minus-random effect, Spearman rank correlation, and top-$k$ Jaccard
+agreement. The 20 random masks describe control variation conditional on fitted
+models; they are not independent deployment datasets. EC, CF, and additivity are
+secondary diagnostics and are not combined into a composite score.
+
+\subsection{Confirmatory versus Exploratory Status}
+
+Table~\ref{tab:evidence-tier} locks the evidence hierarchy before interpretation.
+This prevents a favorable exploratory value from silently replacing a less
+favorable confirmatory result.
+
+\begin{table*}[t]
+\centering
+\caption{Evidence hierarchy used throughout the manuscript.}
+\label{tab:evidence-tier}
+\scriptsize
+\begin{tabular}{p{3.2cm}p{3.8cm}p{7.8cm}}
+\toprule
+Tier & Artifact family & Permitted interpretation \\
+\midrule
+Confirmatory verification pass & EMBER identity AL/fidelity & Main evidence for RQ2/RQ3; use in abstract and conclusion within dataset scope \\
+Original confirmatory protocol & MalBehavD-V1 1,922 & Channel complementarity and component ablation; D does not add stable value \\
+Measured development evidence & Fusion-only 1,922 & Main RQ1 comparison; explicitly label same-cohort post-confirmatory development \\
+Exploratory development & Robust PID v2, horizon 40 & Hypothesis and algorithm candidate; do not claim external confirmation \\
+Exploratory controlled stress & Stateful gated residual PID & Behavior under specified synthetic delay stress only \\
+Measured feasibility & Timestamp pilot & Data-source/parser feasibility; no performance or D-term conclusion \\
+Excluded & Legacy, simulated, or dashboard values & No use as manuscript evidence \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+The source-of-truth report identifies experimental commit
+\texttt{8bfa06b65b93}. That commit and the new result directories were not present
+on the remote branch available to this writing environment. The numerical paper
+is therefore assembled from the locked readiness report and its artifact map,
+not described as an independent replay. Before submission, the source commit,
+artifacts, hash verification, and figure generation must be synchronized in a
+clean environment.

@@ -1,0 +1,34 @@
+\section{Conclusion}
+\label{sec:conclusion}
+
+This paper formulated Windows malware model development as auditable evidence
+allocation under partial observability. The decision stage combines early static
+evidence with event-indexed dynamic evidence; the adaptation stage assigns a
+limited labeling budget; and the audit stage tests the attribution ranking used
+in model inspection and acquisition. The formulation provides one scientific
+flow while preserving component-specific estimands and datasets.
+
+On the 1,922-sample MalBehavD-V1 development cohort, Adaptive P reduced FPR from
+12.45\% to 11.16\% relative to fixed weighting and reduced Brier by 0.00306,
+with paired intervals excluding zero. Full PID obtained AUC comparable to
+logistic stacking and a lower FPR at its independently selected operating point,
+with a small TPR trade-off. Integral and derivative terms did not add consistent
+value over P within 1--20 event prefixes. The evidence therefore favors a
+simpler proportional adaptation and treats richer PID variants as hypotheses for
+external timestamped evaluation.
+
+On the identity-audited 2,000-sample EMBER subset, $U+H$ produced the strongest
+ROC/AP learning-curve areas. $U+V$ reached the predeclared target with the fewest
+labels, while \xfull used 492 labels, 92 fewer than Random. Gains over
+Uncertainty were smaller and metric dependent. Across 25 fitted models,
+top-$|\mathrm{SHAP}|$ deletion produced much larger AUC decreases than equal-
+budget random deletion under mean and median replacement, while moderate
+stability revealed dependence on data partitions.
+
+These results support component-wise adaptive fusion, explanation-guided sample
+prioritization, and quantitative attribution auditing for generic Windows
+malware. They do not establish ransomware detection, causal PE explanations,
+external generalization, or an end-to-end integrated system. The next evidence
+gate is a frozen external or temporal paired cohort with common operating targets
+and real timestamps, followed by stronger AL diversity baselines, conditional
+deletion controls, and a factorial acquisition--fusion experiment on one cohort.

@@ -1,0 +1,142 @@
+\section{Related Work}
+\label{sec:related}
+
+\subsection{Static and Dynamic Windows Malware Detection}
+
+Static malware analysis derives evidence without running a suspect object.
+Learned detectors have used engineered binary attributes
+\cite{saxe2015deep}, complete byte streams \cite{raff2018malware}, and documented
+PE representations such as EMBER \cite{anderson2018ember}. SOREL-20M expanded
+the scale of static PE research and supplied richer metadata
+\cite{harang2020sorel}. Gradient-boosted trees remain effective on heterogeneous
+tables containing histograms, strings, imports, sections, and header fields
+\cite{ke2017lightgbm}. Their principal operational benefit is early scoring, but
+static associations can be changed through packing, obfuscation, build-tool
+variation, and distribution shift \cite{ucci2019survey,gibert2020rise}.
+
+Dynamic analysis instead observes execution. API calls, file and registry
+operations, process creation, and network activity can expose behavior absent
+from a static vector \cite{sikorski2012practical,sgandurra2016automated}. The
+evidence is conditional on the sandbox, inputs, run duration, and path reached by
+the program. Delayed or environment-aware behavior can remain unobserved, while
+longer collection increases resource cost. Work on ransomware illustrates the
+value of behavior-centric analysis \cite{kharraz2015cutting,bacci2021ransomware},
+but the present datasets contain generic malware labels. Those studies motivate
+the analysis modes; they do not transfer ransomware semantics to our labels.
+
+Hybrid systems commonly concatenate features, combine decisions, or fuse
+scores. A concatenated model assumes that all modalities are available at once,
+whereas sequential monitoring produces dynamic prefixes over time. Fixed score
+averaging is transparent but cannot respond to sample-specific disagreement.
+Learned stacking can capture a calibrated relation between channels, but it
+requires a representative development cohort and can obscure how the weight
+changes as evidence arrives. Meaningful evaluation must compare adaptive rules
+with simple average, max-risk, fixed weighting, and a learned stacker using the
+same paired samples and operating-point procedure.
+
+\subsection{From Physical PID Control to Score Fusion}
+
+PID control is a foundational feedback mechanism. Given reference $r(t)$,
+measured output $y(t)$, and tracking error $e(t)=r(t)-y(t)$, proportional action
+responds to present error, integral action addresses persistent accumulated
+error, and derivative action anticipates rapid error change
+\cite{astrom2001future}. These roles are meaningful in a physical loop with a
+plant, time scale, actuation, and stability analysis.
+
+Mapping PID structure to classifier fusion requires narrower language. Two
+detector outputs are measurements, not a reference and controlled state.
+Changing their weight does not alter the program being observed or close a
+physical loop. In our formulation, static--dynamic disagreement is a surrogate
+error and the controller output is a bounded mixture weight. The P/I/D terms
+then provide hypotheses about useful memory: P reacts to current disagreement,
+I represents persistent disagreement across prefixes, and D represents a change
+in disagreement. No stability guarantee follows from this analogy. Validation
+and component ablation decide whether any term improves prediction.
+
+This framing addresses a common methodological gap. A controller name can make a
+fusion rule appear inherently adaptive, even when each sample provides one
+observation or the derivative rarely changes a decision. We retain P/PI/PID as
+nested, testable models and report a negative I/D result. The contribution is
+therefore an auditable translation and empirical simplification of a
+control-inspired rule, rather than a claim that classical control theory proves
+malware-classification performance.
+
+\subsection{Active Learning and Batch Acquisition}
+
+Pool-based active learning alternates model fitting, query selection, oracle
+annotation, and retraining. Uncertainty sampling is widely used because it is
+simple and model compatible \cite{cohn1996active,settles2009active}. In batch
+settings, however, the highest-scoring samples can be redundant. Core-set
+acquisition emphasizes representation coverage \cite{sener2018active}; ensemble
+methods use predictive disagreement \cite{beluch2018power}; BatchBALD uses joint
+mutual information \cite{kirsch2019batchbald}; and BADGE clusters uncertain
+gradient embeddings \cite{ash2020deep}.
+
+These methods are not equally portable to boosted trees. BatchBALD and BADGE
+were designed around Bayesian or differentiable deep models, although their
+principles motivate tree-compatible diversity and committee baselines. Our
+measured policies include random sampling, uncertainty, two explanation-signal
+ablations, and a three-signal combination. They do not include uncertainty plus
+k-center diversity or a calibrated committee. We consequently test whether the
+specific TreeSHAP summaries add value to the retained baselines, without claiming
+general dominance over active learning.
+
+Explanations may enter active learning as annotator-facing context or as an
+algorithmic ranking signal. Explainable active learning has studied how local
+explanations affect annotator experience \cite{ghai2021explainable}. Our use is
+algorithmic: signed TreeSHAP summaries are computed before annotation and enter
+the acquisition score. A balanced or dispersed attribution vector is not equal
+to expected information gain; it is a falsifiable heuristic evaluated through
+matched learning curves, target attainment, low-FPR summaries, and computation.
+
+\subsection{Attribution and Explanation Validation}
+
+LIME estimates a local surrogate \cite{ribeiro2016why}; SHAP unifies additive
+feature attribution through Shapley values \cite{lundberg2017unified}; and
+TreeSHAP specializes the calculation to tree ensembles
+\cite{lundberg2020local}. Explanations can still be insensitive to model
+parameters, manipulated, or misread as causal mechanisms
+\cite{adebayo2018sanity,slack2020fooling}. Security inputs add domain constraints
+and adversarial considerations \cite{warnecke2020evaluating}.
+
+Deletion tests ask whether changing highly ranked coordinates alters model
+output. Their conclusion depends on the intervention: independent replacement
+can move a vector off the data manifold, and a large effect can reflect
+perturbation magnitude as well as ranking quality
+\cite{hooker2019benchmark,yeh2019infidelity}. Training-derived mean and median
+baselines avoid assuming that zero is a semantically neutral PE value, but they
+do not guarantee an executable-valid binary. Equal-count random masks control
+the number of replaced coordinates, though they may select features unused by a
+tree ensemble. Rank stability offers a complementary view by testing sensitivity
+to model seeds and data folds.
+
+\begin{table*}[t]
+\centering
+\caption{Positioning of the three components. “Open comparison” identifies an
+evidence gate rather than a completed experiment.}
+\label{tab:related}
+\scriptsize
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabular}{p{2.8cm}p{3.4cm}p{2.8cm}p{2.8cm}p{3.2cm}}
+\toprule
+Area & Representative approach & Strength & Limitation relevant here & Role in this study \\
+\midrule
+Static detection & EMBER/boosted trees \cite{anderson2018ember,ke2017lightgbm} & Early, scalable PE scoring & Static distribution shift and manipulation & AL/fidelity benchmark and static fusion channel \\
+Dynamic detection & Sandbox/API behavior \cite{sgandurra2016automated} & Observes executed behavior & Environment and observation dependence & Event-indexed fusion channel \\
+Fusion & Average/fixed/learned stacking & Transparent or data-adaptive combination & Fixed rules ignore disagreement; stacking can hide sequential behavior & Measured baselines for P/PI/PID \\
+PID control & P/I/D feedback \cite{astrom2001future} & Interpretable current, accumulated, and rate terms & Classifier fusion has no physical plant or stability guarantee & Control-inspired nested ablation \\
+Active learning & Uncertainty \cite{cohn1996active} & Simple and strong & Margin omits evidence structure & Measured baseline \\
+Batch diversity & Core-set/committee \cite{sener2018active,beluch2018power} & Reduces redundancy or measures disagreement & Absent from retained artifact & Open comparison \\
+Explanation guidance & Explainable AL \cite{ghai2021explainable} & Adds model rationale to selection/annotation & Explanation signal need not equal information gain & TreeSHAP summaries enter query score \\
+XAI evaluation & Sanity/deletion tests \cite{adebayo2018sanity,hooker2019benchmark} & Tests model sensitivity & Intervention may be off-manifold & Mean/median deletion plus stability \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+Our novelty claim is correspondingly specific. We do not claim that static--
+dynamic fusion, PID structure, active learning, or SHAP is individually new. We
+contribute a scoped evidence-allocation formulation, a paired P/PI/PID fusion
+ablation that supports simplification, a signed-mass TreeSHAP acquisition family,
+and quantitative validation of the attribution ranking. The component-wise
+protocol makes clear which links are empirically measured and which remain an
+integration hypothesis.

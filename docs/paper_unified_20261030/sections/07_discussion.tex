@@ -1,0 +1,152 @@
+\section{Discussion}
+\label{sec:discussion}
+
+\subsection{A Unified Flow without an Integrated Claim}
+
+The three components address one recurring security-learning problem: useful
+evidence is incomplete, arrives at different times, and has different costs.
+Static and dynamic scores allocate evidence to an online decision. Active
+learning allocates a label budget to model maintenance. TreeSHAP diagnostics
+allocate confidence to an explanation ranking used in that maintenance process.
+This flow is scientifically useful because it identifies the interfaces a future
+system must validate: paired channel identity, acquisition lineage, and
+explanation checks.
+
+The flow is not itself an empirical interaction. MalBehavD-V1 does not contain
+the EMBER active-learning artifact, and EMBER does not contain the ordered
+dynamic observation required for fusion. Consequently, the study cannot answer
+whether explanation-guided retraining improves the fused detector, whether PID
+changes which samples should be queried, or whether one common threshold reduces
+end-to-end alert cost. A factorial experiment on one paired cohort remains
+necessary. Preserving this boundary makes the component results easier to audit
+and prevents a conceptual architecture from becoming a fabricated system score.
+
+\subsection{What the PID Translation Establishes}
+
+The control analogy provides a disciplined set of nested hypotheses. P asks
+whether current detector disagreement should alter the mixture. I asks whether
+persistent signed disagreement supplies additional information. D asks whether a
+change in disagreement across event prefixes predicts useful adjustment. The
+empirical result supports the first hypothesis and rejects the need for the
+latter two under the measured horizon.
+
+This outcome is plausible. The static score is constant within a sequence, while
+the dynamic score updates at short API prefixes. If successive prefixes change
+only a few events, the derivative term can be sparse or noisy. If one channel is
+systematically higher for a source, the integral may accumulate collection bias
+rather than sample-specific reliability. A proportional mapping can capture the
+dominant behavior with fewer states and lower implementation risk. Adaptive P's
+FPR and Brier improvements over Fixed make it a stronger current candidate than
+full PID for horizon 1--20.
+
+The result also clarifies what PID cannot do. It cannot reveal behavior that the
+sandbox never observes. It cannot turn event count into elapsed time. It cannot
+guarantee calibration or stability from control theory alone. Sleep-evasion
+resistance would require real timestamped traces, controlled delayed behavior,
+and a specified observation policy. End-to-end latency would require separate
+measurement of queueing, sandbox startup, observation, feature extraction,
+channel inference, and fusion. The small timestamp pilot begins data-source
+validation but does not satisfy those requirements.
+
+Learned stacking remains an important baseline. Full PID has comparable AUC and
+lower FPR at its own operating point, but also a small TPR reduction. Average has
+the best Brier and slightly higher AUC than the adaptive family. These results
+show that interpretability and operating-point objectives, rather than a tiny
+AUC difference, must motivate an adaptive controller. External validation at a
+common target TPR should decide whether Adaptive P's lower FPR transfers.
+
+\subsection{What the Acquisition Result Means}
+
+Directional entropy adds a small and repeatable learning-curve improvement over
+Random and a smaller improvement over Uncertainty in four of five folds. It
+distinguishes two probability-equivalent cases: weak evidence and stronger
+opposing signed masses. Such conflict can identify a model region where a new
+label is useful. The algebra in Equation~(\ref{eq:h-identity}) narrows this
+interpretation: $H$ is determined by the total raw-score contribution and the
+$L_1$ attribution norm. A direct margin-plus-norm baseline may recover part of
+the effect and should be included in an extension.
+
+No acquisition policy dominates every objective. $U+H$ leads AULC, $U+V$
+reaches the target earliest, \xfull balances signals and saves 92 labels
+relative to Random, and Uncertainty remains strongest in two restricted-FPR
+summaries. Policy selection should therefore follow the maintenance objective.
+An organization prioritizing average model quality during iterative labeling may
+prefer $U+H$; one using the retained validation target may prefer $U+V$; one
+requiring low computation and strong low-FPR behavior may retain Uncertainty.
+
+The label result has an explicit accounting boundary. It counts labels added to
+training. Validation labels, initial dataset creation, the full-pool reference,
+analyst abstention, and disagreement resolution remain outside the number. A
+15.8\% label-count reduction is not a measured 15.8\% reduction in labor.
+
+Batch redundancy is an unresolved alternative explanation. Selecting the top
+100 pointwise scores can query many objects from one region. Uncertainty plus
+k-center selection would test whether simple diversity reproduces the gain. A
+calibrated committee would test whether ensemble disagreement explains the
+benefit. Robust quantile or rank normalization would test sensitivity to extreme
+$H$ or $V$ values that compress min--max scaling. These settings must be frozen
+within a nested design, not chosen by outer-test AULC.
+
+\subsection{What the TreeSHAP Audit Establishes}
+
+Top-ranked replacement damages model ranking much more than uniform random
+replacement under both training means and medians. This is strong evidence of
+relative model reliance under the defined feature-space intervention. It is
+particularly useful as an internal release check: a TreeSHAP ranking that fails
+to exceed equal-count random deletion should not be presented as a meaningful
+ordering of influential coordinates.
+
+The deletion gap is not a causal certificate. Tree ensembles use a subset of
+2,381 coordinates, so random masks often strike inactive features. Top-ranked
+coordinates may also be farther from the replacement baseline, creating a larger
+standardized displacement and greater off-manifold shift. Stronger controls
+should sample only used features, match displacement magnitude, replace
+semantically linked PE groups, and use conditional backgrounds. Reconstructing
+valid PE binaries would answer a different and substantially harder question.
+
+Moderate stability gives a complementary warning. Explanations change less
+across model seeds in one fold than across folds, showing that data composition
+matters. A global top-feature list should therefore be versioned with the model,
+feature schema, and training cohort. For active learning, round-specific change
+is expected because the model is retrained, but abrupt attribution drift should
+be logged and investigated.
+
+Additivity, EC, and CF remain diagnostics of numerical or geometric properties.
+A common permutation of attribution columns can preserve sums, cosines, norms,
+and centroid separation while giving effects the wrong feature identities.
+Combining such heterogeneous quantities into an unvalidated Overall Fidelity
+Score would hide this weakness. Separate reporting is more informative and more
+defensible.
+
+\subsection{Operational Interpretation}
+
+The most immediate use is a controlled model-development workflow. A candidate
+static model scores a pool; a chosen acquisition rule prioritizes objects for an
+authorized analyst; query/model lineage is retained; and deletion/stability
+checks are run before release. Separately, when a paired dynamic sequence is
+available, Adaptive P can be compared against Average, Fixed, and Stacking at a
+locked operating objective. The evidence does not yet authorize automated
+remediation or deployment claims.
+
+Scaling introduces additional costs. TreeSHAP over a large candidate pool can be
+reduced by first filtering a probability band, but that changes the acquisition
+population and requires reevaluation. Dynamic collection dominates arithmetic
+fusion cost, so optimizing the PID calculation alone will not solve system
+latency. These practical distinctions follow directly from the unified evidence-
+allocation view: computation, labels, observation time, and alert errors are
+different resources and should be measured separately.
+
+\subsection{Evidence Needed for a Stronger Journal Claim}
+
+The highest-priority experiment is an external or temporal paired cohort whose
+method and thresholds are frozen before access. Adaptive P and robust PID v2
+should be preregistered with a common-TPR comparison and noninferiority or
+superiority margins. Timestamped event sequences should support separate early-
+detection and wall-clock analyses. The same cohort should then receive a
+factorial acquisition--fusion evaluation if interaction is claimed.
+
+For RQ2/RQ3, the strongest additions are uncertainty plus diversity, a calibrated
+committee, weight/normalization sensitivity, family- or time-aware splits,
+used-feature and magnitude-matched deletion controls, conditional/group masking,
+and a second explainer. These experiments address plausible alternatives to the
+current effects and determine how far they generalize beyond the audited subset.

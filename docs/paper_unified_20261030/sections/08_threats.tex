@@ -1,0 +1,118 @@
+\section{Threats to Validity}
+\label{sec:threats}
+
+\subsection{Construct Validity}
+
+Both datasets encode generic benign/malware labels. Neither establishes
+ransomware membership, ransomware behavior, or zero-day status. AVClass metadata
+is incomplete and not used as behavioral ground truth. The paper therefore uses
+the term Windows malware and treats ransomware-specific detection as future
+work.
+
+MalBehavD-V1 prefixes are ordered by API-event count. Event 20 is not 20 seconds,
+and a lower arithmetic fusion cost does not imply earlier wall-clock detection.
+Detector disagreement is a surrogate fusion signal, not the tracking error of a
+physical plant. Terms such as proportional, integral, and derivative describe
+the mathematical update only; they do not confer closed-loop stability.
+
+Directional entropy is entropy of positive/negative attribution mass, not
+predictive class entropy. Attribution variance is dispersion across coordinates
+of one SHAP vector, not epistemic variance. “Explanation-guided” describes the
+source of the acquisition signals, not proof that they encode human-understandable
+malware mechanisms.
+
+Deletion measures fitted-model behavior under feature replacement. It does not
+establish causal features, valid PE transformations, adversarial robustness, or
+analyst usefulness. EC, CF, and additivity measure different constructs and are
+not aggregated into an Overall Fidelity Score.
+
+\subsection{Internal Validity}
+
+Fusion methods use paired static/dynamic rows and validation-selected settings,
+which reduces channel and threshold confounding. Yet the adaptive fusion design
+was developed after inspecting the original confirmatory result on the same
+1,922-sample cohort. The resulting test-row estimates are development evidence;
+same-cohort bootstrap intervals cannot remove method-selection bias. Source
+differences between benign and malware data may also influence both channel
+scores despite exclusion of explicit verdict and threat-name metadata.
+
+For AL, outer test partitions do not enter query selection or target definition,
+and policies share initial sets within a fold/seed. The fixed acquisition weights
+and min--max normalization were not selected through an independent outer
+sensitivity analysis. Pointwise top-100 selection has no diversity constraint.
+The simulated oracle returns retained labels without error, whereas analysts can
+abstain, disagree, or use different evidence.
+
+For fidelity, mean and median baselines use training data, avoiding direct test
+leakage. Top and random masks are matched by coordinate count but not by
+standardized displacement, tree usage, semantic group, or manifold distance.
+These differences can inflate the top-minus-random gap. Masked test vectors are
+not verified against the PE format.
+
+\subsection{Statistical Conclusion Validity}
+
+Fusion confidence intervals are paired over retained predictions, but only one
+development cohort is available. Multiple metrics and method comparisons create
+selection opportunities, and no external confirmatory family controls them. FPR
+and TPR use validation-selected operating points; the PID--stacking FPR
+difference is not a comparison at equal TPR.
+
+The AL comparison unit is the outer fold after averaging five seed trajectories.
+Five folds provide effect sizes and direction counts but limited asymptotic
+inference. Twenty-five fold--seed runs do not represent 25 independent datasets.
+The source report supplies aggregate values and selected paired effects rather
+than fold vectors in this checkout, so reconstructed figures omit uncertainty
+bars.
+
+Restricted-FPR estimates use small test folds. With approximately 300 benign
+rows, one false positive changes FPR by roughly 0.33 percentage point. Results at
+1\% or 5\% caps cannot validate alert rates at $10^{-3}$ or $10^{-4}$.
+
+The 25 fidelity models share folds and data; they are not independent population
+draws. Random masks characterize conditional mask variability. Pairwise
+stability values share fitted models and cannot be entered as independent rows
+in a naive significance test.
+
+\subsection{External Validity}
+
+The 2,000-row EMBER subset covers a short 2018 period and uses random row folds.
+It does not impose temporal, family, campaign, or source separation. The
+MalBehavD-V1 cohort is also one source with metadata-availability and minimum-
+event selection. Results can change for newer software, different organizations,
+other sandbox environments, or another feature extractor.
+
+The horizon-40 subset was selected after horizon-20 results were known. Robust
+PID v2 and controlled stress findings are therefore explicitly exploratory. The
+timestamp pilot contains only eight usable sequences and cannot support
+performance inference. No measured result covers production queueing, analyst
+workflow, or end-to-end incident response.
+
+LightGBM and TreeSHAP are central to RQ2/RQ3. The acquisition summaries can be
+defined for other additive attributions, but their numeric behavior, cost, and
+stability may differ for raw-byte networks, graph models, or sequence models.
+
+\subsection{Integration Validity}
+
+The three RQs use two datasets and different feature spaces. The architecture
+connects them as stages of an auditable learning process, but the experiments do
+not demonstrate a single deployed pipeline. There is no measured gate deciding
+which EMBER sample receives dynamic analysis, no AL retraining of the
+MalBehavD-V1 fusion channels, and no shared latency/cost objective. Claims about
+synergy, interaction, or complete-system superiority are outside the evidence.
+
+\subsection{Reproducibility Validity}
+
+The source-of-truth report names commit \texttt{8bfa06b65b93}, dataset hashes,
+result directories, and verification artifacts. The remote branch available in
+the writing environment ends at an older commit, so the manuscript was generated
+from the supplied report rather than by rerunning the missing artifacts. Tables
+and plots reproduce reported aggregate values; they do not constitute an
+independent computational replication.
+
+Before submission, the named commit and all result directories must be pushed,
+hashes checked, verification commands rerun in a clean environment, and tables
+and figures regenerated directly from fold-level records. Bibliographic metadata,
+data-sharing rights, authorship order, corresponding author, and the target
+journal template also require final verification. Computational replay can show
+consistency with stored code and data; it cannot prove upstream label accuracy or
+external generalization.

@@ -1,0 +1,132 @@
+\section{Introduction}
+\label{sec:introduction}
+
+Machine-learning malware detectors operate under partial observability. A
+portable executable (PE) can be inspected statically before execution, providing
+immediate features from its headers, sections, imports, strings, and byte
+statistics. This early evidence supports high-throughput screening, but packing,
+obfuscation, source shift, and novel implementation choices can weaken learned
+associations \cite{ucci2019survey,gibert2020rise,arp2022dos}. Dynamic analysis
+reveals API calls and other behavior that a static representation may obscure,
+but only after a monitored execution has produced enough events. It adds
+collection cost, depends on the analysis environment, and can miss behavior that
+does not manifest during observation \cite{sikorski2012practical,
+sgandurra2016automated}. The operational question is therefore broader than
+choosing one detector: a system must decide how to allocate heterogeneous
+evidence as it becomes available.
+
+The same allocation problem reappears during model maintenance. New labeled
+software is expensive because an analyst must inspect only a small fraction of
+an incoming pool. Uncertainty sampling prioritizes objects near a model boundary
+\cite{cohn1996active,settles2009active}, yet it compresses the model's evidence
+into a probability margin. Two samples can have the same output probability
+while exhibiting different attribution structures: one may have uniformly weak
+support, whereas another may combine strong positive and negative effects that
+cancel. Explanation-derived structure can therefore supply a second view of
+which labels may be informative. Once explanations influence sample selection,
+however, they should not be accepted from a visualization alone. Their ranked
+features must be tested against the fitted model, and their sensitivity to
+training randomness and data partitions must be reported
+\cite{warnecke2020evaluating,adebayo2018sanity}.
+
+We organize these requirements as \emph{auditable evidence allocation under
+partial observability}. The formulation has three connected stages. At the
+decision stage, an early static score and sequential dynamic evidence must be
+combined. At the adaptation stage, a restricted labeling budget must be assigned
+to candidate samples. At the audit stage, the explanation mechanism used in
+adaptation and model inspection must be subjected to controlled diagnostics. The
+connection is conceptual and architectural: the same security-learning process
+must allocate online evidence, offline labels, and trust in explanatory
+artifacts. It does not imply that all components were evaluated on one dataset.
+
+The first stage draws on proportional--integral--derivative (PID) control. In a
+physical feedback loop, a PID controller transforms tracking error into an
+actuation signal: the proportional term responds to present error, the integral
+term accumulates persistent error, and the derivative term reacts to error
+change \cite{astrom2001future}. We transfer this structure cautiously. Detector
+disagreement replaces physical tracking error, and the controller output changes
+the relative weight of static and dynamic scores. There is no physical plant or
+closed-loop stability guarantee. The design is therefore \emph{control-inspired
+score fusion}. This distinction is important because component ablation, rather
+than the PID name, must determine whether temporal memory or a derivative term is
+useful.
+
+The latest paired evidence changes the scientific conclusion. On 1,922
+MalBehavD-V1 samples with static metadata and ordered API events, a proportional
+adaptive rule reduced false-positive rate (FPR) and Brier score relative to
+validation-selected fixed weighting. A full PID rule obtained ranking
+performance comparable to logistic stacking and a lower FPR at its selected
+operating point, but it incurred a small true-positive-rate trade-off. More
+importantly, PI and PID did not improve consistently over P within the examined
+1--20-event horizon. We report this negative result directly and interpret it as
+evidence-driven simplification: current disagreement is useful in this cohort,
+whereas accumulated and derivative disagreement have not yet earned additional
+complexity.
+
+The adaptation and audit stages are evaluated on a separate, identity-audited
+subset of EMBER \cite{anderson2018ember}. We combine predictive uncertainty with
+two summaries of signed TreeSHAP contributions: directional entropy, which
+measures the balance between positive and negative attribution mass, and
+attribution variance across coordinates. Five acquisition policies are compared
+under matched initial sets, pools, budgets, and outer folds. We then evaluate
+TreeSHAP separately over 25 fitted models by replacing sample-specific
+top-$|\mathrm{SHAP}|$ coordinates with training-derived mean or median values and
+comparing the result with equal-budget random masks. Spearman and Jaccard
+agreement distinguish seed sensitivity from fold sensitivity.
+
+This component-wise design answers three research questions:
+
+\begin{itemize}
+    \item \textbf{RQ1---adaptive fusion:} On paired event-indexed static and
+    dynamic evidence, how do P, PI, and PID fusion compare with average,
+    max-risk, fixed weighting, and learned logistic stacking in discrimination,
+    calibration, and operating-point trade-offs?
+    \item \textbf{RQ2---label allocation:} Under matched training-label budgets,
+    do directional entropy and SHAP variance add useful acquisition information
+    beyond random and uncertainty-only selection?
+    \item \textbf{RQ3---explanation audit:} Under training-derived mean and
+    median replacement, do top-$|\mathrm{TreeSHAP}|$ coordinates affect fitted-
+    model ranking more than equal-budget random coordinates, and how stable are
+    the rankings across model seeds and data folds?
+\end{itemize}
+
+The study makes four contributions.
+
+\begin{itemize}
+    \item We formulate one auditable evidence-allocation problem that connects
+    sequential decision fusion, budgeted model adaptation, and explanation
+    verification while keeping their empirical estimands separate.
+    \item We provide a paired comparison of simple and learned fusion rules on
+    1,922 samples. Adaptive P improves FPR by 1.28 percentage points and Brier by
+    0.00306 relative to fixed weighting, with paired-bootstrap intervals that
+    exclude zero. The ablation also shows that I and D do not provide stable
+    incremental value in the measured horizon.
+    \item We evaluate explanation-guided active learning with five outer folds
+    and five seeds. $U+H$ leads ROC/AP area under the learning curve (AULC),
+    $U+V$ reaches the validation target with the fewest labels, and \xfull
+    uses 92 fewer training labels than Random. No policy dominates every
+    criterion.
+    \item We test TreeSHAP rankings with controlled mean/median deletion and
+    stability analysis. Top-ranked deletion produces substantially larger AUC
+    decreases than random deletion, while moderate cross-model agreement exposes
+    dependence on the fitted cohort.
+\end{itemize}
+
+The scope is deliberately narrower than a deployment claim. MalBehavD-V1 is
+used for fusion; EMBER is used for active learning and fidelity. Their metrics
+are not merged, and no active-learning--fusion interaction is claimed. Both
+datasets have generic benign/malware labels, so the study does not establish
+ransomware-specific or zero-day detection. The fusion comparison is development
+evidence obtained after the original confirmatory analysis on the same cohort;
+the active-learning and fidelity results are confirmatory under the retained
+protocol. These evidence levels are visible in the tables and discussion.
+
+The remainder of the paper is organized as follows.
+Section~\ref{sec:related} reviews static/dynamic detection, score fusion, active
+learning, and explanation validation. Section~\ref{sec:problem} states the
+unified problem and claim boundaries. Section~\ref{sec:method} describes the
+fusion, acquisition, and audit methods. Section~\ref{sec:protocol} separates the
+two benchmark protocols and evidence tiers. Section~\ref{sec:results} reports
+results by research question. Sections~\ref{sec:discussion} and
+\ref{sec:threats} interpret the findings and threats to validity, and
+Section~\ref{sec:conclusion} concludes.
