@@ -148,4 +148,16 @@ xu hướng tăng khi dung hợp, nhưng chưa chứng minh PID giảm FPR hoặ
 
 `scripts/live_defense_demo.py`, `scripts/defense_demo.py`, `src/xai_active_learning.py` và `src/fidelity_framework.py` là mã nguyên mẫu cũ. Một số đường chạy trong đó sinh tín hiệu bằng RNG hoặc dùng công thức đánh giá cũ; không dùng các tệp này để tạo số liệu luận văn. Lệnh thực nghiệm chuẩn là `scripts/run_experiments.py`.
 
+Demo bảo vệ chính thức là dashboard offline phát lại artifact đã đo. Kiểm tra và
+khởi động bằng:
+
+```bash
+python scripts/run_defense_demo.py --check
+python scripts/run_defense_demo.py
+```
+
+Dashboard không tải/chạy PE, không gọi mạng và không huấn luyện lại. Hướng dẫn
+thao tác, lời trình bày 4--5 phút, phiên bản 90 giây và phương án dự phòng nằm
+tại [`docs/DEFENSE_DEMO_RUNBOOK_VI.md`](docs/DEFENSE_DEMO_RUNBOOK_VI.md).
+
 Các file PE thô, archive lớn và EMBER raw được `.gitignore` loại khỏi Git. Trình trích đặc trưng riêng lẻ vẫn có thể chạy qua `src/feature_extraction.py` khi đã cài `lief` và đặt mẫu được phép phân tích trong `data/sample_pe/`.
