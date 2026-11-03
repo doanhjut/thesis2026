@@ -486,7 +486,8 @@ def provenance_page(bundle: dict):
     st.markdown(
         "Dashboard chỉ chứa các bản ghi đã chọn và các bảng tổng hợp. Có thể chạy "
         "`python scripts/run_defense_demo.py --check` trước buổi bảo vệ để đối "
-        "chiếu lại hash của toàn bộ nguồn."
+        "chiếu lại hash của toàn bộ nguồn; dùng `--audit-evidence` để tái tính "
+        "40 chỉ số hiển thị từ prediction, round, mask và rank records."
     )
 
 

@@ -14,7 +14,12 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from src.defense_demo import DEFAULT_BUNDLE, build_demo_bundle, validate_demo_bundle
+from src.defense_demo import (
+    DEFAULT_BUNDLE,
+    audit_demo_evidence,
+    build_demo_bundle,
+    validate_demo_bundle,
+)
 
 
 def _dependency_errors() -> list[str]:
@@ -28,6 +33,11 @@ def _dependency_errors() -> list[str]:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true", help="Validate and exit.")
+    parser.add_argument(
+        "--audit-evidence",
+        action="store_true",
+        help="Recompute headline metrics from lower-level artifacts and exit.",
+    )
     parser.add_argument(
         "--rebuild", action="store_true", help="Rebuild the compact bundle first."
     )
@@ -48,6 +58,10 @@ def main() -> int:
     report = validate_demo_bundle(REPO_ROOT, bundle, verify_source_hashes=True)
     report["missing_dependencies"] = missing
     report["ok"] = report["ok"] and not missing
+    if args.audit_evidence and report["ok"]:
+        audit = audit_demo_evidence(REPO_ROOT, bundle)
+        print(json.dumps(audit, ensure_ascii=False, indent=2))
+        return 0 if audit["ok"] else 2
     if args.check or not report["ok"]:
         print(json.dumps(report, ensure_ascii=False, indent=2))
         return 0 if report["ok"] else 2

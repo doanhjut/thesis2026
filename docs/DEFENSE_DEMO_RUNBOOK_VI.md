@@ -46,7 +46,15 @@ pip install -r requirements.txt
 python scripts\run_defense_demo.py --check
 ```
 
-Kết quả đúng phải có `"ok": true`, `source_count: 9` và `pid_scenarios: 4`. Lệnh kiểm tra đối chiếu hash của bundle với chín artifact nguồn, nên chạy sau khi clone/pull hoặc trước buổi bảo vệ. Với tệp văn bản, bộ kiểm tra chuẩn hóa `LF/CRLF` trước khi tính hash để kết quả nhất quán giữa Linux và Windows; tệp nén/binary vẫn được kiểm tra chính xác theo byte.
+Kết quả đúng phải có `"ok": true`, `source_count: 14` và `pid_scenarios: 4`. Lệnh kiểm tra đối chiếu hash của bundle với mười bốn artifact nguồn, nên chạy sau khi clone/pull hoặc trước buổi bảo vệ. Với tệp văn bản, bộ kiểm tra chuẩn hóa `LF/CRLF` trước khi tính hash để kết quả nhất quán giữa Linux và Windows; tệp nén/binary vẫn được kiểm tra chính xác theo byte.
+
+Để chứng minh các số trên dashboard không chỉ được chép từ một bảng tổng hợp, chạy audit tái tính:
+
+```bash
+python scripts/run_defense_demo.py --audit-evidence
+```
+
+Lệnh này tái tính FPR/AUC từ dự đoán cuối của 1.922 mẫu PID; AULC, số nhãn tới mục tiêu và overhead từ toàn bộ vòng AL; deletion và Spearman từ mask/pair records Fidelity. Kết quả đúng có `"ok": true` và số `metric_checks_passed` bằng `metric_checks_total`.
 
 Nếu artifact nguồn được chạy lại có chủ đích, tạo lại bundle rồi kiểm tra:
 
@@ -150,6 +158,10 @@ Không mở vết mẫu trong phiên bản 90 giây.
 ### “Đây có phải kết quả chạy trực tiếp không?”
 
 > Đây là phát lại artifact đo trước, không phải chạy lại thí nghiệm. Chạy lại toàn bộ AL/Fidelity mất thời gian và có rủi ro kỹ thuật không cần thiết tại buổi bảo vệ. Trang Nguồn và hash cho phép đối chiếu bundle với artifact gốc.
+
+Nếu hội đồng hỏi tiếp liệu bảng tổng hợp có thể được tạo thủ công hay không:
+
+> Em có hai lớp kiểm chứng. Hash xác nhận artifact không thay đổi sau khi khóa. Lệnh `--audit-evidence` bỏ qua các con số hiển thị và tái tính chúng từ dự đoán từng mẫu, từng vòng Active Learning, từng mask và từng cặp thứ hạng. Các replay đầy đủ trước đó cũng đã nạp lại checkpoint và tái tạo 1.100.000 prediction records của AL cùng 1.260.000 prediction records của Fidelity. Hash không tự chứng minh nguồn dữ liệu là chân lý, nhưng chuỗi tái tính làm cho việc sửa một con số đơn lẻ bị phát hiện.
 
 ### “Tại sao gọi PID khi P đang tốt hơn?”
 

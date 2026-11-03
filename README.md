@@ -153,6 +153,7 @@ khởi động bằng:
 
 ```bash
 python scripts/run_defense_demo.py --check
+python scripts/run_defense_demo.py --audit-evidence
 python scripts/run_defense_demo.py
 ```
 

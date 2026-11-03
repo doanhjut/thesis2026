@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at_utc": "2026-11-03T02:24:04.536312+00:00",
+  "generated_at_utc": "2026-11-03T07:12:14.801836+00:00",
   "mode": "measured_artifact_replay",
   "safety": "Offline artifact replay only; no PE download, upload, execution, sandbox call, model training, or network request.",
   "sources": [
@@ -35,9 +35,24 @@
       "size_bytes": 555363
     },
     {
+      "path": "results/confirmatory_20261019_ember_identity/al/full_pool_references.csv",
+      "sha256": "961458e56947b25c180bcbd0def4e08e17b65b3d578c049deded5b420684dc87",
+      "size_bytes": 564
+    },
+    {
+      "path": "results/confirmatory_20261019_ember_identity/al/verification.json",
+      "sha256": "3bb1a21fbdf472be8b8ccb29fbbedda1fc225eef2a690dd7105ab443e4b758ef",
+      "size_bytes": 822
+    },
+    {
       "path": "results/confirmatory_20261019_ember_identity/fidelity/deletion_summary.csv",
       "sha256": "cb2323ed8b8f74d67a2c695d75afe2dd9062203da54faa6c7d35309bb1677d08",
       "size_bytes": 965
+    },
+    {
+      "path": "results/confirmatory_20261019_ember_identity/fidelity/mask_metrics_all_models.csv",
+      "sha256": "4482c037ba2fe8f2a380a16ccb961209838a8c7f0228ee53f4ab706b8a794850",
+      "size_bytes": 490941
     },
     {
       "path": "results/confirmatory_20261019_ember_identity/fidelity/shap_stability_summary.csv",
@@ -45,9 +60,19 @@
       "size_bytes": 892
     },
     {
+      "path": "results/confirmatory_20261019_ember_identity/fidelity/shap_rank_stability.csv",
+      "sha256": "a8f421da6551778f7b47951ba9c4917d29a8a493d467ec7ccfc3be066180ab54",
+      "size_bytes": 27049
+    },
+    {
       "path": "results/confirmatory_20261019_ember_identity/fidelity/model_metrics.csv",
       "sha256": "ea2964799535cc80d2cd8779ff80e1fffcb7a4cc23a417fc37438b3d99056453",
       "size_bytes": 5423
+    },
+    {
+      "path": "results/confirmatory_20261019_ember_identity/fidelity/verification.json",
+      "sha256": "271f1c1bb321527b4913e02b23290f1f949c6a5f768875fe333d139786016c7e",
+      "size_bytes": 8791
     }
   ],
   "pid": {

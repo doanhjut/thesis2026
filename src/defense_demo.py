@@ -13,7 +13,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+import numpy as np
 import pandas as pd
+from sklearn.metrics import roc_auc_score
 
 
 SCHEMA_VERSION = 1
@@ -265,9 +267,14 @@ def build_demo_bundle(root: Path, output: Path | None = None) -> Path:
         AL_DIR / "target_reach_summary.csv",
         AL_DIR / "overhead_by_fold.csv",
         AL_DIR / "metrics_all_folds.csv",
+        AL_DIR / "full_pool_references.csv",
+        AL_DIR / "verification.json",
         FIDELITY_DIR / "deletion_summary.csv",
+        FIDELITY_DIR / "mask_metrics_all_models.csv",
         FIDELITY_DIR / "shap_stability_summary.csv",
+        FIDELITY_DIR / "shap_rank_stability.csv",
         FIDELITY_DIR / "model_metrics.csv",
+        FIDELITY_DIR / "verification.json",
     ]
     bundle = {
         "schema_version": SCHEMA_VERSION,
@@ -338,4 +345,164 @@ def validate_demo_bundle(
         "schema_version": bundle["schema_version"],
         "source_count": len(bundle["sources"]),
         "pid_scenarios": len(bundle["pid"]["scenarios"]),
+    }
+
+
+def audit_demo_evidence(root: Path, path: Path) -> dict[str, Any]:
+    """Recompute the headline demo claims from lower-level measured artifacts."""
+
+    root = root.resolve()
+    path = path if path.is_absolute() else root / path
+    hash_report = validate_demo_bundle(root, path, verify_source_hashes=True)
+    bundle = load_demo_bundle(path)
+    checks: list[dict[str, Any]] = []
+
+    def check(name: str, computed: float, displayed: float, tolerance: float = 1e-9):
+        difference = abs(float(computed) - float(displayed))
+        checks.append(
+            {
+                "name": name,
+                "computed": float(computed),
+                "displayed": float(displayed),
+                "absolute_difference": difference,
+                "passed": difference <= tolerance,
+            }
+        )
+
+    event_columns = [
+        "row_id", "time_step", "label", "method", "score", "predicted_label"
+    ]
+    events = pd.read_csv(root / FUSION_EVENTS, usecols=event_columns)
+    final = (
+        events.sort_values(["row_id", "time_step"])
+        .groupby(["row_id", "method"], as_index=False)
+        .tail(1)
+    )
+    displayed_pid = {item["method"]: item for item in bundle["pid"]["methods"]}
+    for method in ("Fixed_weight", "Reliability_P", "Reliability_full_PID"):
+        frame = final[final["method"] == method]
+        y = frame["label"].to_numpy(dtype=int)
+        decision = frame["predicted_label"].to_numpy(dtype=int)
+        negative = y == 0
+        fpr = float(np.mean(decision[negative]))
+        auc = float(roc_auc_score(y, frame["score"].to_numpy(dtype=float)))
+        check(f"PID/{method}/fpr", fpr, displayed_pid[method]["fpr"])
+        check(f"PID/{method}/auc", auc, displayed_pid[method]["auc"])
+
+    al_metrics = pd.read_csv(root / AL_DIR / "metrics_all_folds.csv")
+    references = pd.read_csv(root / AL_DIR / "full_pool_references.csv")
+    areas, costs, timings = [], [], []
+    for (fold, seed, method), group in al_metrics.groupby(["fold", "seed", "method"]):
+        group = group.sort_values("n_labeled")
+        width = float(group["n_labeled"].max() - group["n_labeled"].min())
+        areas.append(
+            {
+                "method": method,
+                "auc": float(np.trapezoid(group["test_auc"], group["n_labeled"]) / width),
+                "ap": float(np.trapezoid(group["test_ap"], group["n_labeled"]) / width),
+            }
+        )
+        target = float(
+            references.loc[references["fold"] == fold, "target_validation_auc"].iloc[0]
+        )
+        reached = group[group["val_auc"] >= target]
+        costs.append(
+            {
+                "method": method,
+                "labels": float(reached.iloc[0]["n_labeled"]) if len(reached) else np.nan,
+            }
+        )
+        timings.append(
+            {
+                "method": method,
+                "train": float(group["train_seconds"].sum()),
+                "query": float(group["query_seconds"].sum()),
+            }
+        )
+    area_summary = pd.DataFrame(areas).groupby("method").mean()
+    cost_summary = pd.DataFrame(costs).groupby("method").mean()
+    timing_summary = pd.DataFrame(timings).groupby("method").mean()
+    displayed_al = {
+        item["method"]: item for item in bundle["active_learning"]["summary"]
+    }
+    for method in displayed_al:
+        check(f"AL/{method}/roc_aulc", area_summary.loc[method, "auc"], displayed_al[method]["auc_aulc_mean"])
+        check(f"AL/{method}/ap_aulc", area_summary.loc[method, "ap"], displayed_al[method]["ap_aulc_mean"])
+        check(f"AL/{method}/labels_to_target", cost_summary.loc[method, "labels"], displayed_al[method]["mean_labels_reached"])
+        query_share = 100 * timing_summary.loc[method, "query"] / (
+            timing_summary.loc[method, "train"] + timing_summary.loc[method, "query"]
+        )
+        check(f"AL/{method}/query_share_percent", query_share, displayed_al[method]["query_share_percent"])
+
+    masks = pd.read_csv(root / FIDELITY_DIR / "mask_metrics_all_models.csv")
+    comparisons = []
+    for (_, _, baseline, k), group in masks.groupby(
+        ["fold", "seed", "mask_baseline", "k"]
+    ):
+        top = group[group["method"] == "top_abs_treeshap"].iloc[0]
+        random = group[group["method"] == "uniform_random"]
+        comparisons.append(
+            {
+                "mask_baseline": baseline,
+                "k": int(k),
+                "top": float(top["auc_drop"]),
+                "random": float(random["auc_drop"].mean()),
+            }
+        )
+    deletion = pd.DataFrame(comparisons).groupby(["mask_baseline", "k"]).mean()
+    displayed_deletion = {
+        (item["mask_baseline"], int(item["k"])): item
+        for item in bundle["fidelity"]["deletion"]
+    }
+    for key, displayed in displayed_deletion.items():
+        check(f"Fidelity/{key[0]}/k{key[1]}/top_drop", deletion.loc[key, "top"], displayed["top_shap_auc_drop_mean"])
+        check(f"Fidelity/{key[0]}/k{key[1]}/random_drop", deletion.loc[key, "random"], displayed["random_auc_drop_mean"])
+
+    ranks = pd.read_csv(root / FIDELITY_DIR / "shap_rank_stability.csv")
+    displayed_stability = {
+        (item["scope"], item["metric"]): item
+        for item in bundle["fidelity"]["stability"]
+    }
+    for same_fold, scope in ((True, "within_fold"), (False, "across_fold")):
+        computed = float(
+            ranks.loc[
+                ranks["same_fold"] == same_fold, "spearman_global_importance"
+            ].mean()
+        )
+        check(
+            f"Fidelity/{scope}/spearman",
+            computed,
+            displayed_stability[(scope, "spearman_global_importance")]["mean"],
+        )
+
+    al_verification = json.loads(
+        (root / AL_DIR / "verification.json").read_text(encoding="utf-8")
+    )
+    fidelity_verification = json.loads(
+        (root / FIDELITY_DIR / "verification.json").read_text(encoding="utf-8")
+    )
+    replay = {
+        "al_status": al_verification["status"],
+        "al_checkpoints_replayed": int(
+            sum(item["checkpoints_replayed"] for item in al_verification["folds"])
+        ),
+        "al_prediction_records": int(
+            sum(item["prediction_records"] for item in al_verification["folds"])
+        ),
+        "fidelity_status": fidelity_verification["status"],
+        "fidelity_mask_batches_replayed": int(
+            sum(item["mask_batches_replayed"] for item in fidelity_verification["runs"])
+        ),
+        "fidelity_prediction_records": int(
+            sum(item["prediction_records"] for item in fidelity_verification["runs"])
+        ),
+    }
+    return {
+        "ok": hash_report["ok"] and all(item["passed"] for item in checks),
+        "mode": "recomputed_from_lower_level_artifacts",
+        "hash_validation": hash_report,
+        "metric_checks_passed": sum(item["passed"] for item in checks),
+        "metric_checks_total": len(checks),
+        "replay_verification": replay,
+        "checks": checks,
     }
