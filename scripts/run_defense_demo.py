@@ -39,6 +39,11 @@ def main() -> int:
         help="Recompute headline metrics from lower-level artifacts and exit.",
     )
     parser.add_argument(
+        "--audit-details",
+        action="store_true",
+        help="Include every recomputed metric in the evidence-audit output.",
+    )
+    parser.add_argument(
         "--rebuild", action="store_true", help="Rebuild the compact bundle first."
     )
     parser.add_argument("--port", type=int, default=8501)
@@ -60,7 +65,14 @@ def main() -> int:
     report["ok"] = report["ok"] and not missing
     if args.audit_evidence and report["ok"]:
         audit = audit_demo_evidence(REPO_ROOT, bundle)
-        print(json.dumps(audit, ensure_ascii=False, indent=2))
+        if args.audit_details:
+            output = audit
+        else:
+            output = {key: value for key, value in audit.items() if key != "checks"}
+            output["failed_checks"] = [
+                item["name"] for item in audit["checks"] if not item["passed"]
+            ]
+        print(json.dumps(output, ensure_ascii=False, indent=2))
         return 0 if audit["ok"] else 2
     if args.check or not report["ok"]:
         print(json.dumps(report, ensure_ascii=False, indent=2))

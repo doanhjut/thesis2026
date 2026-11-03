@@ -56,6 +56,8 @@ python scripts/run_defense_demo.py --audit-evidence
 
 Lệnh này tái tính FPR/AUC từ dự đoán cuối của 1.922 mẫu PID; AULC, số nhãn tới mục tiêu và overhead từ toàn bộ vòng AL; deletion và Spearman từ mask/pair records Fidelity. Kết quả đúng có `"ok": true` và số `metric_checks_passed` bằng `metric_checks_total`.
 
+Khi cần xem cả 40 phép so sánh thay vì phần tóm tắt, thêm `--audit-details`.
+
 Nếu artifact nguồn được chạy lại có chủ đích, tạo lại bundle rồi kiểm tra:
 
 ```bash
