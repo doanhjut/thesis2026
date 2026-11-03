@@ -1,0 +1,13 @@
+﻿task_id,priority,depends_on,owner,action,deliverables,acceptance_criteria,milestone
+T01,P0,Không,Người vận hành và pipeline,Kiểm tra môi trường Linux và cache,process status; history; summary; permission check,Không collector trùng; secret có sẵn; network request hợp lệ; báo chính xác nguyên nhân lỗi,M1
+T02,P0,T01,Pipeline,Thu nốt cohort đã khóa,raw cache; request_history.csv; collection_summary.json,Thử hết cohort; không còn deferred; tách 404 transport và 429,M1
+T03,P0,T02,Pipeline và tác giả,Audit coverage missingness,coverage_audit.json; coverage_by_fold_label.csv; artifact hashes,Ít nhất 1731 usable; kiểm tra class fold; giữ mọi exclusion có lý do,M1
+T04,P1,T03,Pipeline,Chạy fusion confirmatory hiện có,event predictions; fusion metrics; bootstrap; verification,7 phương pháp cùng rows; validation only selection; replay passed,M2
+T05,P1,Khóa trước run mở rộng,Tác giả và pipeline,Max risk stacking và sensitivity,protocol v2; baseline code; gain trace; paired effects,Thêm baseline cùng inputs; train calibration validation tách; không tune trên test,M2
+T06,P1,T03 T05,Pipeline,Gate trên toàn traffic,gate decisions; final predictions; quality cost curve,Mọi test SHA có final decision; báo early FN và missing policy,M3
+T07,P1,Có thể làm song song,Tác giả và pipeline,Strong AL baselines và sensitivity,U diversity; QBC nếu áp dụng; U H V sensitivity; budget card,Cùng pool initial set oracle budget; báo total development cost,M2
+T08,P1,T06 T07,Pipeline,Ma trận AL và fusion,2x2 cells; paired interaction; checkpoints,Cùng paired corpus folds; difference in differences và uncertainty; không ghép hai dataset,M3
+T09,P1,T07,Pipeline,Fidelity trên model liên quan và controls,AL checkpoint masks; gain ranking; permutation control; group schema,Cùng k và preprocessing; công khai feature validity và seed fold dependence,M3
+T10,Theo claim,Corpus bổ sung nếu có,Tác giả,External temporal hoặc ransomware labels,dataset card; label provenance; time group split; held out predictions,Không gọi generic label là ransomware; không dùng current test để thiết kế ngoài miền,M4
+T11,Theo claim,Môi trường timestamp thật,Tác giả và lab nếu có,Latency và sleep evasion,stage timing; delayed behavior verification; detection time,Có mốc thời gian thực và chi phí toàn đường quyết định; nếu không có thì bỏ claim,M3
+T12,P1,T04 T05 và scope đã chốt,Tác giả và thầy hướng dẫn,Cập nhật manuscript và release,tex tables figures references environment lock; response matrix,Mọi claim trỏ artifact; template build sạch; authorship và bản cuối được duyệt,M4

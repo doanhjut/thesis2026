@@ -1,0 +1,18 @@
+claim_id,manuscript_claim,primary_evidence,status,scope_or_boundary
+AL-01,"XAI-Full achieves mean ROC-AUC 0.9749 +/- 0.0040 at 700 training labels","results/measured_20261014/al/summary.json; final checkpoints",verified,"Five paired seeds; 400 validation labels are additional"
+AL-02,"XAI-Full has higher final AUC than uncertainty sampling in every measured seed","results/measured_20261014/al/summary.json; paired-difference artifacts",verified,"Five seeds on one shared row-disjoint test split"
+AL-03,"XAI-Full stably lowers FPR relative to uncertainty sampling","results/measured_20261014/al/summary.json; per-seed test metrics",rejected,"FPR is lower in only 2 of 5 seeds"
+AL-04,"XAI-Full has higher normalized AUC AULC than uncertainty and random sampling","results/measured_20261014/al/summary.json; learning-curve artifacts",verified,"Pilot protocol with budgets from 200 to 700 labels"
+AL-05,"Explanation-guided query scoring costs about 0.1635 s versus 0.0128 s for uncertainty","results/measured_20261014/al/timing artifacts",verified,"Query scoring only; excludes annotation, retraining, sorting, and I/O"
+FID-01,"The fixed fidelity model has baseline test ROC-AUC 0.980167","results/measured_20261014/fidelity/summary.json; saved predictions",verified,"One separately trained LightGBM model and 400-row test split"
+FID-02,"Replacing the top 25 absolute-SHAP coordinates with training means reduces AUC to 0.818533","results/measured_20261014/fidelity/summary.json; masks; predictions",verified,"Feature-space intervention; does not imply a valid PE edit"
+FID-03,"The top-25 AUC drop is approximately 630 times the mean equal-budget random drop","results/measured_20261014/fidelity/summary.json",verified_descriptive,"Ratio has a near-zero denominator; absolute drops and bootstrap interval are primary"
+FID-04,"Native TreeSHAP reconstructs raw LightGBM scores to numerical precision","results/measured_20261014 verifier and contribution matrices",verified,"Numeric additivity does not establish semantic or causal correctness"
+FID-05,"EC is 0.304373 and CF is 0.587352","results/measured_20261014/fidelity/summary.json; replayed geometry inputs",verified,"Geometry of one fitted model and test set"
+FID-06,"An Overall Fidelity Score certifies explanation quality","No validated normalization or aggregation rule",not_supported,"FF, EC, and CF are reported separately"
+PID-01,"PID fusion improves AUC, FPR, or sleep-evasion resistance","Dynamic template and provenance metadata",not_measured,"Observed aligned dynamic scores are absent"
+PID-02,"Fusion runtime is end-to-end detection latency","Fusion runner timing scope",not_supported,"Excludes observation, feature extraction, model inference, queueing, and I/O"
+DATA-01,"The table contains 2000 rows and 2381 feature columns with row-disjoint 60/20/20 splits","results/measured_20261014 dataset audit; split artifacts",verified,"Byte-identical local input; no exact duplicate feature vectors"
+DATA-02,"The pilot is a verified SOREL/EMBER ransomware or zero-day benchmark","No upstream identity, family, time, or label-definition manifest",not_supported,"Report as a local binary PE-feature pilot"
+REP-01,"The saved artifact is computationally replayable","results/measured_20261014 verifier summary",verified,"150 checkpoints; 120000 AL predictions; 12500 queries; 63 masks; 25200 fidelity predictions"
+

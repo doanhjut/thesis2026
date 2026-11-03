@@ -1,0 +1,191 @@
+{
+  "snapshot_date": "2026-10-21",
+  "branch": "feat/reproducible-thesis-experiments",
+  "local_code_commit": "d39ca66",
+  "al_fidelity_run_commit": "fed4322f58f5bb55ec47833e857370d076592a32",
+  "pid_pilot_run_commit": "44812ad0c9997e47b418db55975d80c9814b9b77",
+  "evidence_sources": [
+    {
+      "path": "D:\\Code\\Luanvan\\results\\confirmatory_20261019_ember_identity\\README.md",
+      "sha256": "c76574b8421609a4ce9c7bf370299237a650dc2acb67a4d4494a240390b0a351",
+      "bytes": 8531
+    },
+    {
+      "path": "D:\\Code\\Luanvan\\results\\confirmatory_20261019_ember_identity\\run_status.json",
+      "sha256": "fc30abaf1b1672245e0bcd95532ce05a46f145e99851873c1310bec54ec3b613",
+      "bytes": 1487
+    },
+    {
+      "path": "D:\\Code\\Luanvan\\results\\confirmatory_20261019_ember_identity\\static_identity_audit.json",
+      "sha256": "a2245d5bff52bf9dafc12523599cb8a044abd6139fe53e91aaa27ce193101a48",
+      "bytes": 1753
+    },
+    {
+      "path": "D:\\Code\\Luanvan\\results\\confirmatory_20261019_ember_identity\\al\\aulc_summary.csv",
+      "sha256": "b3bd0baa78ff1eb4ab49c6cc86a8f3b6dd1a3229e7c76267fc236f0b88f6b278",
+      "bytes": 1018
+    },
+    {
+      "path": "D:\\Code\\Luanvan\\results\\confirmatory_20261019_ember_identity\\al\\target_reach_summary.csv",
+      "sha256": "74d557b5118e02cee1f77a74599dccc521e444002d7b6f125f0e5f924430bd83",
+      "bytes": 195
+    },
+    {
+      "path": "D:\\Code\\Luanvan\\results\\confirmatory_20261019_ember_identity\\al\\fold_level_effects.csv",
+      "sha256": "04bd11376538457b58ba40037ea1c37468fcb84debaa041a538cda3ca710dba8",
+      "bytes": 9056
+    },
+    {
+      "path": "D:\\Code\\Luanvan\\results\\confirmatory_20261019_ember_identity\\al\\verification.json",
+      "sha256": "b2b86ad5adb8f0539bba0daded81823cbe3924f96c35e25749950ac3f1b9ddd6",
+      "bytes": 862
+    },
+    {
+      "path": "D:\\Code\\Luanvan\\results\\confirmatory_20261019_ember_identity\\fidelity\\deletion_summary.csv",
+      "sha256": "ddda4638d3c96f82314e9186d58edb2781926f828efed65c87b8bfd58e30cf09",
+      "bytes": 972
+    },
+    {
+      "path": "D:\\Code\\Luanvan\\results\\confirmatory_20261019_ember_identity\\fidelity\\shap_stability_summary.csv",
+      "sha256": "ba24e5574baee7927e2a081e3b105d494a256d4a4dfe9c52471904f3c508fac6",
+      "bytes": 901
+    },
+    {
+      "path": "D:\\Code\\Luanvan\\results\\confirmatory_20261019_ember_identity\\fidelity\\verification.json",
+      "sha256": "d3166cf6815223e9babe127fc65c9ffd72262557ba1d64112c793517adf380df",
+      "bytes": 9196
+    },
+    {
+      "path": "D:\\Code\\Luanvan\\results\\measured_20261020_malbehavd_pid_pilot200\\README.md",
+      "sha256": "984c3dec8c3cd37da92dcc37a3f1e26e50dfeb3d8b7e084b76952a70a06fef05",
+      "bytes": 5737
+    },
+    {
+      "path": "D:\\Code\\Luanvan\\results\\measured_20261020_malbehavd_pid_pilot200\\summary.json",
+      "sha256": "b19b3d5eaec6e9483825f7f27764d276e6cfa1451245db915a6cb95e6c85f4dc",
+      "bytes": 9379
+    },
+    {
+      "path": "D:\\Code\\Luanvan\\results\\measured_20261020_malbehavd_pid_pilot200\\paired_bootstrap_pid_minus_fixed.json",
+      "sha256": "0a34858ce94faa2df1474aaaf49480f173367cef97e1640de6f6416186411e18",
+      "bytes": 1118
+    },
+    {
+      "path": "D:\\Code\\Luanvan\\results\\measured_20261020_malbehavd_pid_pilot200\\verification.json",
+      "sha256": "e3599bce418c56e48f6076d7c497bf4b5de5c44a21b59fb947f61078ec4a0c8f",
+      "bytes": 175
+    },
+    {
+      "path": "D:\\Code\\Luanvan\\results\\measured_20261020_malbehavd_pid_pilot200\\independent_verification.json",
+      "sha256": "2168d266b67d7d217e4379eb919181b68dece10b744f81c9e6c463ae33bbed33",
+      "bytes": 426
+    },
+    {
+      "path": "D:\\Code\\Luanvan\\results\\pid_intake_20261020\\README.md",
+      "sha256": "d63f34ce2b65c46bded37c6b367f6126e23ad8aa068b0b686d3a32e18cf034f9",
+      "bytes": 2245
+    },
+    {
+      "path": "D:\\Code\\Luanvan\\results\\measured_20261019_source_recovery\\README.md",
+      "sha256": "d918e11316313982301ff130c15c02db7967df389e48085387a3ed4178cf6b56",
+      "bytes": 1779
+    },
+    {
+      "path": "D:\\Code\\Luanvan\\results\\measured_20261019_ember_identity\\static_gate\\summary_recomputed.csv",
+      "sha256": "dd4104391a951b1fec6a413068e293a4cbf71429806006a8ccc11196faf10253",
+      "bytes": 265
+    },
+    {
+      "path": "D:\\Code\\Luanvan\\docs\\EVENT_INDEXED_PID_RUNBOOK.md",
+      "sha256": "45a6b893519aae204e1561cd36a394c8764923de08a2695fb69ea1f146b68157",
+      "bytes": 6093
+    },
+    {
+      "path": "D:\\Code\\Luanvan\\src\\experiments\\malbehavd_pid.py",
+      "sha256": "160c2440748b7ea713c6659563f1a9f2bc72248f20821f84513774b1a2a1c4f6",
+      "bytes": 41985
+    },
+    {
+      "path": "D:\\Code\\Luanvan\\src\\experiments\\temporal_fusion.py",
+      "sha256": "3d3ce5dfff0f63db20b2d6bcb89fc201ab63e6d5265c5d7eb9e4b3897b407e4f",
+      "bytes": 16031
+    },
+    {
+      "path": "D:\\Code\\Luanvan\\src\\pid_fusion.py",
+      "sha256": "ae035340da5f88c89de979acbfe40ea9fc09166900ff8384add0317c8dc0dd2a",
+      "bytes": 4488
+    },
+    {
+      "path": "C:\\Users\\hoaho\\Downloads\\ransomware-paper-ieee-master.zip",
+      "sha256": "44002a6cea9cc23161c93a34053635eefde7738ebaf515eaa15b4f87a5b189e0",
+      "bytes": 112354
+    },
+    {
+      "path": "C:\\Users\\hoaho\\Downloads\\MULTI_STAGE_RESEARCH_PLAN.md",
+      "sha256": "7f329ca0c7e8c7a810dd43e5fb1c414a00124b3d7072a7940de203a219357551",
+      "bytes": 14150
+    },
+    {
+      "path": "D:\\Code\\Luanvan\\docs\\paper_revision\\20261021\\sources\\COLLECTION_CHECKPOINT_693.json",
+      "sha256": "01977254a5905a669a16878650101b9764304ccbcccc2452936ba5374ac0604d",
+      "bytes": 2039
+    },
+    {
+      "path": "D:\\Code\\Luanvan\\docs\\paper_revision\\20261021\\sources\\PHAN_HOI_TRUOC_20261019.md",
+      "sha256": "e0614328d2a7156dd68a044f706286a901912f118e56eefe2ab3875930dffcd5",
+      "bytes": 11118
+    }
+  ],
+  "source_package_integrity_counts": {
+    "byte_exact": 14,
+    "lf_normalized_text": 53,
+    "mismatch": 0,
+    "missing": 0
+  },
+  "collection": {
+    "thread_id": "01a11edf-0392-71cc-8e62-5c458c0a80ac",
+    "title": "Thiết lập thesis2026",
+    "turn_id": "01a15c99-753e-751f-b5b0-2f253b780df0",
+    "turn_status": "failed",
+    "error": {
+      "message": "You’ve hit your usage limit. Upgrade to Pro (https://chatgpt.com/explore/pro), visit https://chatgpt.com/settings/usage to purchase more credits or try again at 6:25 AM.",
+      "additionalDetails": null
+    },
+    "completed_at": 1792558161,
+    "evidence": [
+      {
+        "type": "commandExecution",
+        "command": "/bin/bash -lc 'MPLCONFIGDIR=/tmp/mplconfig XDG_CACHE_HOME=/tmp/cache .venv/bin/python scripts/run_experiments.py collect-vt-static --cohort outputs/malbehavd_pid_20261020_prepared/cohort_manifest.csv --output outputs/malbehavd_pid_20261020_vt_full --seed 2026 --requests-per-minute 4 --max-new 100'",
+        "exit_code": 0,
+        "output": {
+          "text": "{\n  \"status\": \"vt_metadata_collected\",\n  \"output\": \"/workspace/thesis2026/outputs/malbehavd_pid_20261020_vt_full\",\n  \"usable_rows\": 593,\n  \"coverage\": 0.3083723348933957\n}\n",
+          "truncated": false
+        }
+      },
+      {
+        "type": "commandExecution",
+        "command": "/bin/bash -lc 'MPLCONFIGDIR=/tmp/mplconfig XDG_CACHE_HOME=/tmp/cache .venv/bin/python scripts/run_experiments.py collect-vt-static --cohort outputs/malbehavd_pid_20261020_prepared/cohort_manifest.csv --output outputs/malbehavd_pid_20261020_vt_full --seed 2026 --requests-per-minute 4 --max-new 100'",
+        "exit_code": 0,
+        "output": {
+          "text": "{\n  \"status\": \"vt_metadata_collected\",\n  \"output\": \"/workspace/thesis2026/outputs/malbehavd_pid_20261020_vt_full\",\n  \"usable_rows\": 693,\n  \"coverage\": 0.36037441497659906\n}\n",
+          "truncated": false
+        }
+      }
+    ],
+    "previous_count": 493,
+    "confirmed_usable": 693,
+    "cohort_rows": 1923,
+    "coverage": 0.36037441497659906,
+    "additional_needed_to_90_percent": 1038,
+    "executables_downloaded": false,
+    "captured_at_utc": "2026-10-21T06:53:14Z"
+  },
+  "cohort_manifest_sha256": "9540b88b0da2463f63b4e983f5ecc277e3845b7badebbb79695e35f2c3b1a669",
+  "do_not_download_or_execute_PE": true,
+  "notes": [
+    "Source-integrity check is distinct from rerunning experiments.",
+    "LF normalization is reported separately from byte-exact integrity.",
+    "Collection693 is a completed remote collector checkpoint, not a local raw-cache audit."
+  ],
+  "manuscript_baseline_commit_exists_now": "e1d4e7a6ea168b53d248d5f4fa778c49d25d53a7"
+}

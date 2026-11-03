@@ -1,0 +1,14 @@
+﻿claim_id,claim,status,evidence_ids,scope,wording_decision
+C01,Tập EMBER có SHA và feature hash kiểm chứng,supported,E01,2000 rows generic malware; random row folds,Được báo
+C02,U H tăng ROC AULC0.004249 và giảm76 nhãn so Random,supported_in_protocol,E02,Năm outer folds; oracle training labels tới target,Được báo kèm label accounting
+C03,XAI full giảm15.8 phần trăm nhãn so Random,supported_in_protocol,E02,Target validation; không phải annotation hours,Được báo đúng comparator
+C04,Full XAI luôn tốt nhất hoặc vượt Uncertainty ổn định,not_supported,E02,U H tốt nhất AULC U V ít labels; mixed metrics,Không dùng
+C05,Top SHAP ảnh hưởng model hơn random dưới mean median,supported_feature_space,E02,25 fitted models; perturbation không bảo đảm PE validity,Được báo
+C06,OFS đo chất lượng giải thích toàn hệ thống,not_supported,E02,Không validated aggregation hoặc dynamic explanations,Không dùng
+C07,Pilot paired static dynamic 199 mẫu chạy được,supported_pilot,E04,Generic malware event count TF IDF và logistic scorers,Được báo feasibility
+C08,PID giảm FPR hoặc D vượt PI,not_supported,E04,FPR tăng soFixed; PI PID không đổi final decisions,Không dùng
+C09,PID AUC hơn Fixed với ý nghĩa xác nhận,not_established,E04,Bootstrap delta AUC CI cắt0; P và Average cạnh tranh,Không gọi significant advantage
+C10,Collection đạt693 usable,confirmed_checkpoint,E07,Không phải live count hoặc final coverage audit,Được báo checkpoint riêng
+C11,Gate fusion và AL có synergy,not_evaluated,E08 E09,Hai corpus và protocols khác nhau; chưa factorial,Không dùng
+C12,Ransomware zero day sleep evasion realtime đã chứng minh,not_supported,E01 E03 E04,Thiếu label family time và delayed behavior,Không dùng
+C13,Independent verification bởi nhóm bên ngoài,not_established,E02 E04,Separate recomputation path trong cùng dự án,Dùng replay verification

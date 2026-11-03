@@ -1,0 +1,570 @@
+% Bản 15 trang, tính cả bìa. Nguồn chuẩn: Slide_Baove_Luu_Van_Doanh.zip.
+% Biên dịch bằng pdfLaTeX, chạy hai lần để cập nhật tham chiếu.
+% Không dùng số liệu minh họa để báo cáo hiệu quả thực nghiệm.
+\documentclass[aspectratio=169,10pt]{beamer}
+
+% ===== Tiếng Việt và font: giữ tương thích pdfLaTeX như nguồn gốc =====
+\usepackage[utf8]{inputenc}
+\usepackage[T5]{fontenc}
+\usepackage[vietnamese]{babel}
+\usepackage{lmodern}
+\usepackage{graphicx}
+\usepackage{booktabs,tabularx,array,ragged2e}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,calc}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\graphicspath{{assets/}{./}}
+
+% ===== Đúng 15 frame, không có phụ lục hoặc overlay sinh thêm trang =====
+\setbeameroption{hide notes} % Lời dẫn nằm trong \note{...} của từng slide.
+\newcommand{\MainSlideCount}{15}
+
+% ===== Nhận diện UET từ bộ gốc =====
+\definecolor{UETBlue}{RGB}{17,74,126}
+\definecolor{UETBlueDark}{RGB}{7,34,62}
+\definecolor{UETBlueLight}{RGB}{231,242,250}
+\definecolor{UETCyan}{RGB}{0,163,224}
+\definecolor{UETGray}{RGB}{85,96,110}
+\definecolor{UETOrange}{RGB}{244,128,36}
+\definecolor{UETGreen}{RGB}{35,145,90}
+\definecolor{UETRed}{RGB}{190,55,55}
+
+\usetheme{Madrid}
+\usecolortheme[named=UETBlue]{structure}
+\setbeamercolor{normal text}{fg=UETBlueDark,bg=white}
+\setbeamercolor{frametitle}{fg=UETBlueDark,bg=white}
+\setbeamercolor{title}{fg=white,bg=UETBlue}
+\setbeamercolor{block title}{fg=white,bg=UETBlue}
+\setbeamercolor{block body}{fg=UETBlueDark,bg=UETBlueLight}
+\setbeamercolor{alerted text}{fg=UETOrange}
+\setbeamercolor{section in toc}{fg=UETBlue}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{itemize item}{\color{UETCyan}$\blacktriangleright$}
+\setbeamertemplate{itemize subitem}{\color{UETCyan}$\circ$}
+\setbeamertemplate{enumerate item}{\color{UETCyan}\insertenumlabel.}
+% Giữ lề và font mặc định của theme Madrid như nguồn seminar gốc.
+\setbeamertemplate{frametitle}{%
+  \vspace{0.2cm}%
+  {\large\bfseries\color{UETBlueDark}\insertframetitle\par}%
+  \vspace{0.12cm}%
+  {\color{UETBlue}\rule{\linewidth}{0.8pt}}%
+}
+
+% Logo và khung dự phòng theo nguồn seminar gốc.
+\newcommand{\SafeLogo}[2]{%
+  \IfFileExists{assets/#1}{\includegraphics[height=#2]{assets/#1}}{%
+    \begin{tikzpicture}[baseline=-0.6ex]
+      \draw[UETBlue,line width=0.6pt,rounded corners=1pt] (0,0) rectangle (0.55,0.30);
+    \end{tikzpicture}}%
+}
+\setbeamertemplate{footline}{%
+  \leavevmode%
+  \vspace{0.05cm}%
+  \hbox{%
+    \begin{beamercolorbox}[wd=.72\paperwidth,ht=2.2ex,dp=1ex,leftskip=0.3cm]{}%
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.28\paperwidth,ht=2.2ex,dp=1ex,rightskip=0.3cm]{}%
+      \hfill\scriptsize\color{UETGray}%
+      \insertframenumber/\MainSlideCount
+      \hspace{0.12cm}\SafeLogo{fit_logo.png}{1.8ex}%
+      \hspace{0.08cm}\SafeLogo{uet_logo.png}{1.8ex}%
+    \end{beamercolorbox}%
+  }%
+  \vspace{0.05cm}%
+}
+
+\newcommand{\key}[1]{\textcolor{UETBlue}{\textbf{#1}}}
+\newcommand{\warn}[1]{\textcolor{UETOrange}{\textbf{#1}}}
+\newcommand{\slidehint}[1]{\par\vspace{.18cm}{\footnotesize\color{UETGray}#1\par}}
+\newcolumntype{Y}{>{\RaggedRight\arraybackslash}X}
+\newcolumntype{P}[1]{>{\RaggedRight\arraybackslash}p{#1}}
+\newcommand{\clipop}{\operatorname{clip}}
+\newcommand{\sigmoid}{\operatorname{sigmoid}}
+
+\title[Seminar luận văn]{Hệ thống phát hiện Ransomware dựa trên Phân tích đa tầng, tích hợp Học tích cực \& Kiểm chứng độ trung thực XAI}
+\subtitle{Báo cáo luận văn với giảng viên hướng dẫn}
+\author{Lưu Văn Doanh}
+\institute{Đại học Quốc gia Hà Nội\\Trường Đại học Công nghệ\\GVHD: PGS.TS. Trương Ninh Thuận}
+\date{Hà Nội, 2026}
+
+\begin{document}
+
+% ===== 01/15. Bìa theo bộ báo cáo chuẩn =====
+\begin{frame}[plain]
+\begin{tikzpicture}[remember picture,overlay]
+\node[anchor=north east] at ([xshift=-0.35cm,yshift=-0.22cm]current page.north east) {\SafeLogo{uet_logo.png}{1.08cm}};
+\node[anchor=north east] at ([xshift=-1.55cm,yshift=-0.22cm]current page.north east) {\SafeLogo{fit_logo.png}{1.08cm}};
+\end{tikzpicture}
+\begin{center}
+\vspace{0.15cm}
+{\bfseries\color{UETBlueDark}\large ĐẠI HỌC QUỐC GIA HÀ NỘI}\\
+\vspace{0.03cm}
+{\bfseries\color{UETBlueDark}\large TRƯỜNG ĐẠI HỌC CÔNG NGHỆ}\\
+\vspace{0.38cm}
+{\bfseries\color{UETBlue}\fontsize{28}{32}\selectfont BÁO CÁO LUẬN VĂN THẠC SĨ}\\
+\vspace{0.28cm}
+{\bfseries\color{UETBlueDark}\normalsize NGÀNH: KỸ THUẬT PHẦN MỀM \hspace{1.2cm} MÃ SỐ: 8480103.01}\\
+\vspace{0.22cm}
+{\bfseries\color{UETBlueDark}\normalsize NGƯỜI THỰC HIỆN: \textcolor{UETBlue}{LƯU VĂN DOANH}}\\
+\vspace{0.48cm}
+{\Large\bfseries\color{UETBlueDark}
+Hệ thống phát hiện Ransomware dựa trên Phân tích đa tầng,\\
+tích hợp Học tích cực \& Kiểm chứng độ trung thực XAI
+}\\
+\vspace{0.28cm}
+{\normalsize\color{UETBlueDark} GVHD: PGS.TS. Trương Ninh Thuận}\\
+\vfill
+{\small\color{UETGray} Hà Nội, 2026}
+\end{center}
+\note{Khoảng 20 giây. Em xin trình bày bài toán, kiến trúc và ba hướng đóng góp của luận văn. Phần số liệu chỉ tóm tắt kết quả đã xác minh. Tình huống PID dùng dữ liệu giả định và được ghi nhãn riêng.}
+\end{frame}
+
+% ===== 02/15. Tổng quan nội dung =====
+\begin{frame}{Tổng quan nội dung}
+\begin{enumerate}
+  \setlength{\itemsep}{.28cm}
+  \item \key{Bài toán, mục tiêu và đóng góp nghiên cứu}
+  \item \key{Nền tảng và kiến trúc hệ thống đa tầng}
+  \item \key{Các cơ chế đề xuất}: PID Fusion, XAI-Guided AL và Fidelity
+  \item \key{Thiết kế đánh giá và kết quả chính}
+  \item \key{Tình huống minh họa, giới hạn và hướng hoàn thiện}
+\end{enumerate}
+\vspace{.18cm}
+\begin{block}{Trọng tâm trình bày}
+Làm rõ vai trò của từng thành phần, tóm tắt bằng chứng hiện có và các nội dung cần Thầy góp ý.
+\end{block}
+\note{Khoảng 25 giây. Bài trình bày gồm năm phần. Em bắt đầu từ bài toán và đóng góp, sau đó trình bày nền tảng cùng kiến trúc đa tầng. Tiếp theo là cơ chế PID, Active Learning và Fidelity. Phần đánh giá chỉ tóm tắt thiết kế và kết quả chính. Cuối cùng em dùng một tình huống minh họa và xin Thầy góp ý về hướng hoàn thiện.}
+\end{frame}
+
+% ===== 03/15. Bài toán và mục tiêu nghiên cứu =====
+\begin{frame}{Bài toán và mục tiêu nghiên cứu}
+\begin{columns}[T,onlytextwidth]
+  \begin{column}{.51\textwidth}
+    \begin{block}{Bài toán trên tệp Windows PE}
+      \begin{itemize}
+        \setlength{\itemsep}{.15cm}
+        \item Biến thể và kỹ thuật che giấu gây khó cho phát hiện tĩnh.
+        \item Quan sát hành vi cần thời gian và tài nguyên.
+        \item Chuyên gia cần hiểu lý do cảnh báo và chọn mẫu cần gán nhãn.
+      \end{itemize}
+    \end{block}
+  \end{column}
+  \begin{column}{.45\textwidth}
+    \begin{block}{Mục tiêu của luận văn}
+      Kết hợp phân tích đa tầng với XAI để hỗ trợ quyết định, cập nhật mô hình và kiểm tra lời giải thích.
+    \end{block}
+    \vspace{.12cm}
+    \key{Các tiêu chí cần cân bằng}\\[.10cm]
+    Hiệu năng phát hiện, độ trễ và chi phí gán nhãn.
+  \end{column}
+\end{columns}
+\slidehint{Định hướng ứng dụng: ransomware. Phạm vi kiểm chứng hiện có: malware tĩnh.}
+\note{Khoảng 55 giây. Em bắt đầu từ yêu cầu hỗ trợ phân tích Windows PE. Phân tích tĩnh cung cấp điểm ban đầu, nhưng với mẫu chưa rõ cần thêm bằng chứng. Nếu chạy quan sát động cho mọi mẫu thì chi phí tăng. Đồng thời mô hình cần giải thích được và cập nhật qua các mẫu có giá trị gán nhãn. Mục tiêu là thiết kế quy trình kết hợp các yêu cầu này, với định hướng ứng dụng ransomware. Phần thực nghiệm hiện có mới xác nhận malware tĩnh trên EMBER.}
+% Nguồn: results/confirmatory_20261019_ember_identity/README.md
+\end{frame}
+
+% ===== 04/15. Nền tảng kế thừa và phần đề xuất của luận văn =====
+\begin{frame}{Nền tảng kế thừa và phần đề xuất của luận văn}
+\small
+\renewcommand{\arraystretch}{1.38}
+\begin{tabularx}{\textwidth}{@{}P{.24\textwidth}Y P{.24\textwidth}@{}}
+\toprule
+\key{Nền tảng kế thừa} & \key{Phần đề xuất, triển khai} & \key{Cách kiểm chứng}\\
+\midrule
+Đặc trưng EMBER và mô hình tĩnh & Cổng chuyển tuyến và quy tắc dung hợp theo lịch sử bất đồng & So Average, Fixed, P, PI và PID\\
+Vòng AL và Uncertainty & Bổ sung entropy hướng và phương sai SHAP vào điểm chọn mẫu & So Random, U, U+H, U+V và XAI\_full\\
+Giải thích TreeSHAP & Quy trình deletion và kiểm tra độ ổn định trên feature PE & Random mask, đổi seed và outer fold\\
+\bottomrule
+\end{tabularx}
+\vspace{.12cm}
+\begin{block}{Giá trị cần làm rõ}
+Cách dùng lịch sử bất đồng và thông tin SHAP trong cùng pipeline, kèm đối chứng để đánh giá từng thành phần.
+\end{block}
+{\scriptsize\color{UETGray}Nền tảng tham chiếu:
+\href{https://arxiv.org/abs/1804.04637}{EMBER (2018)};
+\href{https://doi.org/10.1038/s42256-019-0138-9}{TreeSHAP (2020)};
+\href{https://research.cs.wisc.edu/techreports/2009/TR1648.pdf}{Settles, Active Learning (2009)}.\par}
+\note{Khoảng 60 giây. Đặc trưng EMBER, mô hình cây, TreeSHAP và vòng truy vấn nhãn đều là nền tảng kế thừa. Phần luận văn triển khai và khảo sát là quy tắc dung hợp theo lịch sử bất đồng, cách thêm tín hiệu SHAP vào acquisition score và quy trình đánh giá giải thích trên PE. Giá trị của các lựa chọn phải thể hiện qua ablation và đối chứng, không chỉ qua việc ghép thư viện. Ba tài liệu ở cuối trang mô tả nền tảng tham chiếu, chưa phải một khảo sát đầy đủ để khẳng định tính đầu tiên của toàn bộ khung. U trong bảng là Uncertainty.}
+% Tham chiếu nền tảng, không dùng để suy ra kết quả thực nghiệm của luận văn:
+% Anderson & Roth (2018), EMBER: An Open Dataset for Training Static PE Malware Machine Learning Models. https://arxiv.org/abs/1804.04637
+% Lundberg et al. (2020), From local explanations to global understanding with explainable AI for trees. https://doi.org/10.1038/s42256-019-0138-9
+% Settles (2009), Active Learning Literature Survey, TR1648, University of Wisconsin-Madison. https://research.cs.wisc.edu/techreports/2009/TR1648.pdf
+% Phần triển khai: src/experiments/signals.py; src/pid_fusion.py; src/experiments/robust_fidelity.py.
+\end{frame}
+
+% ===== 05/15. Nền tảng tĩnh: LightGBM và TreeSHAP =====
+\begin{frame}{Nền tảng tĩnh: LightGBM và TreeSHAP}
+\begin{columns}[T,onlytextwidth]
+  \begin{column}{.31\textwidth}
+    \begin{block}{Đặc trưng PE}
+      Vector EMBER 2.381 chiều.\\[.16cm]
+      Thống kê byte, entropy, header, section, import và các nhóm liên quan.
+    \end{block}
+  \end{column}
+  \begin{column}{.31\textwidth}
+    \begin{block}{LightGBM}
+      Học trên dữ liệu bảng.\\[.16cm]
+      Sinh điểm tĩnh $p_{\mathrm{static}}$ để phân loại và chuyển tuyến.
+    \end{block}
+  \end{column}
+  \begin{column}{.31\textwidth}
+    \begin{block}{TreeSHAP}
+      Phân rã dự đoán thành đóng góp đặc trưng.\\[.16cm]
+      Dùng tiếp cho chọn mẫu AL và đánh giá Fidelity.
+    \end{block}
+  \end{column}
+\end{columns}
+\vspace{.25cm}
+\begin{block}{Cách đọc giải thích}
+Đóng góp SHAP mô tả hành vi của mô hình. Muốn diễn giải ở mức API hoặc section cần ánh xạ đúng nhóm đặc trưng.
+\end{block}
+\note{Khoảng 55 giây. Đầu vào là feature EMBER của PE, không phải ảnh hay chuỗi thực thi. LightGBM tạo điểm phân loại và TreeSHAP phân rã raw score thành đóng góp các tọa độ. SHAP giải thích điều mô hình sử dụng, chưa chứng minh nguyên nhân hành vi mã độc. Em không gán một chỉ số feature tùy ý thành API mã hóa. Muốn đọc ý nghĩa từng feature cần đúng phiên bản extractor và mapping nhóm.}
+% Nguồn: results/confirmatory_20261019_ember_identity/README.md; src/experiments/signals.py
+\end{frame}
+
+% ===== 06/15. Kiến trúc phát hiện, cập nhật và kiểm chứng =====
+\begin{frame}{Kiến trúc phát hiện, cập nhật và kiểm chứng}
+\begin{center}
+\resizebox{.98\linewidth}{!}{%
+\begin{tikzpicture}[
+  stage/.style={draw=UETBlue,fill=UETBlueLight,rounded corners=2pt,
+    align=center,font=\small,minimum height=.85cm,text width=2.35cm},
+  offline/.style={stage,fill=white,dashed},
+  route/.style={-{Stealth[length=2mm]},thick,draw=UETBlue},
+  offroute/.style={-{Stealth[length=2mm]},thick,dashed,draw=UETGray},
+  lab/.style={font=\scriptsize,fill=white,inner sep=2pt,text=UETGray}]
+  \node[stage] (static) at (0,0) {Tệp PE\\LightGBM + TreeSHAP};
+  \node[stage,text width=2.0cm] (gate) at (4,0) {Cổng\\chuyển tuyến};
+  \node[stage] (early) at (8,0) {Quyết định\\tĩnh sớm};
+  \node[stage,text width=2.05cm] (dynamic) at (4,-1.85) {Quan sát động\\theo thời gian};
+  \node[stage] (fusion) at (8,-1.85) {Dung hợp PID};
+  \node[stage,text width=2.0cm] (audit) at (11,-.90) {Điểm, SHAP\\và ID artifact};
+  \node[offline,text width=3.0cm] (al) at (.2,-4.05) {AL: chọn mẫu\\Chuyên gia gán nhãn};
+  \node[offline,text width=2.8cm] (train) at (4.35,-4.05) {Huấn luyện lại\\Lưu phiên bản model};
+  \node[offline,text width=3.1cm] (fid) at (10.5,-4.05) {Fidelity: deletion\\và độ ổn định SHAP};
+
+  \draw[route] (static) -- (gate);
+  \draw[route] (gate) -- node[lab,above]{Đủ chắc chắn} (early);
+  \draw[route] (gate) -- node[lab,right]{Chưa rõ} (dynamic);
+  \draw[route] (dynamic) -- node[lab,above]{$p_{\mathrm{dynamic}}$} (fusion);
+  \draw[route] (static.south) -- (0,-2.75) --
+    node[lab,below]{$p_{\mathrm{static}}$ của mẫu chuyển tuyến} (8,-2.75) -- (fusion.south);
+  \draw[route] (early.east) -- (11,0) -- (audit.north);
+  \draw[route] (fusion.east) -- (11,-1.85) -- (audit.south);
+  \draw[offroute] (audit.east) -- (12.7,-.90) -- (12.7,-3.25) -- (.2,-3.25) -- (al.north);
+  \draw[offroute] (12.7,-3.25) -- (10.5,-3.25) -- (fid.north);
+  \draw[offroute] (al) -- (train);
+  \draw[offroute] (train.south) -- (4.35,-4.90) --
+    node[lab,below]{Cập nhật có kiểm soát, lưu phiên bản} (-1.85,-4.90) -- (-1.85,0) -- (static.west);
+\end{tikzpicture}%
+}
+\end{center}
+\slidehint{Nét liền: quyết định theo mẫu. Nét đứt: vòng cập nhật và đánh giá. Artifact liên kết đúng model, dữ liệu và report.}
+\note{Khoảng 75 giây. Sơ đồ thể hiện cả ba phần. Nhánh trên xử lý tệp và chỉ chuyển mẫu chưa rõ sang quan sát động. PID cần hai điểm của đúng mẫu. Kết quả lưu cùng SHAP và định danh artifact. Ở vòng cập nhật, mẫu trong pool được chấm điểm AL, chuyên gia gán nhãn, rồi mới huấn luyện lại và lưu phiên bản model. Fidelity đọc đúng model, dữ liệu và SHAP để đánh giá, không phải một điều kiện bắt buộc trên đường cảnh báo. Mỗi fold thực nghiệm khóa test riêng, không đưa nhãn test vào vòng cập nhật. Cổng chuyển tuyến dùng ngưỡng chọn trên validation.}
+% Nguồn thiết kế: README.md; src/experiments/active_learning.py; robust_fidelity.py; temporal_fusion.py.
+\end{frame}
+
+% ===== 07/15. Từ sự kiện quan sát đến điểm động =====
+\begin{frame}{Từ sự kiện quan sát đến điểm động}
+\begin{columns}[T,onlytextwidth]
+  \begin{column}{.48\textwidth}
+    \begin{block}{Report theo cùng execution}
+      \begin{itemize}
+        \setlength{\itemsep}{.12cm}
+        \item Ghi timestamp và SHA-256 mẫu.
+        \item Đếm tệp ghi, đổi tên, xóa ở các mốc 5, 15, 30 và 60 giây.
+        \item Bổ sung biến đổi entropy nếu collector hỗ trợ.
+      \end{itemize}
+    \end{block}
+  \end{column}
+  \begin{column}{.48\textwidth}
+    \begin{block}{Scorer động đề xuất}
+      \small
+      \[
+        z_k=(n_{\mathrm{write}},n_{\mathrm{rename}},n_{\mathrm{delete}},\ldots)
+      \]
+      \[
+        p_{\mathrm{dynamic},k}=g_\theta(z_{\leq k})
+      \]
+      $g_\theta$ chỉ dùng tín hiệu đến mốc $k$. Fit trên train, chọn cấu hình trên validation và khóa trước test.
+    \end{block}
+  \end{column}
+\end{columns}
+\slidehint{Cần report động ghép đúng mẫu để triển khai scorer. Không có hành vi và lỗi collector là hai trạng thái khác nhau.}
+\note{Khoảng 55 giây. Điểm động không tự có từ một sự kiện đổi tên. Pipeline đề xuất gom sự kiện theo cùng execution thành các feature đếm hoặc tốc độ, rồi dùng scorer được fit bằng train. Ký hiệu g là một họ model cần thiết kế khi có dữ liệu, chưa phải một scorer đã được huấn luyện. Nếu gọi đầu ra là xác suất, cần kiểm tra calibration. Không đọc sự kiện tương lai hoặc nhãn thật của mẫu để tính điểm hiện tại. Watchdog theo dõi tệp không mặc nhiên thu được API, registry hoặc network. Những nguồn đó cần collector riêng. Các điểm động trong tình huống minh họa ở slide 13 là đầu vào giả định, không phải đầu ra thực của g.}
+% Nguồn yêu cầu dữ liệu: docs/CONFIRMATORY_RUNBOOK.md; docs/PID_INPUT_CHECKLIST.md.
+\end{frame}
+
+% ===== 08/15. Vì sao khảo sát PID thay cho trọng số cố định? =====
+\begin{frame}{Vì sao khảo sát PID thay cho trọng số cố định?}
+\[
+  p_{\mathrm{fused},k}=w_kp_{\mathrm{static}}+(1-w_k)p_{\mathrm{dynamic},k}
+\]
+\begin{columns}[T,onlytextwidth]
+  \begin{column}{.45\textwidth}
+    \begin{block}{Trọng số cố định}
+      \[
+        w_k=w_0
+      \]
+      Đơn giản, dễ kiểm tra.\\[.15cm]
+      Giữ cùng cách kết hợp khi chuỗi quan sát thay đổi.
+    \end{block}
+  \end{column}
+  \begin{column}{.51\textwidth}
+    \begin{block}{Trọng số theo lịch sử bất đồng}
+      \begin{itemize}
+        \setlength{\itemsep}{.12cm}
+        \item \textbf{P}: bất đồng hiện tại.
+        \item \textbf{I}: bất đồng tích lũy.
+        \item \textbf{D}: tốc độ thay đổi bất đồng.
+      \end{itemize}
+      Reset theo execution và giới hạn tích phân.
+    \end{block}
+  \end{column}
+\end{columns}
+\vspace{.12cm}
+\key{Giả thuyết cần kiểm chứng:} lịch sử bất đồng có cải thiện quyết định đủ để biện minh độ phức tạp thêm?
+\slidehint{So Average, Fixed, P, PI và PID. Chọn gain trên validation. Fusion vẫn cần thời gian thu tín hiệu động.}
+\note{Khoảng 65 giây. Fixed là baseline quan trọng vì đơn giản và ít tham số. PID chỉ đáng giữ nếu thông tin lịch sử tạo ra lợi ích khi so cùng điểm đầu vào, split và policy. Công thức đang cài đặt là $e_k=p_{\mathrm{static}}-p_{\mathrm{dynamic},k}$, $I_k=\clipop(I_{k-1}+e_k\Delta t_k,I_{\min},I_{\max})$, $D_k=(e_k-e_{k-1})/\Delta t_k$ với $D_0=0$, $u_k=K_pe_k+K_iI_k+K_dD_k$ và $w_k=\clipop(\sigmoid(u_k),0.1,0.9)$. Reset theo execution và clip tích phân. Đây là heuristic dung hợp, không có bảo đảm tự động về ổn định vật lý, giảm FPR hay chống sleep evasion. PID không loại bỏ thời gian quan sát động. Giữ cả kết quả âm nếu không vượt Fixed hoặc PI.}
+% Nguồn công thức: src/pid_fusion.py; src/experiments/temporal_fusion.py.
+\end{frame}
+
+% ===== 09/15. XAI-Guided Active Learning =====
+\begin{frame}{XAI-Guided Active Learning}
+\begin{columns}[T,onlytextwidth]
+  \begin{column}{.53\textwidth}
+    \begin{block}{Điểm chọn mẫu}
+      \[
+        S(x)=\alpha\widetilde U(x)+\beta\widetilde H(x)+\gamma\widetilde V(x)
+      \]
+      \begin{itemize}
+        \item $U$: bất định xác suất.
+        \item $H$: entropy của cân bằng tổng SHAP dương/âm.
+        \item $V$: phương sai đóng góp SHAP giữa các đặc trưng.
+      \end{itemize}
+    \end{block}
+  \end{column}
+  \begin{column}{.43\textwidth}
+    \begin{block}{Vòng học có chuyên gia}
+      \begin{enumerate}
+        \setlength{\itemsep}{.12cm}
+        \item Chấm điểm trên pool.
+        \item Chọn mẫu theo ngân sách.
+        \item Chuyên gia phân tích, gán nhãn.
+        \item Huấn luyện lại mô hình.
+      \end{enumerate}
+    \end{block}
+  \end{column}
+\end{columns}
+\slidehint{Chuẩn hóa từng tín hiệu trên pool. So với Random, Uncertainty, U+H và U+V ở cùng ngân sách.}
+\note{Khoảng 65 giây. Hai mẫu có bất định tương tự vẫn có thể có cấu trúc giải thích khác nhau. Em thử dùng entropy hướng đóng góp và độ phân tán SHAP để chấm thêm giá trị chọn mẫu. Các tín hiệu được min--max trên pool tại từng vòng. Mẫu được chuyên gia gán nhãn rồi mới học lại, không lấy dự đoán làm nhãn chuẩn. Trong thí nghiệm offline, việc truy vấn được mô phỏng bằng mở nhãn sẵn có với cùng ngân sách cho các chiến lược. Điều đó chưa đo số giờ lao động của chuyên gia.}
+% Nguồn: src/experiments/signals.py; results/confirmatory_20261019_ember_identity/README.md
+\end{frame}
+
+% ===== 10/15. Kiểm chứng giải thích TreeSHAP =====
+\begin{frame}{Kiểm chứng giải thích TreeSHAP}
+\begin{columns}[T,onlytextwidth]
+  \begin{column}{.31\textwidth}
+    \begin{block}{Tính cộng}
+      Tổng SHAP và bias phải tái tạo raw score của đúng model đã lưu.
+    \end{block}
+  \end{column}
+  \begin{column}{.31\textwidth}
+    \begin{block}{Faithfulness}
+      Che top-$k$ đặc trưng và so với che ngẫu nhiên cùng kích thước.\\[.12cm]
+      Baseline từ train: mean và median.
+    \end{block}
+  \end{column}
+  \begin{column}{.31\textwidth}
+    \begin{block}{Độ ổn định}
+      Đối chiếu thứ hạng và tập top-$k$ khi đổi model seed hoặc outer fold.
+    \end{block}
+  \end{column}
+\end{columns}
+\vspace{.28cm}
+\begin{block}{Phạm vi diễn giải}
+Deletion diễn ra trong không gian feature. Các khía cạnh được báo cáo riêng, chưa gộp thành điểm OFS.
+\end{block}
+\note{Khoảng 55 giây. Em giữ ba kiểm tra trực tiếp có thể tái lập. Tính cộng kiểm tra model và giải thích có khớp nhau. Deletion kiểm tra thứ hạng feature với hai baseline từ train và đối chứng ngẫu nhiên. Stability cho biết giải thích thay đổi khi model hoặc phân hoạch đổi. Đây chưa phải đánh giá nhân quả hay chứng minh rằng vector sau che tương ứng với một PE hợp lệ. Em bỏ cách diễn giải OFS bằng một điểm có thể chứng minh giải thích không có ảo giác.}
+% Nguồn: src/experiments/signals.py; src/experiments/robust_fidelity.py; results/confirmatory_20261019_ember_identity/README.md
+\end{frame}
+
+% ===== 11/15. Thiết kế đánh giá và phạm vi dữ liệu =====
+\begin{frame}{Thiết kế đánh giá và phạm vi dữ liệu}
+\begin{columns}[T,onlytextwidth]
+  \begin{column}{.47\textwidth}
+    \begin{block}{Dữ liệu static có định danh}
+      \begin{itemize}
+        \setlength{\itemsep}{.12cm}
+        \item 2.000 mẫu EMBER, 2.381 feature.
+        \item 1.500 benign, 500 malware.
+        \item Có SHA-256, source index và hash feature theo hàng.
+      \end{itemize}
+    \end{block}
+  \end{column}
+  \begin{column}{.49\textwidth}
+    \begin{block}{Giao thức so sánh}
+      \begin{itemize}
+        \setlength{\itemsep}{.12cm}
+        \item AL: 5 outer folds $\times$ 5 seeds, cùng initial set và ngân sách.
+        \item Fidelity: 25 model, hai baseline, random control.
+        \item Chọn cấu hình trên validation, giữ test để đánh giá.
+      \end{itemize}
+    \end{block}
+  \end{column}
+\end{columns}
+\vspace{.10cm}
+\key{Đầu ra có thể kiểm tra lại:} config, prediction, bảng tổng hợp, hash và replay verification.
+\slidehint{EMBER xác nhận malware chung. Bộ static này chưa cung cấp behavior trace cho PID.}
+\note{Khoảng 50 giây. Em chỉ giới thiệu dữ liệu và nguyên tắc để đọc đúng kết quả. Dataset này được khôi phục từ bộ EMBER có định danh, không tự ghép SHA vào một NPZ khác thứ tự. Mỗi outer fold có test riêng, các seed trong một fold không phải các tập dữ liệu độc lập. Lần xác nhận đã replay đủ checkpoint. Nhãn dương là malware, không đổi tên thành ransomware. Phần PID chưa đủ paired corpus.}
+% Nguồn: results/confirmatory_20261019_ember_identity/README.md
+\end{frame}
+
+% ===== 12/15. Kết quả chính: Active Learning và Fidelity =====
+\begin{frame}{Kết quả chính: Active Learning và Fidelity}
+\begin{columns}[T,onlytextwidth]
+  \begin{column}{.49\textwidth}
+    \begin{block}{Hiệu quả chọn mẫu}
+      \small
+      \renewcommand{\arraystretch}{1.20}
+      \begin{tabular}{@{}lcc@{}}
+      \toprule
+      Phương pháp & ROC-AULC & Nhãn\\
+      \midrule
+      Random & 0,9288 & 584\\
+      Uncertainty & 0,9313 & 520\\
+      U+H & \textbf{0,9330} & 508\\
+      U+V & 0,9304 & \textbf{488}\\
+      XAI\_full & 0,9322 & 492\\
+      \bottomrule
+      \end{tabular}
+      \par\vspace{.15cm}
+      \key{U+H tốt nhất về AULC.}\\
+      U+V cần ít nhãn nhất để đạt target.
+    \end{block}
+  \end{column}
+  \begin{column}{.47\textwidth}
+    \begin{block}{Faithfulness qua deletion}
+      \small
+      Mức giảm AUC khi che $k=50$:
+      \vspace{.15cm}
+      \renewcommand{\arraystretch}{1.25}
+      \begin{tabular}{@{}lcc@{}}
+      \toprule
+      Baseline & Top-SHAP & Random\\
+      \midrule
+      Mean & 0,3067 & 0,0010\\
+      Median & 0,3008 & 0,0007\\
+      \bottomrule
+      \end{tabular}
+      \par\vspace{.15cm}
+      \key{Top-SHAP ảnh hưởng mạnh hơn random mask.}\\
+      Giải thích còn nhạy với cách chia dữ liệu.
+    \end{block}
+  \end{column}
+\end{columns}
+\slidehint{Nhãn: số nhãn trung bình đạt target validation. AULC tổng hợp đường học. XAI so với Uncertainty có lợi ích nhỏ, tùy chỉ số.}
+\note{Khoảng 75 giây. Đây là kết quả đã đo, làm tròn bốn chữ số để trình bày. U+H có ROC-AULC 0,9330258667, Random 0,928777 và Uncertainty 0,9312717333. U+V đạt target với trung bình 488 nhãn, thấp nhất. Target được đặt từ full-pool validation của mỗi fold. Cấu hình XAI đầy đủ không nhất quán hơn Uncertainty trên mọi chỉ số. Deletion là trung bình 25 model. Với baseline mean, AUC giảm 0,306729 ở top-SHAP và 0,000979 ở random. Baseline median tương ứng 0,300777 và 0,000658. Độ ổn định giảm khi đổi phân hoạch nhiều hơn khi chỉ đổi seed. Không suy ra vector sau che tương ứng với PE hợp lệ.}
+% Nguồn: results/confirmatory_20261019_ember_identity/al/aulc_summary.csv; al/target_reach_summary.csv; fidelity/deletion_summary.csv; fidelity/shap_stability_summary.csv.
+\end{frame}
+
+% ===== 13/15. Minh họa một báo cáo hỗ trợ chuyên gia =====
+\begin{frame}{Minh họa một báo cáo hỗ trợ chuyên gia}
+{\small\warn{ĐIỂM VÀ ĐÓNG GÓP SHAP ĐỀU LÀ GIẢ ĐỊNH}\par}
+\vspace{.08cm}
+\begin{columns}[T,onlytextwidth]
+  \begin{column}{.52\textwidth}
+    \centering
+    \begin{tikzpicture}
+    \begin{axis}[
+      width=\linewidth,height=4.65cm,
+      xmin=0,xmax=60,ymin=0,ymax=1,
+      xtick={5,15,30,60},ytick={0,.2,.4,.6,.8,1},
+      xlabel={Thời điểm quan sát (giây)},ylabel={Điểm rủi ro},
+      tick label style={font=\scriptsize},label style={font=\scriptsize},
+      grid=major,grid style={draw=UETGray!18},
+      legend style={font=\tiny,at={(.03,.97)},anchor=north west,draw=none,fill=white},
+      legend cell align=left]
+      \addplot[UETGray,dashed,thick] coordinates {(5,.55)(15,.55)(30,.55)(60,.55)};
+      \addlegendentry{Điểm tĩnh}
+      \addplot[UETCyan,thick,mark=*] coordinates {(5,.20)(15,.40)(30,.75)(60,.90)};
+      \addlegendentry{Điểm động giả định}
+      \addplot[UETBlue,thick,mark=square*] coordinates
+        {(5,.403829)(15,.481936)(30,.658637)(60,.759478)};
+      \addlegendentry{Điểm dung hợp}
+    \end{axis}
+    \end{tikzpicture}
+  \end{column}
+  \begin{column}{.44\textwidth}
+    \begin{block}{Mẫu minh họa M-001}
+      \small
+      $p_{\mathrm{static}}=0{,}55$. SHAP theo nhóm:
+      \vspace{.10cm}
+      \renewcommand{\arraystretch}{1.20}
+      \begin{tabularx}{\linewidth}{@{}Yr@{}}
+      \toprule
+      Nhóm giả định & Log-odds\\
+      \midrule
+      Import/API & \textcolor{UETRed}{+0,55}\\
+      Section/entropy & \textcolor{UETRed}{+0,35}\\
+      Header & \textcolor{UETBlue}{$-0{,}40$}\\
+      \bottomrule
+      \end{tabularx}
+      \par\vspace{.14cm}
+      Đóng góp trái chiều giúp chuyên gia xác định phần cần xem lại.
+    \end{block}
+    {\small\key{Đầu ra đề xuất:} cảnh báo theo ngưỡng giả định 0,65, tham chiếu report và hàng đợi duyệt nhãn.}
+  \end{column}
+\end{columns}
+\vspace{.05cm}
+{\scriptsize\color{UETGray}Tên nhóm và giá trị chỉ minh họa. Chưa phải report của PE thật hoặc kết quả đo hiệu năng.\par}
+\note{Khoảng 80 giây. Ví dụ này mô phỏng màn hình chuyên gia cần đọc. Điểm tĩnh là 0,55. Ba đóng góp SHAP giả định có tổng 0,50; cộng bias giả định khoảng $-0,2993293$ được raw log-odds khoảng 0,2006707, tương ứng sigmoid 0,55. Dấu dương kéo điểm về malware, dấu âm kéo về benign. Tên nhóm chỉ là nhãn minh họa, không ánh xạ một feature index cụ thể của model EMBER. Sự trái chiều là thông tin hỗ trợ xem xét, chưa đủ kết luận đây là mẫu có điểm AL cao nhất khi chưa chuẩn hóa trên pool. Điểm động giả định tăng ở mốc 5, 15, 30, 60 giây. Gain minh họa là 0,85; 0,02; 0,35 với tích phân clip [-5,5]. Điểm dung hợp vượt ngưỡng giả định 0,65 ở mốc 30 giây. Đây không phải latency phát hiện. Hành động giao diện là cảnh báo và chuyển chuyên gia xem report, không tự dùng dự đoán làm nhãn huấn luyện. Không thực thi PE.}
+% Công thức PID: src/pid_fusion.py. Toàn bộ số ở frame này là giả định riêng cho minh họa.
+\end{frame}
+
+% ===== 14/15. Tiến độ và điều kiện hoàn thiện luận văn =====
+\begin{frame}{Tiến độ và điều kiện hoàn thiện luận văn}
+\begin{block}{Đã hoàn thành phần kiểm chứng static}
+AL có đối chứng, Fidelity có deletion/stability, runner có lưu artifact và replay kết quả.
+\end{block}
+\vspace{.08cm}
+\small
+\renewcommand{\arraystretch}{1.35}
+\begin{tabularx}{\textwidth}{@{}P{.13\textwidth}P{.36\textwidth}Y@{}}
+\toprule
+\key{Mốc} & \key{Sản phẩm tiếp theo} & \key{Điều kiện hoàn tất}\\
+\midrule
+M1 & Manifest và report động cùng mẫu & SHA-256, hash report và timestamp khớp; có nhiều cửa sổ.\\
+M2 & Scorer động và đối chứng dung hợp & Chọn trên validation, khóa trước test, replay kiểm tra được.\\
+M3 & Đồng bộ bản thảo và slide & Kiến trúc, bảng/hình và kết luận cùng nguồn bằng chứng.\\
+\bottomrule
+\end{tabularx}
+\vspace{.20cm}
+\warn{Nếu M1 chưa đáp ứng trước hạn: chốt PID ở mức thiết kế và minh họa.}
+\slidehint{Mong Thầy chốt phạm vi và thứ tự ưu tiên. Các mốc là sản phẩm cần đạt, chưa phải cam kết ngày hoàn thành.}
+\note{Khoảng 55 giây. Em chuyển kế hoạch thành các đầu ra có điều kiện hoàn tất. M1 phải có report động đúng mẫu và đủ mốc thời gian. M2 mới xây scorer và so Static, Dynamic, Average, Fixed, P, PI và PID, chọn cấu hình trên validation và kiểm tra lại test. M3 đồng bộ phần kiến trúc, thực nghiệm và kết luận của bản thảo với slide. Em chưa gán trạng thái hoàn thành cho từng chương khi chưa rà bản thảo cuối và chưa đặt ngày giả cho những việc còn phụ thuộc dữ liệu. Nếu M1 không kịp, phương án chốt là giữ kết quả AL/Fidelity đã đo và trình bày PID ở mức thiết kế. Chưa mở rộng kết luận sang ransomware-specific, zero-day hoặc EDR thực tế.}
+% Nguồn trạng thái: results/confirmatory_20261019_ember_identity/README.md; docs/CONFIRMATORY_RUNBOOK.md.
+\end{frame}
+
+% ===== 15/15. Kết luận và nội dung xin góp ý =====
+\begin{frame}{Kết luận và nội dung xin góp ý}
+\begin{block}{Tóm tắt}
+  \begin{itemize}
+    \setlength{\itemsep}{.15cm}
+    \item Đề xuất quy trình phân tích PE đa tầng, có giải thích và vòng cập nhật.
+    \item XAI bổ sung tín hiệu chọn mẫu và có cơ chế kiểm tra giải thích.
+    \item AL/Fidelity đã có kết quả static. PID còn cần dữ liệu động ghép cặp.
+  \end{itemize}
+\end{block}
+\vspace{.14cm}
+\key{Mong Thầy góp ý:} phạm vi kết luận và vị trí của PID trước bảo vệ.
+\vspace{.35cm}
+\begin{center}
+  {\Large\bfseries\color{UETBlue}Em xin trân trọng cảm ơn Thầy!}
+\end{center}
+\note{Khoảng 35 giây. Em xin chốt lại giá trị của luận văn ở khung kết hợp và kiểm chứng vai trò từng thành phần. XAI không chỉ hiển thị mà còn tham gia chọn mẫu, còn giải thích được đánh giá với model và các đối chứng. Em mong Thầy góp ý cách giới hạn kết luận theo dữ liệu hiện có và mức hoàn thiện cần thiết cho PID trước bảo vệ. Em xin cảm ơn Thầy.}
+\end{frame}
+
+\end{document}

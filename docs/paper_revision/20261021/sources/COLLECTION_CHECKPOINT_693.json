@@ -1,0 +1,38 @@
+{
+  "thread_id": "01a11edf-0392-71cc-8e62-5c458c0a80ac",
+  "title": "Thiết lập thesis2026",
+  "turn_id": "01a15c99-753e-751f-b5b0-2f253b780df0",
+  "turn_status": "failed",
+  "error": {
+    "message": "You’ve hit your usage limit. Upgrade to Pro (https://chatgpt.com/explore/pro), visit https://chatgpt.com/settings/usage to purchase more credits or try again at 6:25 AM.",
+    "additionalDetails": null
+  },
+  "completed_at": 1792558161,
+  "evidence": [
+    {
+      "type": "commandExecution",
+      "command": "/bin/bash -lc 'MPLCONFIGDIR=/tmp/mplconfig XDG_CACHE_HOME=/tmp/cache .venv/bin/python scripts/run_experiments.py collect-vt-static --cohort outputs/malbehavd_pid_20261020_prepared/cohort_manifest.csv --output outputs/malbehavd_pid_20261020_vt_full --seed 2026 --requests-per-minute 4 --max-new 100'",
+      "exit_code": 0,
+      "output": {
+        "text": "{\n  \"status\": \"vt_metadata_collected\",\n  \"output\": \"/workspace/thesis2026/outputs/malbehavd_pid_20261020_vt_full\",\n  \"usable_rows\": 593,\n  \"coverage\": 0.3083723348933957\n}\n",
+        "truncated": false
+      }
+    },
+    {
+      "type": "commandExecution",
+      "command": "/bin/bash -lc 'MPLCONFIGDIR=/tmp/mplconfig XDG_CACHE_HOME=/tmp/cache .venv/bin/python scripts/run_experiments.py collect-vt-static --cohort outputs/malbehavd_pid_20261020_prepared/cohort_manifest.csv --output outputs/malbehavd_pid_20261020_vt_full --seed 2026 --requests-per-minute 4 --max-new 100'",
+      "exit_code": 0,
+      "output": {
+        "text": "{\n  \"status\": \"vt_metadata_collected\",\n  \"output\": \"/workspace/thesis2026/outputs/malbehavd_pid_20261020_vt_full\",\n  \"usable_rows\": 693,\n  \"coverage\": 0.36037441497659906\n}\n",
+        "truncated": false
+      }
+    }
+  ],
+  "previous_count": 493,
+  "confirmed_usable": 693,
+  "cohort_rows": 1923,
+  "coverage": 0.36037441497659906,
+  "additional_needed_to_90_percent": 1038,
+  "executables_downloaded": false,
+  "captured_at_utc": "2026-10-21T06:53:14Z"
+}

@@ -89,3 +89,7 @@ docs/*.htm
 # OS / logs that are regenerated
 *.log
 ~$*
+
+# SOREL-20M local downloads (meta.db is multi-GB)
+data/sorel20m/*.db
+data/sorel20m/*.sqlite

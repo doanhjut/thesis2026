@@ -1,0 +1,79 @@
+\documentclass[journal]{IEEEtran}
+
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{cite}
+\usepackage{url}
+\usepackage[hidelinks]{hyperref}
+
+\graphicspath{{figures/}}
+\newcommand{\pstatic}{p_{\mathrm{s}}}
+\newcommand{\pdynamic}{p_{\mathrm{d}}}
+\newcommand{\pfused}{p_{\mathrm{f}}}
+\newcommand{\xfull}{\textsc{XAI-Full}}
+
+\title{A Multi-Stage Framework for PE Malware Detection:\\
+Explanation-Guided Active Learning and Controlled XAI Fidelity Evaluation}
+
+\author{Luu Van Doanh and Truong Ninh Thuan%
+\thanks{The authors are with the VNU University of Engineering and Technology,
+Vietnam National University, Hanoi, Vietnam.}%
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Early malware detection must balance rapid decisions against behavioral evidence
+that becomes available only after execution. Static classifiers are efficient but
+remain exposed to packing, obfuscation, and distribution shift; dynamic analysis
+can reveal intent but introduces observation delay and can be evaded by dormant
+execution. A third operational difficulty is adaptation: expert labels are costly,
+and explanations are often presented without testing whether they reflect model
+behavior. This paper develops a multi-stage framework that connects three
+mechanisms: a provenance-aware design for proportional--integral--derivative
+(PID) fusion of static and dynamic scores; an explanation-guided active-learning
+policy combining predictive uncertainty, TreeSHAP directional entropy, and SHAP
+variance; and a controlled feature-space fidelity evaluation with equal-budget
+random masking. In a verified row-disjoint pilot of 2,000 feature vectors with
+unverified upstream sample provenance, the full acquisition policy achieved a
+mean ROC--AUC of $0.9749\pm0.0040$ at 700 training labels, compared with
+$0.9691\pm0.0046$ for uncertainty sampling and $0.9634\pm0.0063$ for random
+sampling. Its paired AUC advantage over uncertainty sampling was positive in all
+five seeds, whereas false-positive-rate improvement occurred in only two. For a
+separately fitted fidelity model, replacing the 25 largest absolute-SHAP
+coordinates by training means reduced ROC--AUC from 0.9802 to 0.8185; 20 random
+masks of equal size retained a mean ROC--AUC of 0.9799. The results support
+explanation-guided prioritization and the behavioral relevance of the SHAP
+ranking under the specified feature-space intervention. Because aligned real
+dynamic observations are unavailable, PID effectiveness and end-to-end latency
+remain open empirical questions rather than reported system results.
+\end{abstract}
+
+\begin{IEEEkeywords}
+active learning, explainable artificial intelligence, explanation fidelity,
+LightGBM, malware detection, PID fusion, portable executable, ransomware,
+TreeSHAP
+\end{IEEEkeywords}
+
+\input{sections/01_introduction}
+\input{sections/02_related_work}
+\input{sections/03_problem_threat_model}
+\input{sections/04_methodology}
+\input{sections/05_experimental_methodology}
+\input{sections/06_results}
+\input{sections/07_discussion}
+\input{sections/08_threats_to_validity}
+\input{sections/09_conclusion}
+
+\appendices
+\input{sections/10_appendices}
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}
