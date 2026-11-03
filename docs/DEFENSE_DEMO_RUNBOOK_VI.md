@@ -46,7 +46,7 @@ pip install -r requirements.txt
 python scripts\run_defense_demo.py --check
 ```
 
-Kết quả đúng phải có `"ok": true`, `source_count: 9` và `pid_scenarios: 4`. Lệnh kiểm tra đối chiếu hash của bundle với chín artifact nguồn, nên nên chạy sau khi clone/pull hoặc trước buổi bảo vệ.
+Kết quả đúng phải có `"ok": true`, `source_count: 9` và `pid_scenarios: 4`. Lệnh kiểm tra đối chiếu hash của bundle với chín artifact nguồn, nên chạy sau khi clone/pull hoặc trước buổi bảo vệ. Với tệp văn bản, bộ kiểm tra chuẩn hóa `LF/CRLF` trước khi tính hash để kết quả nhất quán giữa Linux và Windows; tệp nén/binary vẫn được kiểm tra chính xác theo byte.
 
 Nếu artifact nguồn được chạy lại có chủ đích, tạo lại bundle rồi kiểm tra:
 

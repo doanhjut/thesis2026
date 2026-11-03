@@ -80,7 +80,21 @@ PID_SCENARIOS = [
 ]
 
 
+PORTABLE_TEXT_SUFFIXES = {".csv", ".json", ".md", ".txt"}
+
+
 def sha256_file(path: Path) -> str:
+    """Hash an artifact consistently across LF and CRLF Git checkouts.
+
+    Git may materialize tracked text files with CRLF on Windows.  The measured
+    values are unchanged, so text artifacts are hashed after canonicalizing line
+    endings to LF.  Compressed and other binary artifacts keep byte-exact hashes.
+    """
+
+    if path.suffix.lower() in PORTABLE_TEXT_SUFFIXES:
+        content = path.read_bytes().replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+        return hashlib.sha256(content).hexdigest()
+
     digest = hashlib.sha256()
     with path.open("rb") as handle:
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):
